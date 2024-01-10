@@ -1,7 +1,15 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity} from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+const Stack = createNativeStackNavigator();
+
+
+    
 export default function SignUp() {
+  const MyStack = () => {
     return (
+      
       <View style={styles.container}>
         <View>
         <StatusBar style="auto" />
@@ -30,21 +38,34 @@ export default function SignUp() {
                         autoCorrect={false}
                         secureTextEntry={true}
                         />    
+                        
 
     </View>
 
     <View>
-
-       <TouchableOpacity style={styles.button}> 
+    <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Screen
+          name="SignIn"
+          component={SignIn}
+          options={{title: 'Welcome'}}
+        />
+        <Stack.Screen name="SignIn" component={SignIn} />
+      </Stack.Navigator>
+    </NavigationContainer>
+       <TouchableOpacity on press = {()=> poses.navigation.navigate('SignIn') }
+       style={styles.button}> 
           <Text> Sign Up </Text>
         </TouchableOpacity>
 
+       
         </View>
 
       </View>
       
     );
-  }
+  }}
+  
   const styles = StyleSheet.create({
     container: {
       flex: 1,
@@ -89,7 +110,7 @@ export default function SignUp() {
         fontStyle: 'italic'
         },
        button: {
-        backgroundColor: "white",
+        
         width: 150,
         alignItems: "center",
         top: 100,
