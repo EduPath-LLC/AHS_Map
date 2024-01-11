@@ -4,7 +4,7 @@ import { StyleSheet, Text, View, TextInput, TouchableOpacity} from 'react-native
 
 
     
-export default class SignUp extends Component {
+export default class SignIn extends Component {
   render(){
     return (
       
