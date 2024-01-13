@@ -4,8 +4,7 @@ import { StyleSheet, Text, View, TextInput, TouchableOpacity} from 'react-native
 
 
     
-export default class SignUp extends Component {
-  render(){
+export default function SignUp({navigation}) {
     return (
       
       <View style={styles.container}>
@@ -13,7 +12,6 @@ export default class SignUp extends Component {
         <StatusBar style="auto" />
         <Text style={styles.titlez}>Sign up</Text>
         <Text style={styles.titlem}>AHS Map and Availibilty</Text>
-        {/* <View style={styles.rectangle}/> */}
         <TextInput style={[styles.input, {padding: 10}]}
                             autoCapitalize="none"
                             placeholder="Enter Username"
@@ -44,7 +42,7 @@ export default class SignUp extends Component {
 
        <TouchableOpacity 
         style={styles.button}
-        onPress = {() => this.props.navigation.navigate('SignIn') }
+        onPress = {() => navigation.navigate('SignIn') }
        > 
           <Text> Sign Up </Text>
         </TouchableOpacity>
@@ -55,7 +53,7 @@ export default class SignUp extends Component {
       </View>
       
     );
-    }
+    
   }
   
   
