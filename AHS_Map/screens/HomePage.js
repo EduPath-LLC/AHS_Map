@@ -10,6 +10,8 @@ export default function HomePage({navigation}) {
         <StatusBar style="auto" />
         <Text style={styles.titlem}>AHS Map and Availibilty</Text>
         <Text style={styles.titlez}>Home Page</Text>
+        <Text style={styles.titlep}>Your Location</Text>
+        
       </View>
       
     );
@@ -19,7 +21,7 @@ export default function HomePage({navigation}) {
   const styles = StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: '#F84F10',
+      backgroundColor: '#3091BE',
       alignItems: 'center',
       justifyContent: 'top',
     },
@@ -47,10 +49,10 @@ export default function HomePage({navigation}) {
         alignSelf: "center"
       },
       titlem: {
-        margin: 15,
+        margin: 20,
         paddingVertical: 8,
         borderWidth: 4,
-        borderColor: 'red',
+        borderColor: 'white',
         borderRadius: 6,
         color: 'white',
         textAlign: 'center',
@@ -58,6 +60,18 @@ export default function HomePage({navigation}) {
         fontWeight: 'bold',
         fontStyle: 'italic'
         },
+        titlep: {
+          margin: 15,
+          paddingVertical: 8,
+          borderWidth: 4,
+          borderColor: 'white',
+          borderRadius: 6,
+          color: 'white',
+          textAlign: 'center',
+          fontSize: 30,
+          fontWeight: 'bold',
+          fontStyle: 'italic'
+          },
        button: {
         
         width: 150,

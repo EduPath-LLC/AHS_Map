@@ -75,7 +75,7 @@ export default function SignIn({navigation}) {
   const styles = StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: '#F84F10',
+      backgroundColor: '#3091BE',
       alignItems: 'center',
       justifyContent: 'top',
     },
@@ -106,7 +106,7 @@ export default function SignIn({navigation}) {
         margin: 15,
         paddingVertical: 8,
         borderWidth: 4,
-        borderColor: 'red',
+        borderColor: 'white',
         borderRadius: 6,
         color: 'white',
         textAlign: 'center',
@@ -121,6 +121,6 @@ export default function SignIn({navigation}) {
         top: 100,
         padding: 20,
         borderRadius: 50,
-        backgroundColor: "#00BC9C"
+        backgroundColor: "#FFFFFF"
        }
   });
