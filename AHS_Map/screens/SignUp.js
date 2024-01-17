@@ -1,12 +1,11 @@
 import { StatusBar } from 'expo-status-bar';
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity} from 'react-native';
 
 
     
 export default function SignUp({navigation}) {
     return (
-      
       <View style={styles.container}>
         <View>
         <StatusBar style="auto" />
@@ -47,6 +46,7 @@ export default function SignUp({navigation}) {
           <Text> Sign Up </Text>
         </TouchableOpacity>
 
+        <Text onPress={navigation.navigate("SignIn")}> Already have an Account? Sign In! </Text>
        
         </View>
 

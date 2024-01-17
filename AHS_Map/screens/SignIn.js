@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, Alert} from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from '../Firebase';
 
@@ -20,7 +19,7 @@ export default function SignIn({navigation}) {
                   }
               }
               )
-              .catch((err) => Alert.alert("Login error", err.message));
+              .catch((err) => Alert.alert("Login Error", err.message));
       }
   };
 
@@ -61,10 +60,11 @@ export default function SignIn({navigation}) {
         onPress = {onHandleSignIn}
        > 
           <Text> Sign Up </Text>
+        
         </TouchableOpacity>
-
        
-        </View>
+       <Text onPress={navigation.navigate("SignUp")}> Don't Have an Account, Sign Up! </Text>
+    </View>
 
       </View>
       
