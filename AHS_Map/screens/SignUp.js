@@ -1,16 +1,22 @@
-import { StatusBar } from 'expo-status-bar';
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity} from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, SafeAreaView, StatusBar} from 'react-native';
 
 
     
 export default function SignUp({navigation}) {
     return (
-      <View style={styles.container}>
+      <SafeAreaView style={styles.container}>
+
+      <StatusBar
+         barStyle = "dark-content" 
+         backgroundColor = "#3091BE" 
+         translucent = {true}
+      />
+
         <View>
         <StatusBar style="auto" />
-        <Text style={styles.titlez}>Sign up</Text>
         <Text style={styles.titlem}>AHS Map and Availibilty</Text>
+        <Text style={styles.titlez}>Sign up</Text>
         <TextInput style={[styles.input, {padding: 10}]}
                             autoCapitalize="none"
                             placeholder="Enter Username"
@@ -44,13 +50,14 @@ export default function SignUp({navigation}) {
         onPress = {() => navigation.navigate('SignIn') }
        > 
           <Text> Sign Up </Text>
-        </TouchableOpacity>
 
-        <Text onPress={navigation.navigate("SignIn")}> Already have an Account? Sign In! </Text>
+        </TouchableOpacity>
        
         </View>
 
-      </View>
+        <Text style={{color: "red", fontSize: 15}} onPress={() => navigation.navigate("SignIn")}> Already have an Account? Sign In! </Text>
+
+      </SafeAreaView>
       
     );
     
@@ -64,15 +71,6 @@ export default function SignUp({navigation}) {
       alignItems: 'center',
       justifyContent: 'top',
     },
-    rectangle: {
-        height: 50,
-        width: 380, 
-        backgroundColor: 'white',
-        position: 'absolute',
-        zIndex: 99,
-        top: '27%',
-        left: '5%'
-       },
        input: {
         backgroundColor: 'white',
         borderRadius: 20,
@@ -83,13 +81,13 @@ export default function SignUp({navigation}) {
       },
       titlez: {
         fontSize: 40,
-        top: '28%',
         fontWeight: 'bold',
         color: 'white',
         alignSelf: "center"
       },
       titlem: {
-        marginTop: 16,
+        margin: 15,
+        marginTop: 50,
         paddingVertical: 8,
         borderWidth: 4,
         borderColor: 'white',
@@ -101,12 +99,12 @@ export default function SignUp({navigation}) {
         fontStyle: 'italic'
         },
        button: {
-        
+        marginTop: 100,
         width: 150,
         alignItems: "center",
-        top: 100,
         padding: 20,
         borderRadius: 50,
-        backgroundColor: "#FFFFFF"
+        backgroundColor: "#FFFFFF",
+        marginBottom: 25
        }
   });

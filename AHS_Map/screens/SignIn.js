@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, Alert} from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Alert, StatusBar, SafeAreaView} from 'react-native';
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from '../Firebase';
 
@@ -14,7 +13,6 @@ export default function SignIn({navigation}) {
           signInWithEmailAndPassword(auth, email, password)
               .then(cred => {
                   if (!cred.user.emailVerified){
-                      console.log("hello");
                       navigation.navigate("HomePage");
                   }
               }
@@ -25,7 +23,14 @@ export default function SignIn({navigation}) {
 
 
     return (
-      <View style={styles.container}>
+      <SafeAreaView style={styles.container}>
+
+      <StatusBar
+         barStyle = "dark-content" 
+         backgroundColor = "#3091BE" 
+         translucent = {true}
+      />
+
         <View>
         <StatusBar style="auto" />
         <Text style={styles.titlem}>AHS Map and Availibilty</Text>
@@ -59,14 +64,17 @@ export default function SignIn({navigation}) {
         style={styles.button}
         onPress = {onHandleSignIn}
        > 
-          <Text> Sign Up </Text>
+          <Text> Sign In </Text>
         
         </TouchableOpacity>
        
-       <Text onPress={navigation.navigate("SignUp")}> Don't Have an Account, Sign Up! </Text>
+       
     </View>
 
-      </View>
+    <Text style={{color: "red", fontSize: 15}} onPress={() => navigation.navigate("SignUp")}> Don't Have an Account, Sign Up! </Text>
+
+    
+    </SafeAreaView>
       
     );
   
@@ -79,15 +87,6 @@ export default function SignIn({navigation}) {
       alignItems: 'center',
       justifyContent: 'top',
     },
-    rectangle: {
-        height: 50,
-        width: 380, 
-        backgroundColor: 'white',
-        position: 'absolute',
-        zIndex: 99,
-        top: '27%',
-        left: '5%'
-       },
        input: {
         backgroundColor: 'white',
         borderRadius: 20,
@@ -104,6 +103,7 @@ export default function SignIn({navigation}) {
       },
       titlem: {
         margin: 15,
+        marginTop: 50,
         paddingVertical: 8,
         borderWidth: 4,
         borderColor: 'white',
@@ -115,12 +115,12 @@ export default function SignIn({navigation}) {
         fontStyle: 'italic'
         },
        button: {
-        
+        marginTop: 100,
         width: 150,
         alignItems: "center",
-        top: 100,
         padding: 20,
         borderRadius: 50,
-        backgroundColor: "#FFFFFF"
+        backgroundColor: "#FFFFFF",
+        marginBottom: 25
        }
   });
