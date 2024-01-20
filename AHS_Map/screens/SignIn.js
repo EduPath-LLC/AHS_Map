@@ -13,7 +13,7 @@ export default function SignIn({navigation}) {
           signInWithEmailAndPassword(auth, email, password)
               .then(cred => {
                   if (!cred.user.emailVerified){
-                      navigation.navigate("HomePage");
+                      navigation.navigate("TabNavigation");
                   }
               }
               )
@@ -31,8 +31,8 @@ export default function SignIn({navigation}) {
          translucent = {true}
       />
 
-        <View>
-        <StatusBar style="auto" />
+        <View style={{marginTop: 25}}>
+
         <Text style={styles.titlem}>AHS Map and Availibilty</Text>
         <Text style={styles.titlez}>Sign In</Text>
         <TextInput style={[styles.input, {padding: 10}]}
@@ -103,7 +103,6 @@ export default function SignIn({navigation}) {
       },
       titlem: {
         margin: 15,
-        marginTop: 50,
         paddingVertical: 8,
         borderWidth: 4,
         borderColor: 'white',
