@@ -1,84 +1,68 @@
-import React, { Component } from 'react';
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity} from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
-
-export default function HomePage({navigation}) {
-
-    return (
-      <View style={styles.container}>
-        <StatusBar style="auto" />
-        <Text style={styles.titlem}>AHS Map and Availibilty</Text>
-        <Text style={styles.titlez}>Home Page</Text>
-        <Text style={styles.titlep}>Your Location</Text>
-        
-      </View>
-      
-    );
-  }
-  
-
-  const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: '#3091BE',
-      alignItems: 'center',
-      justifyContent: 'top',
-    },
-    rectangle: {
-        height: 50,
-        width: 380, 
-        backgroundColor: 'white',
-        position: 'absolute',
-        zIndex: 99,
-        top: '27%',
-        left: '5%'
-       },
-       input: {
-        backgroundColor: 'white',
-        borderRadius: 20,
-        width: 350,
-        height: 80,
-        margin: 20,
-        top: '18%'
-      },
-      titlez: {
-        fontSize: 40,
-        fontWeight: 'bold',
-        color: 'white',
-        alignSelf: "center"
-      },
-      titlem: {
-        margin: 20,
-        paddingVertical: 8,
-        borderWidth: 4,
-        borderColor: 'white',
-        borderRadius: 6,
-        color: 'white',
-        textAlign: 'center',
-        fontSize: 30,
-        fontWeight: 'bold',
-        fontStyle: 'italic'
-        },
-        titlep: {
-          margin: 15,
-          paddingVertical: 8,
-          borderWidth: 4,
-          borderColor: 'white',
-          borderRadius: 6,
-          color: 'white',
-          textAlign: 'center',
-          fontSize: 30,
-          fontWeight: 'bold',
-          fontStyle: 'italic'
-          },
-       button: {
-        
-        width: 150,
-        alignItems: "center",
-        top: 100,
-        padding: 20,
-        borderRadius: 50,
-        backgroundColor: "#00BC9C"
-       }
+import React, {useState, useEffect} from 'react';
+import MapView, {Marker} from 'react-native-maps';
+import { StyleSheet, Text, View, Dimensions,} from 'react-native';
+import { PROVIDER_GOOGLE, PROVIDER_DEFAULT } from 'react-native-maps';
+export default function App() {
+  const [mapRegion, setMapRegion] = useState({
+    latitude: 33.1076,
+    longitude: -96.662948,
+    latitudeDelta: .003172,
+    longitudeDelta: .004034
+    
   });
+ 
+  return (
+    <View style={styles.container}>
+      <MapView 
+      
+  customMapStyle={mapStyle} 
+      style={styles.map} 
+      region={mapRegion}
+      />
+    </View>
+  );
+}
+mapStyle=[
+  {
+    "elementType": "labels",
+    "stylers": [
+      {
+        "visibility": "off"
+      }
+    ]
+  },
+  {
+    "featureType": "administrative.land_parcel",
+    "stylers": [
+      {
+        "visibility": "off"
+      }
+    ]
+  },
+  {
+    "featureType": "administrative.neighborhood",
+    "stylers": [
+      {
+        "visibility": "off"
+      }
+    ]
+  },
+  {
+    "featureType": "road",
+    "stylers": [
+      {
+        "visibility": "off"
+      }
+    ]
+  }
+]
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  map: {
+    width: '100%',
+    height: '100%',
+  }
+
+})
