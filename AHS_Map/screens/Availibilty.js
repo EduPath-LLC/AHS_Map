@@ -13,7 +13,7 @@ export default function Availibilty({navigation}) {
          translucent = {true}
       />
 
-        <View style={{marginTop: 25}}>
+        <View>
 
         <Text style={styles.titlem}>AHS Map and Availibilty</Text>
         <Text style={styles.titlez}> Availibilty </Text>

@@ -87,7 +87,6 @@ export default function SignUp({navigation}) {
       },
       titlem: {
         margin: 15,
-        marginTop: 50,
         paddingVertical: 8,
         borderWidth: 4,
         borderColor: 'white',

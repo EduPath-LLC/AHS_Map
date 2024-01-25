@@ -32,7 +32,8 @@ export default function Map() {
         <TextInput style={styles.input} />
       </View>
 
-      <MapView 
+      <MapView
+        provider="google" 
         customMapStyle={mapStyle} 
         style={styles.map} 
         region={mapRegion}
@@ -84,7 +85,7 @@ const styles = StyleSheet.create({
   },
   map: {
     width: '100%',
-    height: '70%',
+    height: '60%',
   },
   titlez: {
     fontSize: 40,
@@ -109,17 +110,21 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "row",
     marginVertical: 10,
+    marginHorizontal: 10,
     padding: 10,
   },
   text: {
     fontSize: 15,
+    alignSelf: "center"
   },
   input: {
     backgroundColor: "white",
-    marginHorizontal: 5,
+    marginRight: 10,
     borderRadius: 5,
-    width: 200,
+    width: 175,
     height: 30,
-    fontSize: 10
+    fontSize: 10,
+    padding: 5,
+    alignSelf: "center"
   }
 })

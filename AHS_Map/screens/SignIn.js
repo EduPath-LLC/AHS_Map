@@ -19,6 +19,10 @@ export default function SignIn({navigation}) {
               )
               .catch((err) => Alert.alert("Login Error", err.message));
       }
+
+      if (email == "" || password == "") {
+        Alert.alert("Login Error", "Please Make Sure All Fields are Filled")
+      }
   };
 
 
@@ -31,7 +35,7 @@ export default function SignIn({navigation}) {
          translucent = {true}
       />
 
-        <View style={{marginTop: 25}}>
+        <View>
 
         <Text style={styles.titlem}>AHS Map and Availibilty</Text>
         <Text style={styles.titlez}>Sign In</Text>
