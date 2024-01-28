@@ -7,6 +7,7 @@ import SignIn from "./screens/SignIn"
 import TabNavigation from './navigation/TabNavigation';
 import ResetPassword from './screens/ResetPassword';
 import Verification from './screens/Verification';
+import Settings from './screens/Settings';
 
 const Stack = createStackNavigator();
 
@@ -23,6 +24,7 @@ export default function App() {
         <Stack.Screen name="ResetPassword" component={ResetPassword} />
         <Stack.Screen name="Verification" component={Verification} />
         <Stack.Screen name="TabNavigation" component={TabNavigation} />
+        <Stack.Screen name="Settings" component={Settings} />
       </Stack.Navigator>
       
   </NavigationContainer>
