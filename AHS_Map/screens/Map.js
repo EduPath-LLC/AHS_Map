@@ -81,7 +81,7 @@ mapStyle=[
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#3091BE"
+    backgroundColor: "white"
   },
   map: {
     width: '100%',
@@ -89,22 +89,24 @@ const styles = StyleSheet.create({
   },
   titlez: {
     fontSize: 40,
-    fontWeight: 'bold',
-    color: 'white',
+    //fontWeight: 'bold',
+    color: 'blue',
     alignSelf: "center",
-    marginBottom: 20
+    marginBottom: 20,
+    fontWeight: '300',
   },
   titlem: {
     margin: 20,
     paddingVertical: 8,
-    borderWidth: 4,
+    //borderWidth: 4,
     borderColor: 'white',
     borderRadius: 6,
-    color: 'white',
+    color: 'blue',
     textAlign: 'center',
     fontSize: 30,
-    fontWeight: 'bold',
-    fontStyle: 'italic'
+    //fontWeight: 'bold',
+    //fontStyle: 'italic',
+    fontWeight: '700',
   },
   choose: {
     flex: 1,
@@ -115,16 +117,20 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 15,
-    alignSelf: "center"
+    alignSelf: "center",
+    top: -40,
+    left: 80,
   },
   input: {
-    backgroundColor: "white",
-    marginRight: 10,
+    backgroundColor: "#cfcfcf",
+    borderColor: 'blue',
+    marginRight: 0,
     borderRadius: 5,
     width: 175,
     height: 30,
     fontSize: 10,
     padding: 5,
-    alignSelf: "center"
+    alignSelf: "center",
+    left: -102.5,
   }
 })

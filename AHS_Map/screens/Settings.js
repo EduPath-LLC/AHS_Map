@@ -1,12 +1,12 @@
 import React from 'react';
-import { SafeAreaView, ScrollView, View, Text, StyleSheet } from 'react-native';
+import { SafeAreaView, ScrollView, View, Text, StyleSheet, Switch } from 'react-native';
 import { TextInput, TouchableOpacity, StatusBar, Alert} from 'react-native';
 import FeatherIcon from 'react-native-vector-icons/Feather'
 const SECTIONS= [
     {
         header: 'Preferences',
         items: [
-            {id: 'language', icon: 'globe', label: 'Language', type: 'select'},
+            {id: 'language', icon: 'globe', label: 'Language', type: 'link'},
             { id: 'darkmode', icon: 'moon', label: 'Dark Mode', type: 'toggle'},
             { id: 'wifi', icon: 'wifi', label : 'Use Wi-Fi', type: 'toggle'},
         ]
@@ -28,6 +28,10 @@ const SECTIONS= [
 ];
 
 export default function Settings(navigation) {
+    const [form, setForm] = React.useState ({
+        darkMode: true,
+        wifi: false,
+    });
     return (
         <SafeAreaView style={{ flex:1, backgroundColor: 'white'}}>
             <StatusBar
@@ -65,6 +69,15 @@ export default function Settings(navigation) {
                                         style={{marginRight:12}}
                                          />
                                         <Text style={styles.rowLabel}>{label}</Text>
+                                        <View style={{ flex: 1,}}></View>
+                                        {type === 'toggle' && <Switch 
+                                         value={form[id]}
+                                         onValueChange={value => setForm({ ...form, [id]: value })}
+                                        />}
+
+                                        {type === 'link' && ( 
+                                            <FeatherIcon name ="chevron-right" color="0c0c0c" size={22}/>
+                                        )}
                                     </View>
                                 </TouchableOpacity>
                     </View>
@@ -88,21 +101,23 @@ const styles= StyleSheet.create({
     title: {
         fontSize: 32,
         fontWeight: '700',
-        color: 'green',
+        color: 'blue',
         marginBottom: 6,
     },
     subtitle: {
         fontSize: 15,
         fontWeight: '500',
-        color: 'yellow',
+        color: 'slategray',
     },
     section: {
         paddingTop: 12,
+        left: 0,
 
     },
     sectionHeader: {
         paddingHorizontal: 24,
         paddingVertical: 8,
+        
     },
     sectionHeaderText: {
         fontSize: 14,
@@ -110,10 +125,12 @@ const styles= StyleSheet.create({
         color: 'blue',
         textTransform: 'uppercase',
         letterSpacing: 1.2,
+        left: 10,
+        marginBottom: 12,
     },
     rowWrapper: {
         paddingLeft: 24,
-        borderTopWidth: 1,
+        //borderTopWidth: 1,
         borderColor: 'black',
         backgroundcolor: 'white',
     },
@@ -122,7 +139,12 @@ const styles= StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'flex-start',
+        backgroundColor:  '#f2f2f2',
+        marginBottom: 12,
+        borderRadius: 8,
         paddingRight: 24,
+        marginRight: 24,
+        paddingHorizontal: 12,
     },
     
     
