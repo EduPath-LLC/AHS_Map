@@ -12,15 +12,13 @@ export default function SignIn({navigation}) {
       if (email !== "" && password !== "") {
           signInWithEmailAndPassword(auth, email, password)
               .then(cred => {
-                  if (!cred.user.emailVerified){
+                  if (cred.user.emailVerified){
                       navigation.navigate("TabNavigation");
                   }
               }
               )
               .catch((err) => Alert.alert("Login Error", err.message));
-      }
-
-      if (email == "" || password == "") {
+      } else {
         Alert.alert("Login Error", "Please Make Sure All Fields are Filled")
       }
   };
@@ -60,7 +58,9 @@ export default function SignIn({navigation}) {
                         />
                         
 
-    </View>
+        </View>
+
+    <Text style={{color: "red", fontSize: 15, marginTop: 60, alignSelf: "flex-end", right: 30}} onPress={() => navigation.navigate("ResetPassword")}> Forgot Password? </Text>
 
     <View>
 
@@ -118,7 +118,7 @@ export default function SignIn({navigation}) {
         fontStyle: 'italic'
         },
        button: {
-        marginTop: 100,
+        marginTop: 75,
         width: 150,
         alignItems: "center",
         padding: 20,

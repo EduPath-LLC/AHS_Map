@@ -1,9 +1,34 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, SafeAreaView, StatusBar} from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, SafeAreaView, StatusBar, Alert} from 'react-native';
+import { createUserWithEmailAndPassword, sendEmailVerification} from "firebase/auth";
+import { auth } from '../Firebase';
 
 
     
 export default function SignUp({navigation}) {
+
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [pw2, setpw2] = useState('')
+
+  registerUser = async (email, password) => {
+    if(password != pw2){
+      Alert.alert("Error", "Passwords Don't Match")
+    } else{
+      try {
+        await createUserWithEmailAndPassword(auth, email, password)
+        .then(userCredential=>userCredential.user)
+        .then(user=>{sendEmailVerification(user)})
+        .then(() => 
+              navigation.navigate("Verification"),
+              Alert.alert('Email Sent')
+        )
+        
+      } catch (e) {
+        Alert.alert("Error", e.message)
+      }
+    }
+  }
     return (
       <SafeAreaView style={styles.container}>
 
@@ -19,12 +44,10 @@ export default function SignUp({navigation}) {
         <Text style={styles.titlez}>Sign up</Text>
         <TextInput style={[styles.input, {padding: 10}]}
                             autoCapitalize="none"
-                            placeholder="Enter Username"
+                            placeholder="Enter Email"
                             autoCorrect={false}
                             secureTextEntry={false}
-                           
-                            
-                            
+                            onChangeText={(text) => setEmail(text)}
                         />
         
         <TextInput style={[styles.input, {padding: 10}]}
@@ -32,12 +55,16 @@ export default function SignUp({navigation}) {
                         placeholder="Enter Password"
                         autoCorrect={false}
                         secureTextEntry={true}
+                        onChangeText={(text) => setPassword(text)}
                         />
-                        <TextInput style={[styles.input, {padding: 10}]}
+        
+
+        <TextInput style={[styles.input, {padding: 10}]}
                         autoCapitalize="none"
                         placeholder="Enter Password Again"
                         autoCorrect={false}
                         secureTextEntry={true}
+                        onChangeText={(text) => setpw2(text)}
                         />    
                         
 
@@ -47,7 +74,7 @@ export default function SignUp({navigation}) {
 
        <TouchableOpacity 
         style={styles.button}
-        onPress = {() => navigation.navigate('SignIn') }
+        onPress = {() => registerUser(email, password) }
        > 
           <Text> Sign Up </Text>
 
@@ -106,4 +133,4 @@ export default function SignUp({navigation}) {
         backgroundColor: "#FFFFFF",
         marginBottom: 25
        }
-  });
+});
