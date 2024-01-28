@@ -29,7 +29,7 @@ export default function Availibilty({navigation}) {
   const styles = StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: '#3091BE',
+      backgroundColor: 'white',
       alignItems: 'center',
       justifyContent: 'top',
     },
@@ -52,21 +52,22 @@ export default function Availibilty({navigation}) {
       },
       titlez: {
         fontSize: 40,
-        fontWeight: 'bold',
-        color: 'white',
+        //fontWeight: 'bold',
+        fontWeight: 300,
+        color: 'blue',
         alignSelf: "center"
       },
       titlem: {
         margin: 20,
         paddingVertical: 8,
-        borderWidth: 4,
-        borderColor: 'white',
+        //borderWidth: 4,
+        borderColor: 'blue',
         borderRadius: 6,
-        color: 'white',
+        color: 'blue',
         textAlign: 'center',
         fontSize: 30,
-        fontWeight: 'bold',
-        fontStyle: 'italic'
+        fontWeight: 700,
+        //fontStyle: 'italic'
         },
         titlep: {
           margin: 15,
@@ -77,7 +78,7 @@ export default function Availibilty({navigation}) {
           color: 'white',
           textAlign: 'center',
           fontSize: 30,
-          fontWeight: 'bold',
+          //fontWeight: 'bold',
           fontStyle: 'italic'
           },
        button: {

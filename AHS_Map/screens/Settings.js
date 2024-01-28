@@ -6,7 +6,7 @@ const SECTIONS= [
     {
         header: 'Preferences',
         items: [
-            {id: 'language', icon: 'globe', label: 'Language', type: 'select'},
+            {id: 'language', icon: 'globe', label: 'Language', type: 'link'},
             { id: 'darkmode', icon: 'moon', label: 'Dark Mode', type: 'toggle'},
             { id: 'wifi', icon: 'wifi', label : 'Use Wi-Fi', type: 'toggle'},
         ]
@@ -112,11 +112,13 @@ const styles= StyleSheet.create({
     },
     section: {
         paddingTop: 12,
+        left: 0,
 
     },
     sectionHeader: {
         paddingHorizontal: 24,
         paddingVertical: 8,
+        
     },
     sectionHeaderText: {
         fontSize: 14,
@@ -128,7 +130,7 @@ const styles= StyleSheet.create({
     },
     rowWrapper: {
         paddingLeft: 24,
-        borderTopWidth: 1,
+        //borderTopWidth: 1,
         borderColor: 'black',
         backgroundcolor: 'white',
     },
@@ -137,7 +139,12 @@ const styles= StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'flex-start',
+        backgroundColor:  '#f2f2f2',
+        marginBottom: 12,
+        borderRadius: 8,
         paddingRight: 24,
+        marginRight: 24,
+        paddingHorizontal: 12,
     },
     rowLabel : {
         fontSize: 17,
