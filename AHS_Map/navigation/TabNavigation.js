@@ -1,7 +1,7 @@
 import * as React from "react";
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
-
+import FeatherIcon from 'react-native-vector-icons/Feather'
 import Availibilty from "../screens/Availibilty";
 import Map from "../screens/Map";
 import Settings from "../screens/Settings";
@@ -26,8 +26,8 @@ export default function TabNavigation() {
                     }
                     else if (route.name === 'Settings') {
                         iconName = focused 
-                          ? 'time' 
-                          : 'time-outline';
+                          ? 'settings' 
+                          : 'settings-outline';
                       }
                                       
                     // You can return any component that you like here!

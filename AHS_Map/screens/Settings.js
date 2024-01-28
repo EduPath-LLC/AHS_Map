@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { SafeAreaView, ScrollView, View, Text, StyleSheet } from 'react-native';
-import { TextInput, TouchableOpacity, StatusBar, Alert} from 'react-native';
+import { TextInput, TouchableOpacity, StatusBar, Alert, Switch} from 'react-native';
 import FeatherIcon from 'react-native-vector-icons/Feather'
 const SECTIONS= [
     {
@@ -28,6 +28,12 @@ const SECTIONS= [
 ];
 
 export default function Settings(navigation) {
+    const [form, setForm] = useState({
+        language: 'English',
+        darkMode: true,
+        wifi: false,
+    })
+
     return (
         <SafeAreaView style={{ flex:1, backgroundColor: 'white'}}>
             <StatusBar
@@ -65,6 +71,13 @@ export default function Settings(navigation) {
                                         style={{marginRight:12}}
                                          />
                                         <Text style={styles.rowLabel}>{label}</Text>
+
+                                        <View style={styles.rowSpacer} />
+                                        {type === 'select' &&(
+                                            <Text style = {styles.rowValue}>{form[id]}</Text>
+                                        )}
+                                        
+                                        {type === 'toggle' && <Switch value={form[id]} onValueChange={(value) => setForm({...form, [id]:value})}/>}
                                     </View>
                                 </TouchableOpacity>
                     </View>
@@ -75,26 +88,27 @@ export default function Settings(navigation) {
             </ScrollView>
         </SafeAreaView>
         
-    )
-}
+    )}
+
 const styles= StyleSheet.create({
     container: {
         paddingVertical: 23,
     },
     header: {
-        paddingHorizontal: 23,
+        paddingHorizontal: 24,
         marginBottom: 12,
+        
     }, 
     title: {
         fontSize: 32,
         fontWeight: '700',
-        color: 'green',
+        color: 'black',
         marginBottom: 6,
     },
     subtitle: {
         fontSize: 15,
         fontWeight: '500',
-        color: 'yellow',
+        color: 'gray',
     },
     section: {
         paddingTop: 12,
@@ -110,6 +124,7 @@ const styles= StyleSheet.create({
         color: 'blue',
         textTransform: 'uppercase',
         letterSpacing: 1.2,
+        marginHorizontal:12,
     },
     rowWrapper: {
         paddingLeft: 24,
@@ -124,6 +139,20 @@ const styles= StyleSheet.create({
         justifyContent: 'flex-start',
         paddingRight: 24,
     },
-    
+    rowLabel : {
+        fontSize: 17,
+        fontWeight: '500',
+        color: '#000'
+    },
+    rowSpacer: {
+        flex: 1,
+    },
+    rowValue: {
+        fontSize: 17,
+        fontWeight: '500',
+        color: '#616161',
+        marginRight: 4,
+
+    }
     
 });
