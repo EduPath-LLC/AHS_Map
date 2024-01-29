@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import MapView, {Marker} from 'react-native-maps';
+import MapView, {Marker, targetLocation, showsMyLocationButton, showsUserLocation} from 'react-native-maps';
 import { StyleSheet, Text, View, Dimensions, StatusBar, TextInput} from 'react-native';
 import { PROVIDER_GOOGLE, PROVIDER_DEFAULT } from 'react-native-maps';
 
@@ -33,13 +33,20 @@ export default function Map() {
       </View>
 
       <MapView
-        provider="google" 
-        customMapStyle={mapStyle} 
-        style={styles.map} 
-        region={mapRegion}
-        minZoomLevel={17}  
+          provider={PROVIDER_GOOGLE}
+          customMapStyle={mapStyle} 
+          showsUserLocation={true}
+          showsMyLocationButton={true}
+          minZoomLevel={17}  
         maxZoomLevel={20} 
-      />
+        style={styles.map} 
+          initialRegion={{
+            latitude: mapRegion.latitude,
+            longitude: mapRegion.longitude,
+            latitudeDelta: 0.0922,
+            longitudeDelta: 0.0421,
+            
+          }}/>
 
       </View>
       
