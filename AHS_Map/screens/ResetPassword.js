@@ -1,9 +1,30 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TextInput, TouchableOpacity, SafeAreaView, StatusBar} from 'react-native';
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, SafeAreaView, StatusBar, Alert} from 'react-native';
+import { sendPasswordResetEmail } from 'firebase/auth';
+import { auth } from '../Firebase';
 
 
     
 export default function ResetPassword({navigation}) {
+  const [email, setEmail] = useState("");
+
+  const handlePasswordChange = async () => {
+    if(email == ""){
+      Alert.alert("Error", "Please Enter an Email")
+    } else {
+      try{
+        await sendPasswordResetEmail(auth, email)
+          .then(() => {
+            Alert.alert("Email Sent")
+        }
+      )
+      } catch (err) {
+        Alert.alert("Error", err.message)
+      }
+
+    }
+  }
+
     return (
       <SafeAreaView style={styles.container}>
 
@@ -17,11 +38,15 @@ export default function ResetPassword({navigation}) {
         <StatusBar style="auto" />
         <Text style={styles.titlem}>AHS Map and Availibilty</Text>
         <Text style={styles.titlez}> Reset Password </Text>
+
+
         <TextInput style={[styles.input, {padding: 10}]}
                             autoCapitalize="none"
-                            placeholder="Enter Email"
+                            placeholder="Enter Username"
                             autoCorrect={false}
                             secureTextEntry={false}
+                            value={email}
+                            onChangeText={(text) => setEmail(text)}
                         />
         
         
@@ -33,7 +58,7 @@ export default function ResetPassword({navigation}) {
 
        <TouchableOpacity 
         style={styles.button}
-        onPress = {() => navigation.navigate('SignIn') }
+        onPress = {handlePasswordChange }
        > 
           <Text> Send Email </Text>
 
