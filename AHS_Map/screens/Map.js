@@ -6,9 +6,9 @@ import { PROVIDER_GOOGLE, PROVIDER_DEFAULT } from 'react-native-maps';
 
 export default function Map() {
   const [mapRegion, setMapRegion] = useState({
-    latitude: 33.1076,
-    longitude: -96.662948,
-    latitudeDelta: .003172,
+    latitude: 33.10940,
+    longitude: -96.66068,
+    latitudeDelta: .172,
     longitudeDelta: .004034
     
   });
@@ -43,7 +43,7 @@ export default function Map() {
           initialRegion={{
             latitude: mapRegion.latitude,
             longitude: mapRegion.longitude,
-            latitudeDelta: 0.0922,
+            latitudeDelta: 0.0122,
             longitudeDelta: 0.0421,
             
           }}/>
