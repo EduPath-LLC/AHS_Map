@@ -37,6 +37,8 @@ export default function Map() {
         customMapStyle={mapStyle} 
         style={styles.map} 
         region={mapRegion}
+        minZoomLevel={17}  
+        maxZoomLevel={20} 
       />
 
       </View>
