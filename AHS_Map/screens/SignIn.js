@@ -44,8 +44,6 @@ export default function SignIn({navigation}) {
                             secureTextEntry={false}
                             value={email}
                             onChangeText={(text) => setEmail(text)}
-                            
-                            
                         />
         
         <TextInput style={[styles.input, {padding: 10}]}
