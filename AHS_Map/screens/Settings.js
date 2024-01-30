@@ -127,6 +127,7 @@ const styles= StyleSheet.create({
         textTransform: 'uppercase',
         letterSpacing: 1.2,
         marginHorizontal:12,
+        marginBottom: 12,
     },
     rowWrapper: {
         paddingLeft: 24,

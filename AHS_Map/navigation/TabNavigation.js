@@ -5,6 +5,7 @@ import FeatherIcon from 'react-native-vector-icons/Feather'
 import Availibilty from "../screens/Availibilty";
 import Map from "../screens/Map";
 import Settings from "../screens/Settings";
+import Schedule from "../screens/Schedule";
 
 const Tab = createBottomTabNavigator();
 
@@ -23,12 +24,16 @@ export default function TabNavigation() {
                       iconName = focused 
                         ? 'time' 
                         : 'time-outline';
+                    } else if (route.name === 'Schedule') {
+                        iconName = focused 
+                          ? 'calendar' 
+                          : 'calendar-outline';
                     }
                     else if (route.name === 'Settings') {
                         iconName = focused 
                           ? 'settings' 
                           : 'settings-outline';
-                      }
+                    }
                                       
                     // You can return any component that you like here!
                     return <Ionicons name={iconName} size={size} color={color} />;
@@ -40,6 +45,7 @@ export default function TabNavigation() {
         >
             <Tab.Screen name="Map" component={Map} />
             <Tab.Screen name="Availibility" component={Availibilty} />
+            <Tab.Screen name="Schedule" component={Schedule} />
             <Tab.Screen name="Settings" component={Settings} />
         </Tab.Navigator>
     );
