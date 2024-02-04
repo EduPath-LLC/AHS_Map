@@ -1,7 +1,6 @@
 import React, {useState, useEffect} from 'react';
-import MapView, {Marker, targetLocation, showsMyLocationButton, showsUserLocation} from 'react-native-maps';
-import { StyleSheet, Text, View, Dimensions, StatusBar, TextInput} from 'react-native';
-import { PROVIDER_GOOGLE, PROVIDER_DEFAULT } from 'react-native-maps';
+import MapView, {Marker, targetLocation, showsMyLocationButton, showsUserLocation, PROVIDER_GOOGLE, Polyline} from 'react-native-maps';
+import { StyleSheet, Text, View, Dimensions, StatusBar, TextInput, Alert} from 'react-native';
 
 
 export default function Map() {
@@ -46,7 +45,23 @@ export default function Map() {
             latitudeDelta: 0.0122,
             longitudeDelta: 0.0421,
             
-          }}/>
+          }}>
+          
+          <Marker coordinate={{latitude: 33.10940, longitude: -96.66068}}/>
+
+          <Polyline 
+          coordinates={[mapRegion, {latitude: 33.1100, longitude: -96.66162}]}
+          strokeColor= 'blue'
+          strokeWidth= '6'
+          />
+
+          <Marker 
+          coordinate={{latitude: 33.1100, longitude: -96.66162}}
+          pinColor='green'
+          />
+
+        
+        </MapView>
 
       </View>
       
