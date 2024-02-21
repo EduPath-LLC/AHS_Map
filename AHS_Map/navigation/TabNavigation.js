@@ -1,7 +1,6 @@
 import * as React from "react";
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
-import FeatherIcon from 'react-native-vector-icons/Feather'
 import Availibilty from "../screens/Availibilty";
 import Map from "../screens/Map";
 import Settings from "../screens/Settings";

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, TextInput, TouchableOpacity, SafeAreaView, StatusBar, Alert} from 'react-native';
 import { createUserWithEmailAndPassword, sendEmailVerification} from "firebase/auth";
-import { auth } from '../Firebase';
+import { auth, db } from '../Firebase';
+import { doc, setDoc } from "firebase/firestore";
 
 
     
@@ -11,6 +12,7 @@ export default function SignUp({navigation}) {
   const [password, setPassword] = useState('')
   const [pw2, setpw2] = useState('')
 
+
   registerUser = async (email, password) => {
     if(password != pw2){
       Alert.alert("Error", "Passwords Don't Match")
@@ -19,15 +21,32 @@ export default function SignUp({navigation}) {
         await createUserWithEmailAndPassword(auth, email, password)
         .then(userCredential=>userCredential.user)
         .then(user=>{sendEmailVerification(user)})
-        .then(() => 
-              navigation.navigate("Verification"),
-              Alert.alert('Email Sent')
+        .then(
+          userdb(email),
+          navigation.navigate("Verification"),
+          Alert.alert('Email Sent')
         )
         
       } catch (e) {
         Alert.alert("Error", e.message)
       }
     }
+  }
+
+  userdb = async (email) => {
+    await setDoc(doc(db, "users", email), {
+      email: email,
+      role: "student",
+      FirstPeriod: "",
+      SecondPeriod: "",
+      ThirdPeriod: "",
+      FourthPeriod: "",
+      FifthPeriod: "",
+      SixthPeriod: "",
+      SeventhPeriod: "",
+      EightPeriod: "",
+    });
+
   }
     return (
       <SafeAreaView style={styles.container}>

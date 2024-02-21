@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { SafeAreaView, ScrollView, View, Text, StyleSheet } from 'react-native';
 import { TextInput, TouchableOpacity, StatusBar, Alert, Switch} from 'react-native';
-import FeatherIcon from 'react-native-vector-icons/Feather'
+import FeatherIcon from 'react-native-vector-icons/Feather';
+
+
 const SECTIONS= [
     {
         header: 'Preferences',
@@ -21,18 +23,26 @@ const SECTIONS= [
     {
         header: 'Content', 
         items: [
-            { id: 'save', icon: 'save', label: 'Saved', type: 'link'},
+            { id: 'edit', icon: 'save', label: 'Edit Schedule', type: 'link'},
             {id: 'download', icon: 'download', label: 'Downloads', type: 'link'},
         ],
     },
 ];
 
-export default function Settings(navigation) {
+
+
+export default function Settings({navigation}) {
     const [form, setForm] = useState({
         language: 'English',
         darkMode: true,
         wifi: false,
     })
+
+    handleSettings = async (id) => {
+        if(id == 'edit'){
+            navigation.navigate("EditSchedule");
+        }
+    }
 
     return (
         <SafeAreaView style={{ flex:1, backgroundColor: 'white'}}>
@@ -62,7 +72,7 @@ export default function Settings(navigation) {
                             ]}
                             key={id}>
                                 <TouchableOpacity
-                                onPress={() => {}}>
+                                onPress={() => {handleSettings(id)}}>
                                     <View style={styles.row}>
                                         <FeatherIcon
                                         name={icon}

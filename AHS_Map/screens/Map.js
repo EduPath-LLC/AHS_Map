@@ -1,9 +1,8 @@
 import React, {useState, useEffect} from 'react';
 import MapView, {Marker, targetLocation, showsMyLocationButton, showsUserLocation, PROVIDER_GOOGLE, Polyline} from 'react-native-maps';
-import { StyleSheet, Text, View, Dimensions, StatusBar, TextInput, Alert} from 'react-native';
+import { StyleSheet, Text, View, Dimensions, StatusBar, TextInput, Alert, Image, TouchableOpacity} from 'react-native';
 
-
-export default function Map() {
+export default function Map(navigation) {
   const [mapRegion, setMapRegion] = useState({
     latitude: 33.10940,
     longitude: -96.66068,
