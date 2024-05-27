@@ -28,13 +28,13 @@ export const styles = StyleSheet.create({
     color: 'white',
     alignSelf: 'center',
   },
-  signInButton: {
+  signUpButton: {
     flexDirection: 'row'
   },
-  signIn: {
+  signUp: {
     color: '#2028DE'
   },
-  signInText: {
+  signUpText: {
     color: 'black'
   }
 });

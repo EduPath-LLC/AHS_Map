@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { View, Pressable, Text, Alert, ScrollView } from 'react-native';
+import { View, Pressable, Text, Alert } from 'react-native';
 import { createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
 
 import { auth, app, db } from '../../firebase'
 
+import BigHeader from '../../components/headers/BigHeader';
 import EmailInput from '../../components/inputs/Email';
 import PasswordInput from '../../components/inputs/Password';
 
@@ -49,14 +50,29 @@ export default function SignUp({navigation}) {
 
   return (
     <View style={styles.fullScreen}>
-      <ScrollView contentContainerStyle={styles.container}>
+
+      <BigHeader />
+
+      <View style={styles.container}>
+
         <EmailInput email={email} onEmailChange={setEmail} />
         <PasswordInput password={password} onPasswordChange={setPassword} />
         <PasswordInput password={confirm} onPasswordChange={setConfirm} />
+
         <Pressable style={styles.button} onPress={() => handleSignUp(email, password)}>
           <Text style={styles.buttonText}> Sign Up </Text>
         </Pressable>
-      </ScrollView>
+
+        <Pressable
+          style={styles.signInButton}
+          onPress={() => {navigation.navigate('SignIn')}}
+        >
+
+          <Text style={styles.signInText}> Already Have An Account?</Text>
+          <Text style={styles.signIn}> Sign In </Text>
+        </Pressable>
+        
+      </View>
     </View>
   );
 }

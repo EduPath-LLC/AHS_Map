@@ -4,10 +4,11 @@ import { signInWithEmailAndPassword, resendVerificationEmail } from 'firebase/au
 
 import { auth, app, db } from '../../firebase'
 
+import BigHeader from '../../components/headers/BigHeader';
 import EmailInput from '../../components/inputs/Email';
 import PasswordInput from '../../components/inputs/Password';
 
-import { styles } from '../../styles/light/SignUpLight';
+import { styles } from '../../styles/light/SignInLight';
 
 
 export default function SignIn({navigation}) {
@@ -48,15 +49,29 @@ export default function SignIn({navigation}) {
 
   return (
     <View style={styles.fullScreen}>
+
+      <BigHeader />
+
       <View style={styles.container}>
+
         <EmailInput email={email} onEmailChange={setEmail} />
         <PasswordInput password={password} onPasswordChange={setPassword} />
 
         <Pressable
           style={styles.button}
-          onPress={() => handleSignIn(email, password)}>
+          onPress={() => handleSignIn(email, password)}
+        >
           <Text style={styles.buttonText}> Log In </Text>
         </Pressable>
+
+        <Pressable
+          style={styles.signUpButton}
+          onPress={() => {navigation.navigate('SignUp')}}
+        >
+          <Text style={styles.signUpText}> Don't Have an Account Yet?</Text>
+          <Text style={styles.signUp}> Sign Up</Text>
+        </Pressable>
+        
       </View>
     </View>
   );
