@@ -15,6 +15,12 @@ export default function SignIn({navigation}) {
   const [password, setPassword] = useState('');
 
   const handleSignIn = async (email, password) => {
+
+    if(email == '' || password == '') {
+      Alert.alert("Warning", "One or More Fields is empty")
+      return;
+    }
+
     try {
       // Sign in user with email and password
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
