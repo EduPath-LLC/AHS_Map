@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Pressable, Text, Alert } from 'react-native';
 import { createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
+import { getFirestore, collection, addDoc, doc, setDoc } from 'firebase/firestore';
 
 import { auth, app, db } from '../../firebase'
 
@@ -16,9 +17,9 @@ export default function SignUp({navigation}) {
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
 
-  const handleSignUp = async (email, password) => {
+  const handleSignUp = async (email, password, confirm) => {
 
-    if(email == '' || password == '' || confrim == '') {
+    if(email == '' || password == '' || confirm == '') {
       Alert.alert("Warning", "One or More Fields is empty")
       return;
     }
@@ -28,10 +29,29 @@ export default function SignUp({navigation}) {
       return;
     }
 
+    const checkEmailStudent = email.slice(-21);
+    const checkEmailTeacher = email.slice(-13);
+
+    if(checkEmailStudent !== "@student.allenisd.org" && checkEmailTeacher !== "@allenisd.org"){
+      Alert.alert("Warning", "You must use an Allen ISD email")
+      return;
+    }
+
     try {
-      // Create user with email and password
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
+
+      let docRef = doc(collection(db, 'users'), user.uid);
+      
+      await setDoc(docRef, {
+        email: email,
+        FirstName: (email.slice(0, email.indexOf("."))).toUpperCase(),
+        firstTime: true,
+    });
+
+      let sched = await addDoc(collection(db, `users/${user.uid}/schedule`), {
+        f: 1
+      });
   
       // Send email verification
       await sendEmailVerification(user);
@@ -59,7 +79,7 @@ export default function SignUp({navigation}) {
         <PasswordInput password={password} onPasswordChange={setPassword} />
         <PasswordInput password={confirm} onPasswordChange={setConfirm} />
 
-        <Pressable style={styles.button} onPress={() => handleSignUp(email, password)}>
+        <Pressable style={styles.button} onPress={() => handleSignUp(email, password, confirm)}>
           <Text style={styles.buttonText}> Sign Up </Text>
         </Pressable>
 

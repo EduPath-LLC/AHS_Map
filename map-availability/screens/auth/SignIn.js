@@ -22,6 +22,15 @@ export default function SignIn({navigation}) {
       return;
     }
 
+    const checkEmailStudent = email.slice(-21);
+    const checkEmailTeacher = email.slice(-13);
+
+    if(checkEmailStudent !== "@student.allenisd.org" && checkEmailTeacher !== "@allenisd.org"){
+      Alert.alert("Warning", "You must use an Allen ISD email")
+      return;
+    }
+    
+
     try {
       // Sign in user with email and password
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
@@ -41,7 +50,10 @@ export default function SignIn({navigation}) {
       navigation.navigate("BottomTab");
       
     } catch (error) {
-      // Handle sign-in errors
+      if(error.message === "Firebase: Error (auth/invalid-credential)."){
+        Alert.alert("Error", "Invalid Credentials");
+        return
+      }
       Alert.alert('Error', error.message);
     }
     };
