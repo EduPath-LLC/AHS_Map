@@ -1,0 +1,292 @@
+import React, { Component } from 'react'
+import { View, Text, Alert, Image, Pressable } from 'react-native'
+import { doc, getDocs, collection, setDoc, docRef, updateDoc } from 'firebase/firestore';
+import { db } from '../../firebase'
+
+import { styles } from '../../styles/light/Carousel'
+
+import CardInputs from './CardInputs';
+
+export default class Carousel extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            current: 1,
+            schedule: {},
+            first: {},
+            second: {},
+            third: {},
+            fourth: {},
+            fifth: {},
+            sixth: {},
+            seventh: {},
+            eighth: {},
+            lunch: {},
+        };
+    }
+
+    componentDidMount() {
+        this.fetchSchedule(this.props.userId);
+    }
+
+    fetchSchedule = async (userId) => {
+        try {
+            if (userId) {
+                const scheduleCollectionRef = collection(db, `users/${userId}/schedule`);
+                const scheduleSnapshot = await getDocs(scheduleCollectionRef);
+
+                if (!scheduleSnapshot.empty) {
+                    const scheduleData = scheduleSnapshot.docs.map(doc => ({
+                        id: doc.id,
+                        ...doc.data()
+                    }));
+
+                    this.setState({
+                        schedule: scheduleData,
+                        eighth: scheduleData[0],
+                        fifth: scheduleData[1],
+                        first: scheduleData[2],
+                        fourth: scheduleData[3],
+                        lunch: scheduleData[4],
+                        second: scheduleData[5],
+                        seventh: scheduleData[6],
+                        sixth: scheduleData[7],
+                        third: scheduleData[8]
+                    });
+                } else {
+                    console.log('No schedule documents found!');
+                }
+            } else {
+                console.error('User ID is undefined');
+            }
+        } catch (error) {
+            console.error('Error fetching schedule documents: ', error);
+            Alert.alert('Error', 'There was an error fetching the schedule documents.');
+        }
+    };
+
+    handleClassChange = (newArr) => {
+        switch(this.state.current){
+            case 1:
+                this.setState({first: newArr})
+            case 2:
+                this.setState({second: newArr})
+            case 3:
+                this.setState({third: newArr})
+            case 4:
+                this.setState({fourth: newArr})
+            case 5:
+                this.setState({fifth: newArr})
+            case 6:
+                this.setState({sixth: newArr})
+            case 7:
+                this.setState({seventh: newArr})
+            case 8:
+                this.setState({eighth: newArr})
+            case 9:
+                this.setState({lunch: newArr})
+        }
+    }
+
+    renderCarousel = (current) => {
+        const scheduleMap = {
+            1: this.state.first,
+            2: this.state.second,
+            3: this.state.third,
+            4: this.state.fourth,
+            5: this.state.fifth,
+            6: this.state.sixth,
+            7: this.state.seventh,
+            8: this.state.eighth,
+            9: this.state.lunch,
+        };
+
+        const scheduleItem = scheduleMap[current];
+
+        return scheduleItem && scheduleItem.id ? (
+            <CardInputs key={scheduleItem.id} info={scheduleItem} onInputChange={this.handleClassChange} />
+        ) : (
+            <Text>No Data</Text>
+        );
+    };
+
+    increase = () => {
+        this.setState(prevState => ({
+            current: prevState.current < 9 ? prevState.current + 1 : prevState.current
+        }));
+    }
+
+    decrease = () => {
+        this.setState(prevState => ({
+            current: prevState.current > 1 ? prevState.current - 1 : prevState.current
+        }));
+    }
+
+    handleSubmit = async () => {
+
+        const isEmpty = this.checkIfEmpty()
+
+        // if(isEmpty) {
+        //     return;
+        // }
+
+
+        try {
+            const data = [this.state.first, this.state.second, this.state.third, this.state.fourth, this.state.fifth, this.state.sixth, this.state.seventh, this.state.eighth, this.state.lunch]
+
+            data.map(async (data) => {
+                let docRef = doc(db, `users/${this.props.userId}/schedule`, data.id);
+                await setDoc(docRef, data, { merge: true });
+            })
+
+            let docRef = doc(db, `users`, this.props.userId);
+            await updateDoc(docRef, {firstTime: false});
+
+            this.props.navigation.navigate("BottomTab", { userId: userId })
+            
+        } catch(e) {
+            Alert.alert('Error', e.message)
+        }
+    }
+
+    checkIfEmpty = () => {
+        var empty = false;
+
+
+        for (let key in this.state.first) {
+            let value = this.state.first[key];
+            if (value === "") {
+                empty = true;
+                break;
+            }
+        }
+    
+
+        if(!empty) {
+            for (let key in this.state.second) {
+                let value = this.state.second[key];
+                if (value === "") {
+                    empty = true;
+                    break;
+                }
+            }
+        }
+
+        if(!empty) {
+            for (let key in this.state.third) {
+                let value = this.state.third[key];
+                if (value === "") {
+                    empty = true;
+                    break;
+                }
+            }
+        }
+        
+
+        if(!empty) {
+            for (let key in this.state.fourth) {
+                let value = this.state.fourth[key];
+                if (value === "") {
+                    empty = true;
+                    break;
+                }
+            }
+        }
+        
+
+        if(!empty) {
+            for (let key in this.state.fifth) {
+                let value = this.state.fifth[key];
+                if (value === "") {
+                    empty = true;
+                    break;
+                }
+            }
+        }
+
+        if(!empty) {
+            for (let key in this.state.sixth) {
+                let value = this.state.sixth[key];
+                if (value === "") {
+                    empty = true;
+                    break;
+                }
+            }
+        }
+
+        if(!empty) {
+            for (let key in this.state.seventh) {
+                let value = this.state.seventh[key];
+                if (value === "") {
+                    empty = true;
+                    break;
+                }
+            }
+        }
+
+        if(!empty) {
+            for (let key in this.state.eighth) {
+                let value = this.state.eighth[key];
+                if (value === "") {
+                    empty = true;
+                    break;
+                }
+            }
+        }
+
+        if(!empty) {
+            for (let key in this.state.lunch) {
+                let value = this.state.lunch[key];
+                if (value === "") {
+                    empty = true;
+                    break;
+                }
+            }
+        }
+
+        if(empty){
+            Alert.alert('Warning', 'One or More Fields are Empty')
+            return true
+        }
+
+        return false
+    }
+    
+
+    render() {
+        return (
+            <View style={styles.container}>
+                <View style={styles.viewer}>
+                    <Pressable 
+                        onPress={this.decrease}
+                        style={styles.arrows}
+                    >
+                        <Image 
+                            style={styles.image}
+                            source={require('../../assets/images/ArrowBack.png')}
+                        />
+                    </Pressable>
+
+                    {this.renderCarousel(this.state.current)}
+
+                    <Pressable 
+                        onPress={this.increase}
+                        style={styles.arrows}
+                    >
+                        <Image 
+                            style={styles.image}
+                            source={require('../../assets/images/ArrowForward.png')}
+                        />
+                    </Pressable>
+                </View>
+
+                <Pressable 
+                    style={styles.button}
+                    onPress={this.handleSubmit}
+                >
+                    <Text style={styles.buttonText}> Finish </Text>
+                </Pressable>
+            </View>
+        );
+    }
+}

@@ -1,5 +1,4 @@
-import React from 'react'
-import { StyleSheet, Dimensions } from 'react-native'
+import { StyleSheet, Dimensions } from 'react-native';
 
 // Get 1% of the width and height
 const width = Dimensions.get('window').width * 0.01;
@@ -14,7 +13,14 @@ export const styles = StyleSheet.create({
         flex: 1,
         flexDirection: 'column',
         alignItems: 'center',
-        padding: 10 * width,
+        paddingTop: 10 * height,
         backgroundColor: "#E0EDFC",
+        marginTop: 15 * height
     },
-})
+    bigText: {
+        fontSize: 10 * width,
+        alignSelf: 'flex-start',
+        textAlign: 'left',
+        fontFamily: 'Kanit-Bold'
+    }
+});

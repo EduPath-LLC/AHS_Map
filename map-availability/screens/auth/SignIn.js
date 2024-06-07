@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { View, Pressable, Text, Alert } from 'react-native';
 import { signInWithEmailAndPassword, resendVerificationEmail } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
+import { useFonts } from 'expo-font';
 
 import { auth, app, db } from '../../firebase'
 
-import BigHeader from '../../components/headers/BigHeader';
+import WavyHeader from '../../components/headers/WavyHeader';
 import EmailInput from '../../components/inputs/Email';
 import PasswordInput from '../../components/inputs/Password';
 
@@ -14,6 +16,39 @@ import { styles } from '../../styles/light/SignInLight';
 export default function SignIn({navigation}) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+
+  const [fontsLoaded] = useFonts({
+    'Kanit-Black': require('../../assets/fonts/Kanit-Black.ttf'),
+    'Kanit-Bold': require('../../assets/fonts/Kanit-Bold.ttf'),
+  });
+
+  const isFirstTime = async (userId) => {
+    try {
+      if (userId) {
+        const userDocRef = doc(db, 'users', userId);
+        const userDocSnap = await getDoc(userDocRef);
+
+        if (userDocSnap.exists()) {
+          const userData = userDocSnap.data();
+          const firstTime = userData.firstTime;
+
+          if(firstTime) {
+            return true
+          } else {
+            return false
+          }
+
+        } else {
+          console.log('No such document!');
+        }
+      } else {
+        console.error('User ID is undefined');
+      }
+    } catch (error) {
+      console.error('Error fetching document: ', error);
+    }
+  };
+
 
   const handleSignIn = async (email, password) => {
 
@@ -46,8 +81,11 @@ export default function SignIn({navigation}) {
         return;
       }
       
-
-      navigation.navigate("BottomTab");
+      if(isFirstTime(user.uid)){
+        navigation.navigate("SetSchedule", { userId: user.uid });
+      } else {
+        navigation.navigate("BottomTab", { userId: user.uid });
+      }
       
     } catch (error) {
       if(error.message === "Firebase: Error (auth/invalid-credential)."){
@@ -62,12 +100,22 @@ export default function SignIn({navigation}) {
   return (
     <View style={styles.fullScreen}>
 
-      <BigHeader />
+      <WavyHeader 
+        customHeight={20}
+        customTop={15}
+        customImageDimensions={25}
+      />
 
       <View style={styles.container}>
 
+        <Text style={styles.title}> Sign In </Text>
+
         <EmailInput email={email} onEmailChange={setEmail} />
         <PasswordInput password={password} onPasswordChange={setPassword} />
+
+        <View style={styles.forgotPasswordContainer}>
+          <Text style={styles.forgotPassword} onPress={() => navigation.navigate('ResetPassword')} > Forgot Password? </Text>
+        </View>
 
         <Pressable
           style={styles.button}
@@ -81,7 +129,7 @@ export default function SignIn({navigation}) {
           onPress={() => {navigation.navigate('SignUp')}}
         >
           <Text style={styles.signUpText}> Don't Have an Account Yet?</Text>
-          <Text style={styles.signUp}> Sign Up</Text>
+          <Text style={styles.signUp}> Sign Up </Text>
         </Pressable>
         
       </View>

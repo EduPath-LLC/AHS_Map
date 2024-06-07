@@ -12,6 +12,7 @@ export const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'column',
     alignItems: 'center',
+    padding: 10 * width,
     backgroundColor: '#E0EDFC',
     paddingTop: 10 * height,
     marginTop: 20 * height
@@ -28,26 +29,12 @@ export const styles = StyleSheet.create({
     color: 'white',
     alignSelf: 'center',
   },
-  signUpButton: {
-    flexDirection: 'row'
-  },
-  signUp: {
+  return: {
     color: '#2028DE'
-  },
-  signUpText: {
-    color: 'black'
-  },
-  forgotPasswordContainer: {
-    width: 80 * width,
-    marginTop: -1 * height,
-    marginBottom: 2 * height,
-  },
-  forgotPassword: {
-    color: '#1A16E2',
-    textAlign: 'right'
   },
   title: {
     fontFamily: 'Kanit-Bold',
-    fontSize: 10 * width
+    fontSize: 10 * width,
+    marginBottom: 2 * height
   }
 });

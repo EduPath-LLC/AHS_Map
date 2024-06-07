@@ -12,9 +12,9 @@ export const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'column',
     alignItems: 'center',
-    padding: 10 * width,
     backgroundColor: '#E0EDFC',
-    padding: 10 * height
+    paddingTop: 10 * height,
+    marginTop: 20 * height
   },
   button: {
     backgroundColor: '#574BE5',
@@ -36,5 +36,9 @@ export const styles = StyleSheet.create({
   },
   signInText: {
     color: 'black'
+  },
+  title: {
+    fontFamily: 'Kanit-Bold',
+    fontSize: 10 * width
   }
 });

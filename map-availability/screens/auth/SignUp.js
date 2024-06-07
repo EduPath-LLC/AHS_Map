@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 import { View, Pressable, Text, Alert } from 'react-native';
 import { createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
 import { getFirestore, collection, addDoc, doc, setDoc } from 'firebase/firestore';
+import { useFonts } from 'expo-font';
 
 import { auth, app, db } from '../../firebase'
 
-import BigHeader from '../../components/headers/BigHeader';
+import WavyHeader from '../../components/headers/WavyHeader';
 import EmailInput from '../../components/inputs/Email';
 import PasswordInput from '../../components/inputs/Password';
 
@@ -16,6 +17,8 @@ export default function SignUp({navigation}) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
+
+
 
   const handleSignUp = async (email, password, confirm) => {
 
@@ -42,16 +45,88 @@ export default function SignUp({navigation}) {
       const user = userCredential.user;
 
       let docRef = doc(collection(db, 'users'), user.uid);
+
+      const FirstName = email.slice(0,1).toUpperCase() + email.slice(1, email.indexOf("."))
       
       await setDoc(docRef, {
         email: email,
-        FirstName: (email.slice(0, email.indexOf("."))).toUpperCase(),
+        firstName: FirstName,
         firstTime: true,
+     });
+
+      let docRefFirst = doc(collection(db, `users/${user.uid}/schedule`), 'First');
+      let docRefSecond = doc(collection(db, `users/${user.uid}/schedule`), 'Second');
+      let docRefThird = doc(collection(db, `users/${user.uid}/schedule`), 'Third');
+      let docRefFourth = doc(collection(db, `users/${user.uid}/schedule`), 'Fourth');
+      let docRefFifth = doc(collection(db, `users/${user.uid}/schedule`), 'Fifth');
+      let docRefSixth = doc(collection(db, `users/${user.uid}/schedule`), 'Sixth');
+      let docRefSeventh = doc(collection(db, `users/${user.uid}/schedule`), 'Seventh');
+      let docRefEight = doc(collection(db, `users/${user.uid}/schedule`), 'Eight');
+      let docRefLunch = doc(collection(db, `users/${user.uid}/schedule`), 'Lunch');
+
+
+
+      await setDoc(docRefFirst, {
+        className: '',
+        teacher: '',
+        building: '',
+        roomNumber: ''
+     });
+
+      await setDoc(docRefSecond, {
+        className: '',
+        teacher: '',
+        building: '',
+        roomNumber: ''
     });
 
-      let sched = await addDoc(collection(db, `users/${user.uid}/schedule`), {
-        f: 1
-      });
+      await setDoc(docRefThird, {
+        className: '',
+        teacher: '',
+        building: '',
+        roomNumber: ''
+    });
+
+      await setDoc(docRefFourth, {
+        className: '',
+        teacher: '',
+        building: '',
+        roomNumber: ''
+    });
+
+      await setDoc(docRefFifth, {
+        className: '',
+        teacher: '',
+        building: '',
+        roomNumber: ''
+    });
+
+      await setDoc(docRefSixth, {
+        className: '',
+        teacher: '',
+        building: '',
+        roomNumber: ''
+    });
+
+      await setDoc(docRefSeventh, {
+        className: '',
+        teacher: '',
+        building: '',
+        roomNumber: ''
+    });
+
+      await setDoc(docRefEight, {
+        className: '',
+        teacher: '',
+        building: '',
+        roomNumber: ''
+    });
+
+      await setDoc(docRefLunch, {
+        a_day: '',
+        b_day: ''
+    });
+
   
       // Send email verification
       await sendEmailVerification(user);
@@ -71,9 +146,14 @@ export default function SignUp({navigation}) {
   return (
     <View style={styles.fullScreen}>
 
-      <BigHeader />
-
+      <WavyHeader 
+        customHeight={20}
+        customTop={15}
+        customImageDimensions={25}
+      />
       <View style={styles.container}>
+
+      <Text style={styles.title}> Sign Up </Text>
 
         <EmailInput email={email} onEmailChange={setEmail} />
         <PasswordInput password={password} onPasswordChange={setPassword} />

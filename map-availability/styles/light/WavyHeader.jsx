@@ -7,14 +7,12 @@ const height = Dimensions.get('window').height * 0.01;
 
 export const styles = StyleSheet.create({
     svgCurve: {
+        position: 'absolute',
         width: 100 * width,
-        height: 20 * height,
         zIndex: 500,
     },
     logo: {
         alignSelf: 'center',
         marginTop: 7 * height,
-        width: 25 * width,
-        height: 25 * width,
     }
 });
