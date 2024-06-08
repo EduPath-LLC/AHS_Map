@@ -142,7 +142,7 @@ export default class Carousel extends Component {
             let docRef = doc(db, `users`, this.props.userId);
             await updateDoc(docRef, {firstTime: false});
 
-            this.props.navigation.navigate("BottomTab", { userId: userId })
+            this.props.navigation.navigate("BottomTab", { userId: this.props.userId })
             
         } catch(e) {
             Alert.alert('Error', e.message)

@@ -17,4 +17,8 @@ export const styles = StyleSheet.create({
         padding: 10 * width,
         backgroundColor: "#E0EDFC",
     },
+    map: {
+        width: '100%',
+        height: '100%',
+    },
 })
