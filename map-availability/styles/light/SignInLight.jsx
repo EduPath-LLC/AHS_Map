@@ -29,7 +29,8 @@ export const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   signUpButton: {
-    flexDirection: 'row'
+    flexDirection: 'row',
+    alignSelf: 'center'
   },
   signUp: {
     color: '#2028DE'

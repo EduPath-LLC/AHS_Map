@@ -3,7 +3,7 @@ import { View, StyleSheet, Dimensions } from 'react-native';
 import MapView, { Polyline,  Marker} from 'react-native-maps';
 // import Geolocation from '@react-native-community/geolocation';
 
-const Map = () => {
+export default function Map() {
   const [region, setRegion] = useState({
     latitude: 33.150722,
     longitude: -96.69532,
@@ -107,6 +107,3 @@ const styles = StyleSheet.create({
     marginVertical:90
   },
 });
-
-export default Map;
-0
