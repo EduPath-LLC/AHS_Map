@@ -5,7 +5,9 @@ import { db } from '../../firebase'
 
 import { styles } from '../../styles/light/Carousel'
 
+import Loader from '../Loader';
 import CardInputs from './CardInputs';
+import { loadAsync } from 'expo-font';
 
 export default class Carousel extends Component {
     constructor(props) {
@@ -22,6 +24,7 @@ export default class Carousel extends Component {
             seventh: {},
             eighth: {},
             lunch: {},
+            loading: false
         };
     }
 
@@ -106,7 +109,9 @@ export default class Carousel extends Component {
         return scheduleItem && scheduleItem.id ? (
             <CardInputs key={scheduleItem.id} info={scheduleItem} onInputChange={this.handleClassChange} />
         ) : (
-            <Text>No Data</Text>
+            <View style={{alignSelf: 'center'}}>
+                <Loader />
+            </View>
         );
     };
 
@@ -132,6 +137,7 @@ export default class Carousel extends Component {
 
 
         try {
+            this.setState({loading: true})
             const data = [this.state.first, this.state.second, this.state.third, this.state.fourth, this.state.fifth, this.state.sixth, this.state.seventh, this.state.eighth, this.state.lunch]
 
             data.map(async (data) => {
@@ -143,13 +149,17 @@ export default class Carousel extends Component {
             await updateDoc(docRef, {firstTime: false});
 
             this.props.navigation.navigate("BottomTab", { userId: this.props.userId })
+            this.setState({loading: false})
             
         } catch(e) {
+            this.setState({loading: false})
             Alert.alert('Error', e.message)
         }
     }
 
     checkIfEmpty = () => {
+
+        this.setState({loading: true})
         var empty = false;
 
 
@@ -244,6 +254,8 @@ export default class Carousel extends Component {
             }
         }
 
+        this.setState({loading: false})
+
         if(empty){
             Alert.alert('Warning', 'One or More Fields are Empty')
             return true
@@ -256,36 +268,42 @@ export default class Carousel extends Component {
     render() {
         return (
             <View style={styles.container}>
-                <View style={styles.viewer}>
-                    <Pressable 
-                        onPress={this.decrease}
-                        style={styles.arrows}
-                    >
-                        <Image 
-                            style={styles.image}
-                            source={require('../../assets/images/ArrowBack.png')}
-                        />
-                    </Pressable>
+                {this.state.loading? 
+                ( <Loader /> ) :
+                (
+                    <View>
+                        <View style={styles.viewer}>
+                            <Pressable 
+                                onPress={this.decrease}
+                                style={styles.arrows}
+                            >
+                                <Image 
+                                    style={styles.image}
+                                    source={require('../../assets/images/ArrowBack.png')}
+                                />
+                            </Pressable>
 
-                    {this.renderCarousel(this.state.current)}
+                            {this.renderCarousel(this.state.current)}
 
-                    <Pressable 
-                        onPress={this.increase}
-                        style={styles.arrows}
-                    >
-                        <Image 
-                            style={styles.image}
-                            source={require('../../assets/images/ArrowForward.png')}
-                        />
-                    </Pressable>
-                </View>
+                            <Pressable 
+                                onPress={this.increase}
+                                style={styles.arrows}
+                            >
+                                <Image 
+                                    style={styles.image}
+                                    source={require('../../assets/images/ArrowForward.png')}
+                                />
+                            </Pressable>
+                        </View>
 
-                <Pressable 
-                    style={styles.button}
-                    onPress={this.handleSubmit}
-                >
-                    <Text style={styles.buttonText}> Finish </Text>
-                </Pressable>
+                        <Pressable 
+                            style={styles.button}
+                            onPress={this.handleSubmit}
+                        >
+                            <Text style={styles.buttonText}> Finish </Text>
+                        </Pressable>
+                    </View>
+            )}
             </View>
         );
     }

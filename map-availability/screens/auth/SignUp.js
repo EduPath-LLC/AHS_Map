@@ -9,6 +9,7 @@ import { auth, app, db } from '../../firebase'
 import WavyHeader from '../../components/headers/WavyHeader';
 import EmailInput from '../../components/inputs/Email';
 import PasswordInput from '../../components/inputs/Password';
+import Loader from '../../components/Loader';
 
 import { styles } from '../../styles/light/SignUpLight';
 
@@ -17,6 +18,7 @@ export default function SignUp({navigation}) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
+  const [loading, setLoading] = useState(false);
 
 
 
@@ -41,6 +43,7 @@ export default function SignUp({navigation}) {
     }
 
     try {
+      setLoading(true)
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
@@ -130,6 +133,7 @@ export default function SignUp({navigation}) {
   
       // Send email verification
       await sendEmailVerification(user);
+      setLoading(false)
   
       // Inform user to check their email for verification
       Alert.alert(
@@ -138,6 +142,7 @@ export default function SignUp({navigation}) {
         [{ text: 'OK', onPress: () => navigation.navigate('SignIn') }]
       );
     } catch (error) {
+      setLoading(false)
       // Handle sign-up errors
       Alert.alert('Error', error.message);
     }
@@ -155,22 +160,30 @@ export default function SignUp({navigation}) {
 
       <Text style={styles.title}> Sign Up </Text>
 
-        <EmailInput email={email} onEmailChange={setEmail} />
-        <PasswordInput password={password} onPasswordChange={setPassword} />
-        <PasswordInput password={confirm} onPasswordChange={setConfirm} />
+      {loading ? (
+          <View style={{ marginTop: 100 }}>
+            <Loader />
+          </View>
+        ) : (
+          <View>  
+            <EmailInput email={email} onEmailChange={setEmail} />
+            <PasswordInput password={password} onPasswordChange={setPassword} />
+            <PasswordInput password={confirm} onPasswordChange={setConfirm} />
 
-        <Pressable style={styles.button} onPress={() => handleSignUp(email, password, confirm)}>
-          <Text style={styles.buttonText}> Sign Up </Text>
-        </Pressable>
+            <Pressable style={styles.button} onPress={() => handleSignUp(email, password, confirm)}>
+              <Text style={styles.buttonText}> Sign Up </Text>
+            </Pressable>
 
-        <Pressable
-          style={styles.signInButton}
-          onPress={() => {navigation.navigate('SignIn')}}
-        >
+            <Pressable
+              style={styles.signInButton}
+              onPress={() => {navigation.navigate('SignIn')}}
+            >
 
-          <Text style={styles.signInText}> Already Have An Account?</Text>
-          <Text style={styles.signIn}> Sign In </Text>
-        </Pressable>
+              <Text style={styles.signInText}> Already Have An Account?</Text>
+              <Text style={styles.signIn}> Sign In </Text>
+            </Pressable>
+          </View>
+        )}
         
       </View>
     </View>
