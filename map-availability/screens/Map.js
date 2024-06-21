@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, StyleSheet, Dimensions, TextInput, Button } from 'react-native';
+import { View, StyleSheet, Dimensions, TextInput, Button, Text, ScrollView } from 'react-native';
 import MapView, { Polyline, Marker } from 'react-native-maps';
+import * as Location from 'expo-location';
 
 const Map = () => {
   const [region, setRegion] = useState({
@@ -10,22 +11,63 @@ const Map = () => {
     longitudeDelta: 0.005,
   });
 
-  const [currentLocation, setCurrentLocation] = useState({ latitude: 33.15005556, longitude: -96.695055 });
+  const [currentLocation, setCurrentLocation] = useState(null);
   const [destination, setDestination] = useState(null);
   const [routeCoordinates, setRouteCoordinates] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [directions, setDirections] = useState([]);
   const mapRef = useRef(null);
 
   useEffect(() => {
-    if (mapRef.current) {
-      mapRef.current.animateCamera({
-        center: currentLocation,
-        pitch: 0,
-        heading: 0,
-        altitude: 1200,
-        zoom: 1,
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        console.log('Permission to access location was denied');
+        setIsLoading(false);
+        return;
+      }
+
+      getCurrentPosition();
+    })();
+  }, []);
+
+  const getCurrentPosition = async () => {
+    try {
+      let location = await Location.getCurrentPositionAsync({});
+      const { latitude, longitude } = location.coords;
+      setCurrentLocation({ latitude, longitude });
+      setRegion({
+        latitude,
+        longitude,
+        latitudeDelta: 0.005,
+        longitudeDelta: 0.005,
       });
+      setIsLoading(false);
+    } catch (error) {
+      console.error("Error getting location:", error);
+      setIsLoading(false);
     }
+  };
+
+  useEffect(() => {
+    let locationSubscription;
+
+    (async () => {
+      locationSubscription = await Location.watchPositionAsync(
+        { accuracy: Location.Accuracy.High, timeInterval: 10000, distanceInterval: 10 },
+        (location) => {
+          const { latitude, longitude } = location.coords;
+          setCurrentLocation({ latitude, longitude });
+        }
+      );
+    })();
+
+    return () => {
+      if (locationSubscription) {
+        locationSubscription.remove();
+      }
+    };
   }, []);
 
   const polylineCoordinates = [
@@ -38,37 +80,60 @@ const Map = () => {
     { latitude: 33.148972, longitude: -96.695055, reference: 'G' },
   ];
 
-  const findNearestPoint = (location, points) => {
-    return points.reduce((prev, curr) => {
-      const prevDistance = Math.hypot(prev.point.latitude - location.latitude, prev.point.longitude - location.longitude);
-      const currDistance = Math.hypot(curr.latitude - location.latitude, curr.longitude - location.longitude);
-      return currDistance < prevDistance ? { point: curr, distance: currDistance } : prev;
-    }, { point: points[0], distance: Infinity });
+  const findNearestPointOnLine = (point, lineStart, lineEnd) => {
+    const dx = lineEnd.longitude - lineStart.longitude;
+    const dy = lineEnd.latitude - lineStart.latitude;
+    const t = ((point.longitude - lineStart.longitude) * dx + (point.latitude - lineStart.latitude) * dy) / (dx * dx + dy * dy);
+    const clampedT = Math.max(0, Math.min(1, t));
+    return {
+      latitude: lineStart.latitude + clampedT * dy,
+      longitude: lineStart.longitude + clampedT * dx
+    };
   };
 
   const calculateDistance = (point1, point2) => {
-    return Math.hypot(point2.latitude - point1.latitude, point2.longitude - point1.longitude);
+    const R = 6371000; // radius of Earth in meters
+    const lat1 = point1.latitude * Math.PI / 180;
+    const lat2 = point2.latitude * Math.PI / 180;
+    const deltaLat = (point2.latitude - point1.latitude) * Math.PI / 180;
+    const deltaLon = (point2.longitude - point1.longitude) * Math.PI / 180;
+
+    const a = Math.sin(deltaLat / 2) * Math.sin(deltaLat / 2) +
+              Math.cos(lat1) * Math.cos(lat2) *
+              Math.sin(deltaLon / 2) * Math.sin(deltaLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+    const distance = R * c;
+    return distance;
   };
 
   const buildGraph = (coordinates, currentLocation) => {
     const graph = {};
-    const nearest = findNearestPoint(currentLocation, coordinates);
-    
-    // Add current location to the graph
-    graph['current'] = [
-      { reference: nearest.point.reference, distance: nearest.distance },
-      { reference: coordinates[(coordinates.indexOf(nearest.point) + 1) % coordinates.length].reference, 
-        distance: calculateDistance(currentLocation, coordinates[(coordinates.indexOf(nearest.point) + 1) % coordinates.length]) }
+    let nearestLinePoint = null;
+    let minDistance = Infinity;
+    let nearestSegmentStart = null;
+
+    for (let i = 0; i < coordinates.length; i++) {
+      const start = coordinates[i];
+      const end = coordinates[(i + 1) % coordinates.length];
+      const nearestPoint = findNearestPointOnLine(currentLocation, start, end);
+      const distance = calculateDistance(currentLocation, nearestPoint);
+      if (distance < minDistance) {
+        minDistance = distance;
+        nearestLinePoint = nearestPoint;
+        nearestSegmentStart = start;
+      }
+    }
+
+    const newPointReference = 'current_projected';
+    graph['current'] = [{ reference: newPointReference, distance: minDistance }];
+    graph[newPointReference] = [
+      { reference: 'current', distance: minDistance },
+      { reference: nearestSegmentStart.reference, distance: calculateDistance(nearestLinePoint, nearestSegmentStart) },
+      { reference: coordinates[(coordinates.indexOf(nearestSegmentStart) + 1) % coordinates.length].reference, 
+        distance: calculateDistance(nearestLinePoint, coordinates[(coordinates.indexOf(nearestSegmentStart) + 1) % coordinates.length]) }
     ];
-  
-    // Add direct connections to start and end points (A and G)
-    const startPoint = coordinates[0];
-    const endPoint = coordinates[coordinates.length - 1];
-    graph['current'].push(
-      { reference: startPoint.reference, distance: calculateDistance(currentLocation, startPoint) },
-      { reference: endPoint.reference, distance: calculateDistance(currentLocation, endPoint) }
-    );
-  
+
     coordinates.forEach((point, index) => {
       graph[point.reference] = [];
       const nextIndex = (index + 1) % coordinates.length;
@@ -82,18 +147,16 @@ const Map = () => {
         reference: coordinates[prevIndex].reference,
         distance: calculateDistance(point, coordinates[prevIndex])
       });
-  
-      // Connect to current location if it's one of the nearest points or start/end point
-      if (point.reference === nearest.point.reference || 
-          point.reference === coordinates[(coordinates.indexOf(nearest.point) + 1) % coordinates.length].reference ||
-          point === startPoint || point === endPoint) {
+
+      if (point === nearestSegmentStart || point === coordinates[(coordinates.indexOf(nearestSegmentStart) + 1) % coordinates.length]) {
         graph[point.reference].push({
-          reference: 'current',
-          distance: calculateDistance(point, currentLocation)
+          reference: newPointReference,
+          distance: calculateDistance(point, nearestLinePoint)
         });
       }
     });
-    return graph;
+
+    return { graph, nearestLinePoint };
   };
 
   const dijkstra = (start, end, graph) => {
@@ -134,23 +197,69 @@ const Map = () => {
     return path;
   };
 
+  const calculateDirections = (routeCoords) => {
+    const directions = [];
+    for (let i = 1; i < routeCoords.length; i++) {
+      const start = routeCoords[i - 1];
+      const end = routeCoords[i];
+      const bearing = calculateBearing(start, end);
+      const distance = calculateDistance(start, end);
+
+      let direction;
+      if (bearing >= 337.5 || bearing < 22.5) direction = "north";
+      else if (bearing >= 22.5 && bearing < 67.5) direction = "northeast";
+      else if (bearing >= 67.5 && bearing < 112.5) direction = "east";
+      else if (bearing >= 112.5 && bearing < 157.5) direction = "southeast";
+      else if (bearing >= 157.5 && bearing < 202.5) direction = "south";
+      else if (bearing >= 202.5 && bearing < 247.5) direction = "southwest";
+      else if (bearing >= 247.5 && bearing < 292.5) direction = "west";
+      else direction = "northwest";
+
+      directions.push(`Go ${direction} for ${Math.round(distance)} meters`);
+    }
+    directions.push("You have reached your destination");
+    return directions;
+  };
+
+  const calculateBearing = (start, end) => {
+    const startLat = start.latitude * Math.PI / 180;
+    const startLng = start.longitude * Math.PI / 180;
+    const endLat = end.latitude * Math.PI / 180;
+    const endLng = end.longitude * Math.PI / 180;
+
+    const y = Math.sin(endLng - startLng) * Math.cos(endLat);
+    const x = Math.cos(startLat) * Math.sin(endLat) -
+              Math.sin(startLat) * Math.cos(endLat) * Math.cos(endLng - startLng);
+    const bearing = Math.atan2(y, x) * 180 / Math.PI;
+    return (bearing + 360) % 360;
+  };
+
   const handleSearch = () => {
+    if (!currentLocation) {
+      alert("Current location not available. Please try again.");
+      return;
+    }
+
     const destinationPoint = polylineCoordinates.find(point => point.reference === searchQuery.toUpperCase());
     if (destinationPoint) {
       setDestination(destinationPoint);
 
-      // Generate the route using Dijkstra's algorithm
-      const graph = buildGraph(polylineCoordinates, currentLocation);
+      const { graph, nearestLinePoint } = buildGraph(polylineCoordinates, currentLocation);
       const path = dijkstra('current', destinationPoint.reference, graph);
 
-      // Convert path references to coordinates
       const routeCoords = path.map(ref => {
         if (ref === 'current') return currentLocation;
+        if (ref === 'current_projected') return nearestLinePoint;
         return polylineCoordinates.find(point => point.reference === ref);
       });
 
-      // Set route coordinates
       setRouteCoordinates(routeCoords);
+      
+      // Calculate and set directions
+      const newDirections = calculateDirections(routeCoords);
+      setDirections(newDirections);
+    } else {
+      alert("Invalid destination reference. Please try again.");
     }
   };
 
@@ -163,44 +272,58 @@ const Map = () => {
         onChangeText={setSearchQuery}
       />
       <Button title="Search" onPress={handleSearch} />
-      <MapView
-        style={styles.map}
-        initialRegion={region}
-        region={region}
-        onRegionChangeComplete={setRegion}
-        showsPointsOfInterest={false}
-        showsUserLocation={true}
-        zoomEnabled={true}
-        showsCompass={true}
-        rotateEnabled={true}
-        ref={mapRef}
-      >
-        {polylineCoordinates.map((point, index) => (
-          <Marker
-            key={index}
-            coordinate={point}
-            title={`Point ${point.reference}`}
-            description={`Latitude: ${point.latitude}, Longitude: ${point.longitude}`}
-          />
-        ))}
-        <Marker
-          coordinate={currentLocation}
-          title="Current Location"
-          pinColor="blue"
-        />
-        <Polyline
-          coordinates={polylineCoordinates}
-          strokeColor="#07AFF0"
-          strokeWidth={4}
-        />
-        {routeCoordinates.length > 0 && (
-          <Polyline
-            coordinates={routeCoordinates}
-            strokeColor="red"
-            strokeWidth={6}
-          />
-        )}
-      </MapView>
+      {isLoading ? (
+        <View style={styles.loadingContainer}>
+          <Text>Loading location...</Text>
+        </View>
+      ) : (
+        <>
+          <MapView
+            style={styles.map}
+            region={region}
+            onRegionChangeComplete={setRegion}
+            showsPointsOfInterest={false}
+            showsUserLocation={true}
+            zoomEnabled={true}
+            showsCompass={true}
+            rotateEnabled={true}
+            ref={mapRef}
+          >
+            {polylineCoordinates.map((point, index) => (
+              <Marker
+                key={index}
+                coordinate={point}
+                title={`Point ${point.reference}`}
+                description={`Latitude: ${point.latitude}, Longitude: ${point.longitude}`}
+              />
+            ))}
+            {currentLocation && (
+              <Marker
+                coordinate={currentLocation}
+                title="Current Location"
+                pinColor="blue"
+              />
+            )}
+            <Polyline
+              coordinates={polylineCoordinates}
+              strokeColor="#07AFF0"
+              strokeWidth={4}
+            />
+            {routeCoordinates.length > 0 && (
+              <Polyline
+                coordinates={routeCoordinates}
+                strokeColor="red"
+                strokeWidth={6}
+              />
+            )}
+          </MapView>
+          <ScrollView style={styles.directionsContainer}>
+            {directions.map((direction, index) => (
+              <Text key={index} style={styles.directionText}>{direction}</Text>
+            ))}
+          </ScrollView>
+        </>
+      )}
     </View>
   );
 };
@@ -226,8 +349,25 @@ const styles = StyleSheet.create({
   },
   map: {
     width: windowWidth,
-    height: windowHeight * 0.7,
+    height: windowHeight * 0.6,
     marginVertical: 20,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  directionsContainer: {
+    width: windowWidth * 0.9,
+    maxHeight: windowHeight * 0.2,
+    backgroundColor: 'white',
+    borderRadius: 10,
+    padding: 10,
+    marginTop: 10,
+  },
+  directionText: {
+    fontSize: 16,
+    marginBottom: 5,
   },
 });
 
