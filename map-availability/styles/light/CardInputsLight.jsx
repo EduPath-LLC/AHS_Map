@@ -11,7 +11,8 @@ export const styles = StyleSheet.create({
         backgroundColor: 'rgba(255,255,255,0.5)',
         width: 70 * width,
         height: 45 * height,
-        borderRadius: 10 * width
+        borderRadius: 10 * width,
+        alignSelf: 'center'
     },
     period: {
         fontFamily: 'Kanit-Bold',

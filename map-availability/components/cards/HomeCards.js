@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { View, Text, TextInput, KeyboardAvoidingView, Platform } from 'react-native'
 import { styles } from '../../styles/light/CardInputsLight'
 
-export default class CardInputs extends Component {
+export default class HomeCards extends Component {
     constructor(props) {
         super(props);
         this.state = {

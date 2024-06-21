@@ -6,6 +6,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase'
 import { styles } from '../styles/light/HomeLight'
 import WavyHeader from '../components/headers/WavyHeader'
+import HomeCarousel from '../components/cards/HomeCarousel';
 
 export default function Home({userId}) {
   const [firstName, setFirstName] = useState('');
@@ -43,6 +44,8 @@ export default function Home({userId}) {
         />
             <View style={styles.container}>
                 <Text style={styles.bigText}> Hello {firstName} </Text>
+
+                <HomeCarousel userId={userId} />
             </View>
         </View>
   );

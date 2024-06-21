@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Pressable, Text, Alert } from 'react-native';
+import { View, Pressable, Text, Alert, KeyboardAvoidingView, Platform } from 'react-native';
 import { createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
 import { getFirestore, collection, addDoc, doc, setDoc } from 'firebase/firestore';
 import { useFonts } from 'expo-font';
@@ -157,6 +157,11 @@ export default function SignUp({navigation}) {
         customImageDimensions={25}
       />
       <View style={styles.container}>
+      <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={{ flex: 1 }}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}
+        >
 
       <Text style={styles.title}> Sign Up </Text>
 
@@ -185,6 +190,7 @@ export default function SignUp({navigation}) {
           </View>
         )}
         
+      </KeyboardAvoidingView>
       </View>
     </View>
   );
