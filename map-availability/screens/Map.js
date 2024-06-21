@@ -10,7 +10,7 @@ const Map = () => {
     longitudeDelta: 0.005,
   });
 
-  const [currentLocation, setCurrentLocation] = useState({ latitude: 33.150083, longitude: -96.695083 });
+  const [currentLocation, setCurrentLocation] = useState({ latitude: 33.15005556, longitude: -96.695055 });
   const [destination, setDestination] = useState(null);
   const [routeCoordinates, setRouteCoordinates] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -40,58 +40,95 @@ const Map = () => {
 
   const findNearestPoint = (location, points) => {
     return points.reduce((prev, curr) => {
-      const prevDistance = Math.hypot(prev.latitude - location.latitude, prev.longitude - location.longitude);
+      const prevDistance = Math.hypot(prev.point.latitude - location.latitude, prev.point.longitude - location.longitude);
       const currDistance = Math.hypot(curr.latitude - location.latitude, curr.longitude - location.longitude);
-      return currDistance < prevDistance ? curr : prev;
-    });
+      return currDistance < prevDistance ? { point: curr, distance: currDistance } : prev;
+    }, { point: points[0], distance: Infinity });
   };
 
   const calculateDistance = (point1, point2) => {
     return Math.hypot(point2.latitude - point1.latitude, point2.longitude - point1.longitude);
   };
 
+  const buildGraph = (coordinates, currentLocation) => {
+    const graph = {};
+    const nearest = findNearestPoint(currentLocation, coordinates);
+    
+    // Add current location to the graph
+    graph['current'] = [
+      { reference: nearest.point.reference, distance: nearest.distance },
+      { reference: coordinates[(coordinates.indexOf(nearest.point) + 1) % coordinates.length].reference, 
+        distance: calculateDistance(currentLocation, coordinates[(coordinates.indexOf(nearest.point) + 1) % coordinates.length]) }
+    ];
+  
+    // Add direct connections to start and end points (A and G)
+    const startPoint = coordinates[0];
+    const endPoint = coordinates[coordinates.length - 1];
+    graph['current'].push(
+      { reference: startPoint.reference, distance: calculateDistance(currentLocation, startPoint) },
+      { reference: endPoint.reference, distance: calculateDistance(currentLocation, endPoint) }
+    );
+  
+    coordinates.forEach((point, index) => {
+      graph[point.reference] = [];
+      const nextIndex = (index + 1) % coordinates.length;
+      const prevIndex = (index - 1 + coordinates.length) % coordinates.length;
+      
+      graph[point.reference].push({
+        reference: coordinates[nextIndex].reference,
+        distance: calculateDistance(point, coordinates[nextIndex])
+      });
+      graph[point.reference].push({
+        reference: coordinates[prevIndex].reference,
+        distance: calculateDistance(point, coordinates[prevIndex])
+      });
+  
+      // Connect to current location if it's one of the nearest points or start/end point
+      if (point.reference === nearest.point.reference || 
+          point.reference === coordinates[(coordinates.indexOf(nearest.point) + 1) % coordinates.length].reference ||
+          point === startPoint || point === endPoint) {
+        graph[point.reference].push({
+          reference: 'current',
+          distance: calculateDistance(point, currentLocation)
+        });
+      }
+    });
+    return graph;
+  };
+
   const dijkstra = (start, end, graph) => {
     const distances = {};
-    const visited = {};
     const previous = {};
     const queue = [];
 
-    for (let point of graph) {
-      distances[point.reference] = Infinity;
-      previous[point.reference] = null;
+    for (let point in graph) {
+      distances[point] = Infinity;
+      previous[point] = null;
       queue.push(point);
     }
-    distances[start.reference] = 0;
+    distances[start] = 0;
 
     while (queue.length > 0) {
-      queue.sort((a, b) => distances[a.reference] - distances[b.reference]);
+      queue.sort((a, b) => distances[a] - distances[b]);
       const current = queue.shift();
 
-      if (current.reference === end.reference) break;
-      if (distances[current.reference] === Infinity) break;
+      if (current === end) break;
+      if (distances[current] === Infinity) break;
 
-      const currentIndex = graph.indexOf(current);
-      const neighbors = [];
-      if (currentIndex > 0) neighbors.push(graph[currentIndex - 1]);
-      if (currentIndex < graph.length - 1) neighbors.push(graph[currentIndex + 1]);
-
-      for (let neighbor of neighbors) {
-        if (visited[neighbor.reference]) continue;
-
-        const alt = distances[current.reference] + calculateDistance(current, neighbor);
+      for (let neighbor of graph[current]) {
+        const alt = distances[current] + neighbor.distance;
         if (alt < distances[neighbor.reference]) {
           distances[neighbor.reference] = alt;
           previous[neighbor.reference] = current;
         }
       }
-      visited[current.reference] = true;
     }
 
     const path = [];
     let step = end;
-    while (previous[step.reference]) {
+    while (previous[step]) {
       path.unshift(step);
-      step = previous[step.reference];
+      step = previous[step];
     }
     path.unshift(start);
     return path;
@@ -102,13 +139,18 @@ const Map = () => {
     if (destinationPoint) {
       setDestination(destinationPoint);
 
-      // Find the nearest points on the polyline to the current location and destination
-      const startNearestPoint = findNearestPoint(currentLocation, polylineCoordinates);
-      const endNearestPoint = findNearestPoint(destinationPoint, polylineCoordinates);
-
       // Generate the route using Dijkstra's algorithm
-      const path = dijkstra(startNearestPoint, endNearestPoint, polylineCoordinates);
-      setRouteCoordinates([currentLocation, ...path, destinationPoint]);
+      const graph = buildGraph(polylineCoordinates, currentLocation);
+      const path = dijkstra('current', destinationPoint.reference, graph);
+
+      // Convert path references to coordinates
+      const routeCoords = path.map(ref => {
+        if (ref === 'current') return currentLocation;
+        return polylineCoordinates.find(point => point.reference === ref);
+      });
+
+      // Set route coordinates
+      setRouteCoordinates(routeCoords);
     }
   };
 
@@ -141,6 +183,11 @@ const Map = () => {
             description={`Latitude: ${point.latitude}, Longitude: ${point.longitude}`}
           />
         ))}
+        <Marker
+          coordinate={currentLocation}
+          title="Current Location"
+          pinColor="blue"
+        />
         <Polyline
           coordinates={polylineCoordinates}
           strokeColor="#07AFF0"
