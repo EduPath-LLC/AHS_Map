@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, StyleSheet, Dimensions, TextInput, Button } from 'react-native';
+import { View, StyleSheet, Dimensions, TextInput, Button, Text } from 'react-native';
 import MapView, { Polyline, Marker } from 'react-native-maps';
+import * as Location from 'expo-location'
+import { useRoute } from '@react-navigation/native';
 
 export default function Map() {
   const [region, setRegion] = useState({
@@ -10,13 +12,27 @@ export default function Map() {
     longitudeDelta: 0.005,
   });
 
+  const route = useRoute();
+
+  const { roomNumber } = route.params || {};
+
+
+
   const [currentLocation, setCurrentLocation] = useState({ latitude: 33.15005556, longitude: -96.695055 });
   const [destination, setDestination] = useState(null);
   const [routeCoordinates, setRouteCoordinates] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [locationData, setLocationData] = useState({});
+  const [location, setLocation] = useState({});
+  const [altitude, setAltitude] = useState(null);
   const mapRef = useRef(null);
 
   useEffect(() => {
+
+    if(roomNumber){
+      setSearchQuery(roomNumber);
+    }
+
     if (mapRef.current) {
       mapRef.current.animateCamera({
         center: currentLocation,
@@ -26,7 +42,38 @@ export default function Map() {
         zoom: 1,
       });
     }
-  }, []);
+
+    let subscription;
+
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        setErrorMsg('Permission to access location was denied');
+        return;
+      }
+      
+      subscription = await Location.watchPositionAsync(
+        {
+          accuracy: Location.Accuracy.High,
+          timeInterval: 5000, // 5 seconds
+          distanceInterval: 10, // 10 meters
+        },
+        (newLocation) => {
+          setLocationData(newLocation);
+          setAltitude(newLocation.coords.altitude);
+          let locData = {latitude: newLocation.coords.latitude, longitude: newLocation.coords.longitude};
+          setLocation(locData)
+        }
+      );
+    })();
+
+    return () => {
+      if (subscription) {
+        subscription.remove();
+      }
+    };
+
+  }, [roomNumber]);
 
   const polylineCoordinates = [
     { latitude: 33.148972, longitude: -96.695055, reference: 'A' },
@@ -154,6 +201,7 @@ export default function Map() {
     }
   };
 
+
   return (
     <View style={styles.container}>
       <TextInput
@@ -175,6 +223,8 @@ export default function Map() {
         rotateEnabled={true}
         ref={mapRef}
       >
+        <Marker coordinate={location} />
+        {/* {console.log(location)} */}
         {polylineCoordinates.map((point, index) => (
           <Marker
             key={index}
