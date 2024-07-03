@@ -100,6 +100,9 @@ export default function SignIn({ navigation }) {
       }
 
       const firstTime = await isFirstTime(user.uid);
+
+      setEmail("");
+      setPassword("");
       setLoading(false);
 
       if (firstTime) {
@@ -164,7 +167,7 @@ export default function SignIn({ navigation }) {
                 style={styles.signUpButton}
                 onPress={() => navigation.navigate('SignUp')}
               >
-                <Text style={styles.signUpText}>Don't Have an Account Yet?</Text>
+                <Text style={styles.signUpText}>Don't Have an Account Yet? </Text>
                 <Text style={styles.signUp}>Sign Up</Text>
               </Pressable>
             </View>

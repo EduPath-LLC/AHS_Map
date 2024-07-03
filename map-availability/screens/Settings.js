@@ -1,16 +1,25 @@
-import React from 'react'
-import { View, Text, TextInput, Switch, Pressable } from 'react-native'
-import WavyHeader from '../components/headers/WavyHeader'
-import { styles } from '../styles/dark/SettingsDark'
-import {useState} from 'react';
+import React, { useState } from 'react';
+import { View, Text, TextInput, Switch, Pressable, Alert } from 'react-native';
+import { signOut } from 'firebase/auth';
+import WavyHeader from '../components/headers/WavyHeader';
+import { styles } from '../styles/dark/SettingsDark';
+import { auth } from '../firebase';
 
-
-
-export default function Settings() {
+export default function Settings({ userId, navigation }) {
     const [dMisEnabled, dMsetIsEnabled] = useState(false);
     const dMtoggleSwitch = () => dMsetIsEnabled(previousState => !previousState);
     const [oMAisEnabled, oMAsetIsEnabled] = useState(false);
     const oMAtoggleSwitch = () => oMAsetIsEnabled(previousState => !previousState);
+
+    const logOut = async () => {
+        signOut(auth)
+        .then(() => {
+            navigation.navigate("SignIn")
+        }).catch((e) => {
+            Alert.alert("Error", e);
+        })
+    }
+    
     return (
         <View style={styles.fullScreen}>
             <WavyHeader 
@@ -18,10 +27,10 @@ export default function Settings() {
                 customTop={10}
                 customImageDimensions={20}
             />
-                <View style={styles.container}>
-                    <Text style={styles.bigText}> Settings </Text>
-                    <TextInput style={styles.firstNameTextInput}> First Name </TextInput>
-                    <View style={{flexDirection: 'row'}}>
+            <View style={styles.container}>
+                <Text style={styles.bigText}> Settings </Text>
+                <TextInput style={styles.firstNameTextInput} placeholder='First Name' />
+                <View style={{flexDirection: 'row'}}>
                     <Text style={styles.normalText}> Dark Mode </Text>
                     <Switch
                         style={styles.toggleSwitch}
@@ -31,8 +40,8 @@ export default function Settings() {
                         onValueChange={dMtoggleSwitch}
                         value={dMisEnabled}
                     />
-                    </View>
-                    <View style={{flexDirection: 'row'}}>
+                </View>
+                <View style={{flexDirection: 'row'}}>
                     <Text style={styles.normalText}> 1 Min Alert  </Text>
                     <Switch
                         style={styles.toggleSwitch}
@@ -42,19 +51,18 @@ export default function Settings() {
                         onValueChange={oMAtoggleSwitch}
                         value={oMAisEnabled}
                     />
-                    </View>
-                    <View>
+                </View>
+                <View>
                     <Pressable style={styles.button}>
-                        <Text style={styles.buttonText}>Edit Schedule</Text>
+                        <Text style={styles.buttonText} onPress={() => navigation.navigate("SetSchedule", {userId: userId})}>Edit Schedule</Text>
                     </Pressable>
-                    </View>
-                    <View>
-                    <Pressable style={[styles.button, {backgroundColor: "#EE6F6F"}]}>
-                    {/* style={[styles.pressable, { backgroundColor: 'lightblue' }]} */}
+                </View>
+                <View>
+                    <Pressable style={[styles.button, {backgroundColor: "#EE6F6F"}]} onPress={logOut}>
                         <Text style={styles.buttonText}>Log Out</Text>
                     </Pressable>
-                    </View>
                 </View>
-            </View>
-    )
+            </View> 
+        </View>
+    );
 }

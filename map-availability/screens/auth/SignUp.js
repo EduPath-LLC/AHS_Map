@@ -55,6 +55,7 @@ export default function SignUp({navigation}) {
         email: email,
         firstName: FirstName,
         firstTime: true,
+        light: true,
      });
 
       let docRefFirst = doc(collection(db, `users/${user.uid}/schedule`), 'First');
