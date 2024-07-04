@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { View, Text, TextInput } from 'react-native'
+import { View, Text, TextInput, KeyboardAvoidingView, Platform } from 'react-native'
 import { styles } from '../../styles/light/CardInputsLight'
 
 export default class CardInputs extends Component {
@@ -28,8 +28,11 @@ export default class CardInputs extends Component {
     render() {
         if(this.state.arr.id != 'Lunch'){
             return (
+
                 <View style={styles.card}>
                     <Text style={styles.period}> {this.state.arr.id} Period </Text>
+
+
 
                     <TextInput
                         style={styles.input}
@@ -56,8 +59,9 @@ export default class CardInputs extends Component {
                         style={styles.input}
                         placeholder="Room Number"
                         value={this.state.arr.roomNumber}
-                        onChangeText={(value) => this.handleInputChange('room', value)}
+                        onChangeText={(value) => this.handleInputChange('roomNumber', value)}
                     />
+
                 </View>
             );
         } else {

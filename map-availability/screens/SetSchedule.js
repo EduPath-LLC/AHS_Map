@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, KeyboardAvoidingView, Platform } from 'react-native';
 
 import { styles } from '../styles/light/SetSchedule';
 
@@ -13,12 +13,18 @@ export default function SetSchedule({ route, navigation }) {
         <View style={styles.fullScreen}>
             <WavyHeader 
                 customHeight={15}
-                customTop={10}
+                customTop={8}
                 customImageDimensions={20}
             />
             <View style={styles.container}>
+            <KeyboardAvoidingView
+                    behavior={Platform.OS === 'ios' ? 'position' : 'height'}
+                    style={{ flex: 1 }}
+                    keyboardVerticalOffset={Platform.OS === 'ios' ? -100 : 0}
+                >
                 <Text style={styles.title} >Schedule Set Up</Text>
                 <Carousel userId={userId} navigation={navigation} />
+                </KeyboardAvoidingView>
             </View>
         </View>
     );

@@ -39,7 +39,9 @@ export default function BottomTab() {
       </Tab.Screen>
       <Tab.Screen name="Map" component={Map} />
       <Tab.Screen name="Availability" component={Availability} />
-      <Tab.Screen name="Settings" component={Settings} />
+      <Tab.Screen name="Settings">
+        {props => <Settings {...props} userId={userId} />}
+      </Tab.Screen>
     </Tab.Navigator>
   );
 }

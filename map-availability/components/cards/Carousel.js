@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { View, Text, Alert, Image, Pressable } from 'react-native'
+import { View, Text, Alert, Image, Pressable, KeyboardAvoidingView, Platform } from 'react-native'
 import { doc, getDocs, collection, setDoc, docRef, updateDoc } from 'firebase/firestore';
 import { db } from '../../firebase'
 

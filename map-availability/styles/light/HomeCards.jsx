@@ -12,7 +12,8 @@ export const styles = StyleSheet.create({
         width: 70 * width,
         height: 45 * height,
         borderRadius: 10 * width,
-        alignSelf: 'center'
+        alignSelf: 'center',
+        marginTop: 2 * height
     },
     period: {
         fontFamily: 'Kanit-Bold',
@@ -20,13 +21,10 @@ export const styles = StyleSheet.create({
         textAlign: 'center',
         marginTop: height
     },
-    input: {
-        width: 60 * width,
-        height: 7 * height,
-        padding: 3 * width,
-        borderRadius: 5 * width,
-        backgroundColor: "#FFFFFF",
-        margin: height,
-        alignSelf: 'center'
+    list: {
+        fontFamily: 'Kanit-Black',
+        margin: 2 * width,
+        fontSize: 2 * height,
+        marginTop: 4 * height
     }
 })

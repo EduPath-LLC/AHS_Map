@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Pressable, Text, Alert } from 'react-native';
+import { View, Pressable, Text, Alert, KeyboardAvoidingView, Platform } from 'react-native';
 import { signInWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import * as SplashScreen from 'expo-splash-screen';
@@ -100,6 +100,9 @@ export default function SignIn({ navigation }) {
       }
 
       const firstTime = await isFirstTime(user.uid);
+
+      setEmail("");
+      setPassword("");
       setLoading(false);
 
       if (firstTime) {
@@ -130,39 +133,46 @@ export default function SignIn({ navigation }) {
 
   return (
     <View style={styles.fullScreen} onLayout={onLayoutRootView}>
-      <WavyHeader
-        customHeight={20}
-        customTop={15}
-        customImageDimensions={25}
-      />
+      <WavyHeader customHeight={20} customTop={15} customImageDimensions={25} />
       <View style={styles.container}>
-        <Text style={styles.title}>Sign In</Text>
-        {loading ? (
-          <View style={{ marginTop: 100 }}>
-            <Loader />
-          </View>
-        ) : (
-          <View>
-            <EmailInput email={email} onEmailChange={setEmail} />
-            <PasswordInput password={password} onPasswordChange={setPassword} />
-            <View style={styles.forgotPasswordContainer}>
-              <Text style={styles.forgotPassword} onPress={() => navigation.navigate('ResetPassword')}>Forgot Password?</Text>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={{ flex: 1 }}
+          keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}
+        >
+          <Text style={styles.title}>Sign In</Text>
+          {loading ? (
+            <View style={{ marginTop: 100 }}>
+              <Loader />
             </View>
-            <Pressable
-              style={styles.button}
-              onPress={() => handleSignIn(email, password)}
-            >
-              <Text style={styles.buttonText}>Log In</Text>
-            </Pressable>
-            <Pressable
-              style={styles.signUpButton}
-              onPress={() => navigation.navigate('SignUp')}
-            >
-              <Text style={styles.signUpText}>Don't Have an Account Yet?</Text>
-              <Text style={styles.signUp}>Sign Up</Text>
-            </Pressable>
-          </View>
-        )}
+          ) : (
+            <View>
+              <EmailInput email={email} onEmailChange={setEmail} />
+              <PasswordInput password={password} onPasswordChange={setPassword} />
+              <View style={styles.forgotPasswordContainer}>
+                <Text
+                  style={styles.forgotPassword}
+                  onPress={() => navigation.navigate('ResetPassword')}
+                >
+                  Forgot Password?
+                </Text>
+              </View>
+              <Pressable
+                style={styles.button}
+                onPress={() => handleSignIn(email, password)}
+              >
+                <Text style={styles.buttonText}>Log In</Text>
+              </Pressable>
+              <Pressable
+                style={styles.signUpButton}
+                onPress={() => navigation.navigate('SignUp')}
+              >
+                <Text style={styles.signUpText}>Don't Have an Account Yet? </Text>
+                <Text style={styles.signUp}>Sign Up</Text>
+              </Pressable>
+            </View>
+          )}
+        </KeyboardAvoidingView>
       </View>
     </View>
   );

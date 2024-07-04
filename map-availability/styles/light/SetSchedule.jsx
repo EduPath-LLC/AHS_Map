@@ -19,6 +19,7 @@ export const styles = StyleSheet.create({
   title: {
     fontFamily: 'Kanit-Bold',
     fontSize: 10 * width,
-    margin: 5 * width
+    margin: 5 * width,
+    alignSelf: 'center'
   }
 });
