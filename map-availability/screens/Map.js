@@ -133,7 +133,18 @@ function findLowestCostNode(costs, processed) {
     return lowest;
   }, null);
 }
-
+function calculateTotalDistance(routeCoordinates) {
+  let totalDistance = 0;
+  for (let i = 0; i < routeCoordinates.length - 1; i++) {
+    totalDistance += calculateDistance(
+      routeCoordinates[i].latitude,
+      routeCoordinates[i].longitude,
+      routeCoordinates[i + 1].latitude,
+      routeCoordinates[i + 1].longitude
+    );
+  }
+  return totalDistance;
+}
 function calculateBearing(start, end) {
   const startLat = start.latitude * Math.PI / 180;
   const startLng = start.longitude * Math.PI / 180;
@@ -161,6 +172,32 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
 
   return R * c; // Distance in meters
 }
+function checkDistanceToPolyline(userLocation) {
+  if (!userLocation) return;
+
+  const { point: nearestPoint } = findNearestPointOnPolyline(userLocation);
+  const distanceToPolyline = calculateDistance(
+    userLocation.latitude,
+    userLocation.longitude,
+    nearestPoint.latitude,
+    nearestPoint.longitude
+  );
+
+  setIsMapDisabled(distanceToPolyline > 200);
+}
+function calculateRouteLengthInFeet(route) {
+  let totalDistance = 0;
+  for (let i = 0; i < route.length - 1; i++) {
+    totalDistance += calculateDistance(
+      route[i].latitude,
+      route[i].longitude,
+      route[i + 1].latitude,
+      route[i + 1].longitude
+    );
+  }
+  // Convert meters to feet and round to nearest 5
+  return Math.round(totalDistance * 3.28084 / 5) * 5;
+}
 function findCurrentSegment(location, route) {
   if (!location || !route || route.length < 2) {
     return { currentSegment: 0, progress: 0 };
@@ -187,8 +224,10 @@ function findCurrentSegment(location, route) {
 
   return { currentSegment, progress };
 }
+
 export default function Map() {
   const { location, errorMsg } = useContext(LocationContext);
+  const [estimatedTime, setEstimatedTime] = useState(0);
   const mapRef = useRef(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [route, setRoute] = useState([]);
@@ -196,7 +235,24 @@ export default function Map() {
   const [bearing, setBearing] = useState(0);
   const [isRouteActive, setIsRouteActive] = useState(false);
   const [showArrivedMessage, setShowArrivedMessage] = useState(false);
-const [destinationCoords, setDestinationCoords] = useState(null);
+  const [destinationCoords, setDestinationCoords] = useState(null);
+  const [hasArrived, setHasArrived] = useState(false);
+  const [isMapDisabled, setIsMapDisabled] = useState(false);
+  const [routeLength, setRouteLength] = useState(0);
+
+  const checkDistanceToPolyline = useCallback((userLocation) => {
+    if (!userLocation) return;
+
+    const { point: nearestPoint } = findNearestPointOnPolyline(userLocation);
+    const distanceToPolyline = calculateDistance(
+      userLocation.latitude,
+      userLocation.longitude,
+      nearestPoint.latitude,
+      nearestPoint.longitude
+    );
+
+    setIsMapDisabled(distanceToPolyline > 200);
+  }, []);
 
   const calculateRoute = useCallback((start, end) => {
     const { point: startPoint, segmentIndex } = findNearestPointOnPolyline(start);
@@ -237,49 +293,96 @@ const [destinationCoords, setDestinationCoords] = useState(null);
   }, []);
 
   useEffect(() => {
-    if (location && route.length > 1) {
-      const { currentSegment, progress } = findCurrentSegment(
-        { latitude: location.coords.latitude, longitude: location.coords.longitude },
-        route
-      );
+    if (location) {
+      // Check distance to polyline and disable map if necessary
+      checkDistanceToPolyline({
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude
+      });
   
-      if (currentSegment < route.length - 1) {
-        const start = route[currentSegment];
-        const end = route[currentSegment + 1];
+      if (route.length > 1 && destinationCoords) {
+        const { currentSegment, progress } = findCurrentSegment(
+          { latitude: location.coords.latitude, longitude: location.coords.longitude },
+          route
+        );
   
-        if (start && end) {
-          // Calculate the bearing to the next point on the route
-          const newBearing = calculateBearing(start, end);
+        // Calculate remaining distance
+        const remainingRoute = route.slice(currentSegment);
+        const remainingDistance = calculateTotalDistance(remainingRoute);
+        const remainingDistanceInFeet = Math.round(Math.round(remainingDistance * 3.28084) / 5) * 5;
+        const updatedEstimatedTime = Math.ceil(remainingDistanceInFeet / 280); // minutes
+        setEstimatedTime(updatedEstimatedTime);
+        
+        // Update route length
+        setRouteLength(remainingDistanceInFeet);
   
-          // If we're close to the end of the segment, look ahead to the next segment
-          if (progress > 0.9 && currentSegment < route.length - 2) {
-            const nextEnd = route[currentSegment + 2];
-            if (nextEnd) {
-              const nextBearing = calculateBearing(end, nextEnd);
-              // Interpolate between current and next bearing
-              const t = (progress - 0.9) / 0.1;
-              setBearing(newBearing * (1 - t) + nextBearing * t);
-            } else {
+        // Check distance to destination
+        const distanceToDestination = calculateDistance(
+          location.coords.latitude,
+          location.coords.longitude,
+          destinationCoords.latitude,
+          destinationCoords.longitude
+        );
+  
+        if (distanceToDestination <= 20) {
+          setHasArrived(true);
+          setShowArrivedMessage(true);
+          setRoute([]);
+          setDestination(null);
+          setBearing(0);
+          setIsRouteActive(false);
+          setEstimatedTime(0);
+          setRouteLength(0);
+          setTimeout(() => setShowArrivedMessage(false), 3000);
+        } else {
+          // Update bearing based on route
+          if (currentSegment < route.length - 1) {
+            const start = route[currentSegment];
+            const end = route[currentSegment + 1];
+  
+            if (start && end) {
+              const newBearing = calculateBearing(start, end);
               setBearing(newBearing);
             }
-          } else {
-            setBearing(newBearing);
           }
-  
+          
+          // Animate camera to current location with route bearing
           animateCamera({
             latitude: location.coords.latitude,
             longitude: location.coords.longitude,
-          }, newBearing);
+          }, bearing);
         }
       }
     }
-  }, [location, route, animateCamera]);
+  }, [location, route, destinationCoords, animateCamera, bearing, checkDistanceToPolyline]);
+  
+  useInterval(() => {
+    if (location && mapRef.current && isRouteActive) {
+      mapRef.current.animateCamera({
+        center: {
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+        },
+        heading: bearing,
+        pitch: 0,
+        zoom: 18,
+        altitude: 1000,
+      }, { duration: 1000 });
+    }
+  }, 5000);
+  useInterval(() => {
+    if (isRouteActive && !hasArrived) {
+      performSearch();
+    }
+  }, 3000);
+  
   const handleExitRoute = useCallback(() => {
     setRoute([]);
     setDestination(null);
     setBearing(0);
     setIsRouteActive(false);
-    setSearchQuery(''); // Clear the search bar
+    setSearchQuery('');
+    setDestinationCoords(null);
   
     // Reset the map view to the current location
     if (location) {
@@ -289,17 +392,17 @@ const [destinationCoords, setDestinationCoords] = useState(null);
       }, 0);
     }
   }, [location, animateCamera]);
-
-  const handleSearch = useCallback(() => {
-    if (location && searchQuery) {
-      const destination = searchQuery.toUpperCase();
-      setDestination(destination);
-  
+  const performSearch = useCallback(() => {
+    if (location && destination) {
       const newRoute = calculateRoute(
         { latitude: location.coords.latitude, longitude: location.coords.longitude },
         destination
       );
       setRoute(newRoute);
+  
+      // Calculate and set route length
+      const length = calculateRouteLengthInFeet(newRoute);
+      setRouteLength(length);
   
       if (newRoute.length > 1) {
         const { currentSegment } = findCurrentSegment(
@@ -317,13 +420,93 @@ const [destinationCoords, setDestinationCoords] = useState(null);
           const destPoint = newRoute[newRoute.length - 1];
           setDestinationCoords(destPoint);
   
-          // Animate camera immediately after search
-          animateCamera(start, newBearing);
-          setIsRouteActive(true);
+          // Animate camera to current location with new bearing
+          animateCamera({
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+          }, newBearing);
+  
+          // Calculate remaining distance
+          const remainingRoute = newRoute.slice(currentSegment);
+          const remainingDistance = calculateTotalDistance(remainingRoute);
+          const remainingDistanceInFeet = Math.round(Math.round(remainingDistance * 3.28084) / 5) * 5;
+          const updatedEstimatedTime = Math.ceil(remainingDistanceInFeet / 280); // minutes
+          setEstimatedTime(updatedEstimatedTime);
+  
+          // Check distance to destination
+          const distanceToDestination = calculateDistance(
+            location.coords.latitude,
+            location.coords.longitude,
+            destPoint.latitude,
+            destPoint.longitude
+          );
+  
+          if (distanceToDestination <= 20) {
+            setHasArrived(true);
+            setShowArrivedMessage(true);
+            setRoute([]);
+            setDestination(null);
+            setBearing(0);
+            setIsRouteActive(false);
+            setEstimatedTime(0);
+            setRouteLength(0);
+            setTimeout(() => setShowArrivedMessage(false), 3000);
+          }
         }
       }
     }
-  }, [location, searchQuery, calculateRoute, animateCamera]);
+  }, [
+    location,
+    destination,
+    calculateRoute,
+    calculateRouteLengthInFeet,
+    findCurrentSegment,
+    calculateBearing,
+    animateCamera,
+    calculateTotalDistance,
+    calculateDistance
+  ]);
+  const handleSearch = useCallback(() => {
+    if (location && searchQuery) {
+      setHasArrived(false);
+      const newDestination = searchQuery.toUpperCase();
+      setDestination(newDestination);
+      setIsRouteActive(true);
+      
+      // Immediately calculate and set the new route
+      const newRoute = calculateRoute(
+        { latitude: location.coords.latitude, longitude: location.coords.longitude },
+        newDestination
+      );
+      setRoute(newRoute);
+      
+      // Calculate and set route length
+      const length = calculateRouteLengthInFeet(newRoute);
+      setRouteLength(length);
+      
+      // Calculate and set estimated time
+      const estimatedTimeInMinutes = Math.ceil(length / 280);
+      setEstimatedTime(estimatedTimeInMinutes);
+      
+      if (newRoute.length > 1) {
+        const start = newRoute[0];
+        const end = newRoute[1];
+        if (start && end) {
+          const newBearing = calculateBearing(start, end);
+          setBearing(newBearing);
+          
+          // Set destination coordinates
+          const destPoint = newRoute[newRoute.length - 1];
+          setDestinationCoords(destPoint);
+          
+          animateCamera({
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+          }, newBearing);
+        }
+      }
+    }
+  }, [location, searchQuery, calculateRoute, calculateRouteLengthInFeet, calculateBearing, animateCamera]);
   
   const animateCamera = useCallback((targetLocation, targetBearing) => {
     mapRef.current?.animateCamera({
@@ -337,20 +520,9 @@ const [destinationCoords, setDestinationCoords] = useState(null);
       altitude: 1000,
     }, { duration: 2000 }); // 2 seconds duration
   }, []);
-  useInterval(() => {
-    if (location && mapRef.current) {
-      mapRef.current.animateCamera({
-        center: {
-          latitude: location.coords.latitude,
-          longitude: location.coords.longitude,
-        },
-        heading: bearing,
-        pitch: 0,
-        zoom: 18,
-        altitude: 1000,
-      }, { duration: 1000 });
-    }
-  }, 5000);
+
+  // The return statement would start here
+  
   return (
     <View style={styles.container}>
       <View style={styles.searchContainer}>
@@ -363,7 +535,7 @@ const [destinationCoords, setDestinationCoords] = useState(null);
         <Button title="Search" onPress={handleSearch} />
         {isRouteActive && <Button title="Exit Route" onPress={handleExitRoute} />}
       </View>
-      {location && (
+      {location && !isMapDisabled ? (
         <MapView
           ref={mapRef}
           style={styles.map}
@@ -384,7 +556,7 @@ const [destinationCoords, setDestinationCoords] = useState(null);
             strokeColor="#4a4a4a"
             strokeWidth={6}
           />
-          {route.length > 0 && (
+          {route.length > 0 && !hasArrived && (
             <Polyline
               coordinates={route}
               strokeColor="#1E90FF"
@@ -392,15 +564,31 @@ const [destinationCoords, setDestinationCoords] = useState(null);
             />
           )}
         </MapView>
+      ) : (
+        <View style={styles.disabledMapContainer}>
+          <Text style={styles.disabledMapText}>
+            Map is currently unavailable. Please move closer to the designated area.
+          </Text>
+        </View>
       )}
       {showArrivedMessage && (
         <View style={styles.arrivedMessageContainer}>
           <Text style={styles.arrivedMessageText}>You have arrived!</Text>
         </View>
       )}
+      {isRouteActive && (
+  <View style={styles.routeInfoContainer}>
+    <Text style={styles.routeInfoText}>
+      Distance: {routeLength} feet
+    </Text>
+    <Text style={styles.routeInfoText}>
+      Estimated time: {estimatedTime} minutes
+    </Text>
+  </View>
+)}
     </View>
   );
-  }
+}
   
   const styles = StyleSheet.create({
     container: {
@@ -442,8 +630,31 @@ const [destinationCoords, setDestinationCoords] = useState(null);
       fontSize: 24,
       fontWeight: 'bold',
     },
+    disabledMapContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: '#f0f0f0',
+    },
+    disabledMapText: {
+      fontSize: 18,
+      textAlign: 'center',
+      padding: 20,
+    },routeInfoContainer: {
+      position: 'absolute',
+      bottom: 20,
+      left: 10,
+      right: 10,
+      backgroundColor: 'rgba(255, 255, 255, 0.8)',
+      padding: 10,
+      borderRadius: 5,
+    },
+    routeInfoText: {
+      fontSize: 16,
+      textAlign: 'center',
+      marginBottom: 5,
+    },
   });
-
 // import React, { useContext, useEffect, useRef, useState, useCallback } from 'react';
 // import { View, StyleSheet, TextInput, Button, Text } from 'react-native';
 // import MapView, { Polyline } from 'react-native-maps';
