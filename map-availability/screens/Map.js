@@ -1,9 +1,14 @@
-
-
 import React, { useContext, useEffect, useRef, useState, useCallback } from 'react';
-import { View, StyleSheet, TextInput, Button, Text } from 'react-native';
+import { 
+  View, 
+  StyleSheet, 
+  TextInput, 
+  Text, 
+  TouchableOpacity,
+  Keyboard // Add this
+} from 'react-native';
 import MapView, { Polyline } from 'react-native-maps';
-import { LocationContext } from '../LocationContext';
+import { LocationContext } from '../LocationContext'; // Adjust this path as needed
 
 const polylineCoordinates = [
   { latitude: 33.148972, longitude: -96.695055, reference: 'A' },
@@ -198,9 +203,17 @@ function calculateRouteLengthInFeet(route) {
   // Convert meters to feet and round to nearest 5
   return Math.round(totalDistance * 3.28084 / 5) * 5;
 }
+function calculateTurnDirection(currentBearing, nextBearing) {
+  const angle = ((nextBearing - currentBearing + 360) % 360 + 360) % 360;
+  if (angle > 315 || angle <= 45) return 'straight';
+  if (angle > 45 && angle <= 135) return 'right';
+  return 'left';
+}
+
+// Modify the findCurrentSegment function
 function findCurrentSegment(location, route) {
   if (!location || !route || route.length < 2) {
-    return { currentSegment: 0, progress: 0 };
+    return { currentSegment: 0, progress: 0, currentBearing: 0, nextBearing: 0 };
   }
 
   let minDistance = Infinity;
@@ -222,7 +235,11 @@ function findCurrentSegment(location, route) {
     }
   }
 
-  return { currentSegment, progress };
+  const currentBearing = calculateBearing(route[currentSegment], route[currentSegment + 1]);
+  const nextBearing = currentSegment < route.length - 2 ? 
+    calculateBearing(route[currentSegment + 1], route[currentSegment + 2]) : currentBearing;
+
+  return { currentSegment, progress, currentBearing, nextBearing };
 }
 
 export default function Map() {
@@ -238,7 +255,8 @@ export default function Map() {
   const [destinationCoords, setDestinationCoords] = useState(null);
   const [hasArrived, setHasArrived] = useState(false);
   const [isMapDisabled, setIsMapDisabled] = useState(false);
-  const [routeLength, setRouteLength] = useState(0);
+  const [currentDirection, setCurrentDirection] = useState('');
+  const [remainingDistance, setRemainingDistance] = useState(0);
 
   const checkDistanceToPolyline = useCallback((userLocation) => {
     if (!userLocation) return;
@@ -259,7 +277,6 @@ export default function Map() {
     
     const graph = {};
     
-    // Create graph with connections only between adjacent points on the polyline
     for (let i = 0; i < polylineCoordinates.length; i++) {
       const point = polylineCoordinates[i];
       const nextPoint = polylineCoordinates[(i + 1) % polylineCoordinates.length];
@@ -271,7 +288,6 @@ export default function Map() {
       graph[nextPoint.reference][point.reference] = distance(nextPoint, point);
     }
     
-    // Add connections for the start point
     graph[startPoint.reference] = {};
     graph[startPoint.reference][polylineCoordinates[segmentIndex].reference] = distance(startPoint, polylineCoordinates[segmentIndex]);
     graph[startPoint.reference][polylineCoordinates[(segmentIndex + 1) % polylineCoordinates.length].reference] = distance(startPoint, polylineCoordinates[(segmentIndex + 1) % polylineCoordinates.length]);
@@ -281,7 +297,6 @@ export default function Map() {
 
     const path = dijkstra(graph, startPoint.reference, end);
     
-    // Reconstruct route through polyline
     const routeCoordinates = [startPoint];
     for (let i = 1; i < path.length; i++) {
       const currentRef = path[i];
@@ -294,29 +309,45 @@ export default function Map() {
 
   useEffect(() => {
     if (location) {
-      // Check distance to polyline and disable map if necessary
       checkDistanceToPolyline({
         latitude: location.coords.latitude,
         longitude: location.coords.longitude
       });
   
       if (route.length > 1 && destinationCoords) {
-        const { currentSegment, progress } = findCurrentSegment(
+        const { currentSegment, progress, currentBearing, nextBearing } = findCurrentSegment(
           { latitude: location.coords.latitude, longitude: location.coords.longitude },
           route
         );
   
-        // Calculate remaining distance
+        const currentSegmentDistance = calculateDistance(
+          route[currentSegment].latitude,
+          route[currentSegment].longitude,
+          route[currentSegment + 1].latitude,
+          route[currentSegment + 1].longitude
+        );
+        const remainingSegmentDistance = currentSegmentDistance * (1 - progress);
+  
+        const remainingDistanceInFeet = Math.round(remainingSegmentDistance * 3.28084 / 5) * 5;
+        setRemainingDistance(remainingDistanceInFeet);
+  
+        if (currentSegment < route.length - 2) {
+          const turnDirection = calculateTurnDirection(currentBearing, nextBearing);
+          if (remainingDistanceInFeet <= 20) {
+            setCurrentDirection(`Turn ${turnDirection} in ${remainingDistanceInFeet} feet`);
+          } else {
+            setCurrentDirection(`Go straight for ${remainingDistanceInFeet} feet then turn ${turnDirection}`);
+          }
+        } else if (currentSegment === route.length - 2) {
+          setCurrentDirection(`Go straight for ${remainingDistanceInFeet} feet and you will arrive at your destination`);
+        }
+  
         const remainingRoute = route.slice(currentSegment);
         const remainingDistance = calculateTotalDistance(remainingRoute);
-        const remainingDistanceInFeet = Math.round(Math.round(remainingDistance * 3.28084) / 5) * 5;
-        const updatedEstimatedTime = Math.ceil(remainingDistanceInFeet / 280); // minutes
+        const totalRemainingDistanceInFeet = Math.round(Math.round(remainingDistance * 3.28084) / 5) * 5;
+        const updatedEstimatedTime = Math.ceil(totalRemainingDistanceInFeet / 308);
         setEstimatedTime(updatedEstimatedTime);
-        
-        // Update route length
-        setRouteLength(remainingDistanceInFeet);
   
-        // Check distance to destination
         const distanceToDestination = calculateDistance(
           location.coords.latitude,
           location.coords.longitude,
@@ -332,10 +363,10 @@ export default function Map() {
           setBearing(0);
           setIsRouteActive(false);
           setEstimatedTime(0);
-          setRouteLength(0);
+          setCurrentDirection('');
+          setSearchQuery(''); // Clear the search query
           setTimeout(() => setShowArrivedMessage(false), 3000);
         } else {
-          // Update bearing based on route
           if (currentSegment < route.length - 1) {
             const start = route[currentSegment];
             const end = route[currentSegment + 1];
@@ -346,7 +377,6 @@ export default function Map() {
             }
           }
           
-          // Animate camera to current location with route bearing
           animateCamera({
             latitude: location.coords.latitude,
             longitude: location.coords.longitude,
@@ -369,7 +399,8 @@ export default function Map() {
         altitude: 1000,
       }, { duration: 1000 });
     }
-  }, 5000);
+  }, 3000);
+
   useInterval(() => {
     if (isRouteActive && !hasArrived) {
       performSearch();
@@ -381,10 +412,9 @@ export default function Map() {
     setDestination(null);
     setBearing(0);
     setIsRouteActive(false);
-    setSearchQuery('');
+    setSearchQuery(''); // Add this line to clear the search query
     setDestinationCoords(null);
   
-    // Reset the map view to the current location
     if (location) {
       animateCamera({
         latitude: location.coords.latitude,
@@ -392,6 +422,7 @@ export default function Map() {
       }, 0);
     }
   }, [location, animateCamera]);
+
   const performSearch = useCallback(() => {
     if (location && destination) {
       const newRoute = calculateRoute(
@@ -399,10 +430,6 @@ export default function Map() {
         destination
       );
       setRoute(newRoute);
-  
-      // Calculate and set route length
-      const length = calculateRouteLengthInFeet(newRoute);
-      setRouteLength(length);
   
       if (newRoute.length > 1) {
         const { currentSegment } = findCurrentSegment(
@@ -416,24 +443,20 @@ export default function Map() {
           const newBearing = calculateBearing(start, end);
           setBearing(newBearing);
   
-          // Set destination coordinates
           const destPoint = newRoute[newRoute.length - 1];
           setDestinationCoords(destPoint);
   
-          // Animate camera to current location with new bearing
           animateCamera({
             latitude: location.coords.latitude,
             longitude: location.coords.longitude,
           }, newBearing);
   
-          // Calculate remaining distance
           const remainingRoute = newRoute.slice(currentSegment);
           const remainingDistance = calculateTotalDistance(remainingRoute);
           const remainingDistanceInFeet = Math.round(Math.round(remainingDistance * 3.28084) / 5) * 5;
-          const updatedEstimatedTime = Math.ceil(remainingDistanceInFeet / 280); // minutes
+          const updatedEstimatedTime = Math.ceil(remainingDistanceInFeet / 308);
           setEstimatedTime(updatedEstimatedTime);
   
-          // Check distance to destination
           const distanceToDestination = calculateDistance(
             location.coords.latitude,
             location.coords.longitude,
@@ -449,7 +472,6 @@ export default function Map() {
             setBearing(0);
             setIsRouteActive(false);
             setEstimatedTime(0);
-            setRouteLength(0);
             setTimeout(() => setShowArrivedMessage(false), 3000);
           }
         }
@@ -459,33 +481,28 @@ export default function Map() {
     location,
     destination,
     calculateRoute,
-    calculateRouteLengthInFeet,
     findCurrentSegment,
     calculateBearing,
     animateCamera,
     calculateTotalDistance,
     calculateDistance
   ]);
+
   const handleSearch = useCallback(() => {
     if (location && searchQuery) {
+      Keyboard.dismiss(); // Dismiss the keyboard
       setHasArrived(false);
       const newDestination = searchQuery.toUpperCase();
       setDestination(newDestination);
       setIsRouteActive(true);
       
-      // Immediately calculate and set the new route
       const newRoute = calculateRoute(
         { latitude: location.coords.latitude, longitude: location.coords.longitude },
         newDestination
       );
       setRoute(newRoute);
       
-      // Calculate and set route length
-      const length = calculateRouteLengthInFeet(newRoute);
-      setRouteLength(length);
-      
-      // Calculate and set estimated time
-      const estimatedTimeInMinutes = Math.ceil(length / 280);
+      const estimatedTimeInMinutes = Math.ceil(calculateTotalDistance(newRoute) * 3.28084 / 308);
       setEstimatedTime(estimatedTimeInMinutes);
       
       if (newRoute.length > 1) {
@@ -495,7 +512,6 @@ export default function Map() {
           const newBearing = calculateBearing(start, end);
           setBearing(newBearing);
           
-          // Set destination coordinates
           const destPoint = newRoute[newRoute.length - 1];
           setDestinationCoords(destPoint);
           
@@ -506,7 +522,7 @@ export default function Map() {
         }
       }
     }
-  }, [location, searchQuery, calculateRoute, calculateRouteLengthInFeet, calculateBearing, animateCamera]);
+  }, [location, searchQuery, calculateRoute, calculateBearing, animateCamera, calculateTotalDistance]);
   
   const animateCamera = useCallback((targetLocation, targetBearing) => {
     mapRef.current?.animateCamera({
@@ -518,112 +534,179 @@ export default function Map() {
       pitch: 0,
       zoom: 18,
       altitude: 1000,
-    }, { duration: 2000 }); // 2 seconds duration
+    }, { duration: 3000 });
   }, []);
-
-  // The return statement would start here
   
   return (
     <View style={styles.container}>
-      <View style={styles.searchContainer}>
-        <TextInput
-          style={styles.searchInput}
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-          placeholder="Enter destination (A-G)"
+      <MapView
+        ref={mapRef}
+        style={styles.map}
+        initialCamera={{
+          center: {
+            latitude: location?.coords.latitude || 0,
+            longitude: location?.coords.longitude || 0,
+          },
+          pitch: 0,
+          heading: 0,
+          altitude: 1000,
+          zoom: 18,
+        }}
+        showsUserLocation={true}
+        showsCompass={!isRouteActive}
+      >
+        <Polyline
+          coordinates={polylineCoordinates}
+          strokeColor="#4a4a4a"
+          strokeWidth={6}
         />
-        <Button title="Search" onPress={handleSearch} />
-        {isRouteActive && <Button title="Exit Route" onPress={handleExitRoute} />}
-      </View>
-      {location && !isMapDisabled ? (
-        <MapView
-          ref={mapRef}
-          style={styles.map}
-          initialCamera={{
-            center: {
-              latitude: location.coords.latitude,
-              longitude: location.coords.longitude,
-            },
-            pitch: 0,
-            heading: 0,
-            altitude: 1000,
-            zoom: 18,
-          }}
-          showsUserLocation={true}
-        >
+        {route.length > 0 && !hasArrived && (
           <Polyline
-            coordinates={polylineCoordinates}
-            strokeColor="#4a4a4a"
-            strokeWidth={6}
+            coordinates={route}
+            strokeColor="#007AFF"
+            strokeWidth={4}
           />
-          {route.length > 0 && !hasArrived && (
-            <Polyline
-              coordinates={route}
-              strokeColor="#1E90FF"
-              strokeWidth={4}
-            />
-          )}
-        </MapView>
-      ) : (
+        )}
+      </MapView>
+      
+      <View style={styles.overlay}>
+        <View style={styles.searchContainer}>
+          <TextInput
+            style={styles.searchInput}
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            placeholder="Enter destination (A-G)"
+            placeholderTextColor="#999"
+          />
+          <TouchableOpacity style={styles.button} onPress={handleSearch}>
+            <Text style={styles.buttonText}>Search</Text>
+          </TouchableOpacity>
+        </View>
+        
+        {isRouteActive && (
+          <View style={styles.routeInfoContainer}>
+            <Text style={styles.routeInfoText}>
+              Estimated time: {estimatedTime} min
+            </Text>
+            <Text style={styles.directionText}>{currentDirection}</Text>
+            <TouchableOpacity style={styles.exitButton} onPress={handleExitRoute}>
+              <Text style={styles.exitButtonText}>Exit Route</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+      </View>
+  
+      {showArrivedMessage && (
+        <View style={styles.arrivedMessageContainer}>
+          <Text style={styles.arrivedMessageText}>You have arrived!</Text>
+        </View>
+      )}
+  
+      {isMapDisabled && (
         <View style={styles.disabledMapContainer}>
           <Text style={styles.disabledMapText}>
             Map is currently unavailable. Please move closer to the designated area.
           </Text>
         </View>
       )}
-      {showArrivedMessage && (
-        <View style={styles.arrivedMessageContainer}>
-          <Text style={styles.arrivedMessageText}>You have arrived!</Text>
-        </View>
-      )}
-      {isRouteActive && (
-  <View style={styles.routeInfoContainer}>
-    <Text style={styles.routeInfoText}>
-      Distance: {routeLength} feet
-    </Text>
-    <Text style={styles.routeInfoText}>
-      Estimated time: {estimatedTime} minutes
-    </Text>
-  </View>
-)}
     </View>
   );
 }
-  
   const styles = StyleSheet.create({
     container: {
       flex: 1,
     },
     map: {
-      width: '100%',
-      height: '100%',
+      ...StyleSheet.absoluteFillObject,
+    },
+    overlay: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
     },
     searchContainer: {
-      position: 'absolute',
-      top: 60,
-      left: 10,
-      right: 10,
       flexDirection: 'row',
-      zIndex: 1,
-      justifyContent: 'space-between',
+      marginTop: 50,
+      marginHorizontal: 20,
+      borderRadius: 25,
+      backgroundColor: 'white',
+      shadowColor: "#000",
+      shadowOffset: {
+        width: 0,
+        height: 2,
+      },
+      shadowOpacity: 0.25,
+      shadowRadius: 3.84,
+      elevation: 5,
     },
     searchInput: {
       flex: 1,
-      height: 40,
-      borderColor: 'gray',
-      borderWidth: 1,
-      paddingHorizontal: 10,
-      backgroundColor: 'white',
-      marginRight: 5,
+      height: 50,
+      paddingHorizontal: 20,
+      fontSize: 16,
+    },
+    button: {
+      backgroundColor: '#007AFF',
+      paddingHorizontal: 20,
+      justifyContent: 'center',
+      borderTopRightRadius: 25,
+      borderBottomRightRadius: 25,
+    },
+    buttonText: {
+      color: 'white',
+      fontSize: 16,
+      fontWeight: 'bold',
+    },
+    routeInfoContainer: {
+      position: 'absolute',
+      bottom: 30,
+      left: 20,
+      right: 20,
+      backgroundColor: 'rgba(255, 255, 255, 0.9)',
+      borderRadius: 15,
+      padding: 15,
+      shadowColor: "#000",
+      shadowOffset: {
+        width: 0,
+        height: 2,
+      },
+      shadowOpacity: 0.25,
+      shadowRadius: 3.84,
+      elevation: 5,
+    },
+    routeInfoText: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      marginBottom: 10,
+      textAlign: 'center',
+    },
+    directionText: {
+      fontSize: 16,
+      textAlign: 'center',
+      marginBottom: 15,
+    },
+    exitButton: {
+      backgroundColor: '#FF3B30',
+      paddingVertical: 10,
+      borderRadius: 20,
+      alignItems: 'center',
+    },
+    exitButtonText: {
+      color: 'white',
+      fontSize: 16,
+      fontWeight: 'bold',
     },
     arrivedMessageContainer: {
       position: 'absolute',
       top: '50%',
-      left: 0,
-      right: 0,
-      alignItems: 'center',
-      backgroundColor: 'rgba(0, 0, 0, 0.7)',
+      left: 20,
+      right: 20,
+      backgroundColor: 'rgba(0, 122, 255, 0.9)',
+      borderRadius: 15,
       padding: 20,
+      alignItems: 'center',
     },
     arrivedMessageText: {
       color: 'white',
@@ -631,28 +714,16 @@ export default function Map() {
       fontWeight: 'bold',
     },
     disabledMapContainer: {
-      flex: 1,
+      ...StyleSheet.absoluteFillObject,
       justifyContent: 'center',
       alignItems: 'center',
-      backgroundColor: '#f0f0f0',
+      backgroundColor: 'rgba(240, 240, 240, 0.9)',
     },
     disabledMapText: {
       fontSize: 18,
       textAlign: 'center',
       padding: 20,
-    },routeInfoContainer: {
-      position: 'absolute',
-      bottom: 20,
-      left: 10,
-      right: 10,
-      backgroundColor: 'rgba(255, 255, 255, 0.8)',
-      padding: 10,
-      borderRadius: 5,
-    },
-    routeInfoText: {
-      fontSize: 16,
-      textAlign: 'center',
-      marginBottom: 5,
+      color: '#333',
     },
   });
 // import React, { useContext, useEffect, useRef, useState, useCallback } from 'react';
