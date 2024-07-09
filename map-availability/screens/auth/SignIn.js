@@ -42,6 +42,8 @@ export default function SignIn({ navigation }) {
       }
     }
     prepare();
+
+
   }, []);
 
   const isFirstTime = async (userId) => {

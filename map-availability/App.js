@@ -2,7 +2,7 @@ import React from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { LocationProvider } from './LocationContext';
+import { LocationProvider } from './components/LocationContext';
 import SignUp from './screens/auth/SignUp.js'
 import SignIn from './screens/auth/SignIn.js';
 import BottomTab from './navigation/BottomTab.js';

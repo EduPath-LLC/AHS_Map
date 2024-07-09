@@ -2,14 +2,16 @@ import React, { useEffect, useState } from 'react';
 import { View, Text } from 'react-native';
 import { doc, getDoc } from 'firebase/firestore';
 
-
 import { db } from '../firebase'
-import { styles } from '../styles/light/HomeLight'
+import { stylesLight } from '../styles/light/HomeLight'
+import { stylesDark } from '../styles/dark/HomeDark'
 import WavyHeader from '../components/headers/WavyHeader'
 import HomeCarousel from '../components/cards/HomeCarousel';
 
 export default function Home({userId, navigation}) {
   const [firstName, setFirstName] = useState('');
+  const [darkMode, setDarkMode] = useState(false);
+  let styles = darkMode ? stylesDark : stylesLight;
 
   useEffect(() => {
     const fetchFirstName = async () => {
@@ -21,6 +23,13 @@ export default function Home({userId, navigation}) {
           if (userDocSnap.exists()) {
             const userData = userDocSnap.data();
             setFirstName(userData.firstName);
+
+            if(userData.dark) {
+              setDarkMode(true)
+            } else {
+              setDarkMode(false)
+            }
+
           } else {
             console.log('No such document!');
           }
@@ -33,7 +42,13 @@ export default function Home({userId, navigation}) {
     };
 
     fetchFirstName();
+
+    const interval = setInterval(fetchFirstName, 2000);
+
+    return () => clearInterval(interval);
+    
   }, [userId]);
+
 
   return (
     <View style={styles.fullScreen}>
@@ -41,11 +56,12 @@ export default function Home({userId, navigation}) {
           customHeight={15}
           customTop={10}
           customImageDimensions={20}
+          darkMode={darkMode}
         />
             <View style={styles.container}>
                 <Text style={styles.bigText}> Hello {firstName} </Text>
 
-                <HomeCarousel userId={userId} navigation={navigation} />
+                <HomeCarousel userId={userId} navigation={navigation} dark={darkMode} />
             </View>
         </View>
   );

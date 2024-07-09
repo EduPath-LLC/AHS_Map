@@ -52,11 +52,11 @@ export default function SignUp({navigation}) {
       const FirstName = email.slice(0,1).toUpperCase() + email.slice(1, email.indexOf("."))
       
       await setDoc(docRef, {
+        dark: false,
         email: email,
         firstName: FirstName,
         firstTime: true,
-        light: true,
-     });
+      });
 
       let docRefFirst = doc(collection(db, `users/${user.uid}/schedule`), 'First');
       let docRefSecond = doc(collection(db, `users/${user.uid}/schedule`), 'Second');

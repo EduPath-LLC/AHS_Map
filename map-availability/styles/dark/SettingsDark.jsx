@@ -6,7 +6,7 @@ const width = Dimensions.get('window').width * 0.01;
 const height = Dimensions.get('window').height * 0.01;
 
 
-export const styles = StyleSheet.create({
+export const stylesDark = StyleSheet.create({
     fullScreen: {
         flex: 1,
     },
@@ -15,7 +15,7 @@ export const styles = StyleSheet.create({
         flexDirection: 'column',
         alignItems: 'center',
         paddingTop: 10 * height,
-        backgroundColor: "#E0EDFC",
+        backgroundColor: "#001C2D",
         marginTop: 10 * height
     },
     bigText: {
@@ -23,6 +23,7 @@ export const styles = StyleSheet.create({
         alignItems: 'center',
         textAlign: 'left',
         fontFamily: 'Kanit-Bold',
+        color: '#ffffff'
     },
     firstNameTextInput: {
         width: 80 * width,
@@ -44,8 +45,8 @@ export const styles = StyleSheet.create({
         alignSelf: 'flex-start',
         textAlign: 'left',
         fontFamily: 'Kanit-Bold',
-        // marginRight: 40 * width,
         marginBottom: 2 * width,
+        color: '#ffffff'
     },
     button: {
         borderRadius: 9999,

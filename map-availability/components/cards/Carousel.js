@@ -3,7 +3,7 @@ import { View, Text, Alert, Image, Pressable, KeyboardAvoidingView, Platform } f
 import { doc, getDocs, collection, setDoc, docRef, updateDoc } from 'firebase/firestore';
 import { db } from '../../firebase'
 
-import { styles } from '../../styles/light/Carousel'
+import { styles } from '../../styles/light/CarouselLight'
 
 import Loader from '../Loader';
 import CardInputs from './CardInputs';

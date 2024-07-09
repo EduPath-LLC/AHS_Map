@@ -1,11 +1,16 @@
 import React, { Component } from 'react'
-import { View, Text, Pressable, Image } from 'react-native'
+import { View, Text, Pressable, Image, Alert } from 'react-native'
 import { getDocs, collection } from 'firebase/firestore';
 import { db } from '../../firebase'
 
-import { styles } from '../../styles/light/HomeCarousel'
-
+import { stylesLight } from '../../styles/light/HomeCarouselLight'
+import { stylesDark } from '../../styles/dark/HomeCarouselDark'
 import HomeCards from './HomeCards';
+
+import ArrowBack from '../../assets/images/ArrowBack.png';
+import ArrowBackDark from '../../assets/images/ArrowBackDark.png';
+import ArrowForward from '../../assets/images/ArrowForward.png';
+import ArrowForwardDark from '../../assets/images/ArrowForwardDark.png';
 
 export default class HomeCarousel extends Component {
     constructor(props) {
@@ -22,12 +27,16 @@ export default class HomeCarousel extends Component {
             seventh: {},
             eighth: {},
             lunch: {},
-            loading: false
+            loading: false,
+            arrowBack: this.props.dark ? ArrowBackDark : ArrowBack,
+            arrowForward: this.props.dark ? ArrowForwardDark : ArrowForward,
+            styles: this.props.dark ? stylesDark : stylesLight,
         };
     }
 
     componentDidMount() {
         this.fetchSchedule(this.props.userId);
+
     }
 
     fetchSchedule = async (userId) => {
@@ -69,23 +78,34 @@ export default class HomeCarousel extends Component {
     handleClassChange = (newArr) => {
         switch(this.state.current){
             case 1:
-                this.setState({first: newArr})
+                this.setState({first: newArr});
+                break;
             case 2:
-                this.setState({second: newArr})
+                this.setState({second: newArr});
+                break;
             case 3:
-                this.setState({third: newArr})
+                this.setState({third: newArr});
+                break;
             case 4:
-                this.setState({fourth: newArr})
+                this.setState({fourth: newArr});
+                break;
             case 5:
-                this.setState({fifth: newArr})
+                this.setState({fifth: newArr});
+                break;
             case 6:
-                this.setState({sixth: newArr})
+                this.setState({sixth: newArr});
+                break;
             case 7:
-                this.setState({seventh: newArr})
+                this.setState({seventh: newArr});
+                break;
             case 8:
-                this.setState({eighth: newArr})
+                this.setState({eighth: newArr});
+                break;
             case 9:
-                this.setState({lunch: newArr})
+                this.setState({lunch: newArr});
+                break;
+            default:
+                break;
         }
     }
 
@@ -105,7 +125,7 @@ export default class HomeCarousel extends Component {
         const scheduleItem = scheduleMap[current];
 
         return scheduleItem && scheduleItem.id ? (
-            <HomeCards key={scheduleItem.id} info={scheduleItem} />
+            <HomeCards key={scheduleItem.id} info={scheduleItem} dark={this.props.dark} />
         ) : (
             <View style={{alignSelf: 'center'}}>
                 <Text> Loading </Text>
@@ -139,43 +159,43 @@ export default class HomeCarousel extends Component {
         };
 
         const roomNumber = scheduleMap[this.state.current].roomNumber;
-        this.props.navigation.navigate('Map', {roomNumber: roomNumber})
+        this.props.navigation.navigate('Map', {roomNumber: roomNumber});
     }
 
     render() {
-    return (
-        <View>
-            <View style={styles.viewer}>
-                <Pressable 
-                    onPress={this.decrease}
-                    style={styles.arrows}
-                >
-                    <Image 
-                        style={styles.image}
-                        source={require('../../assets/images/ArrowBack.png')}
-                    />
-                </Pressable>
+        return (
+            <View>
+                <View style={this.state.styles.viewer}>
+                    <Pressable 
+                        onPress={this.decrease}
+                        style={this.state.styles.arrows}
+                    >
+                        <Image 
+                            style={this.state.styles.image}
+                            source={this.state.arrowBack}
+                        />
+                    </Pressable>
 
-                {this.renderCarousel(this.state.current)}
+                    {this.renderCarousel(this.state.current)}
+
+                    <Pressable 
+                        onPress={this.increase}
+                        style={this.state.styles.arrows}
+                    >
+                        <Image 
+                            style={this.state.styles.image}
+                            source={this.state.arrowForward}
+                        />
+                    </Pressable>
+                </View>
 
                 <Pressable 
-                    onPress={this.increase}
-                    style={styles.arrows}
+                    style={this.state.styles.button}
+                    onPress={this.handleSubmit}
                 >
-                    <Image 
-                        style={styles.image}
-                        source={require('../../assets/images/ArrowForward.png')}
-                    />
+                    <Text style={this.state.styles.buttonText}> Go To Class </Text>
                 </Pressable>
             </View>
-
-            <Pressable 
-                style={styles.button}
-                onPress={this.handleSubmit}
-            >
-                <Text style={styles.buttonText}> Go To Class </Text>
-            </Pressable>
-        </View>
-    )
+        );
     }
 }

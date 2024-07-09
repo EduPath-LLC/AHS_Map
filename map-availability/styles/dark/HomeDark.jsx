@@ -5,7 +5,7 @@ const width = Dimensions.get('window').width * 0.01;
 const height = Dimensions.get('window').height * 0.01;
 
 
-export const stylesLight = StyleSheet.create({
+export const stylesDark = StyleSheet.create({
     fullScreen: {
         flex: 1,
     },
@@ -14,13 +14,14 @@ export const stylesLight = StyleSheet.create({
         flexDirection: 'column',
         alignItems: 'center',
         paddingTop: 10 * height,
-        backgroundColor: "#E0EDFC",
+        backgroundColor: "#001C2D",
         marginTop: 15 * height
     },
     bigText: {
         fontSize: 10 * width,
         alignSelf: 'flex-start',
         textAlign: 'left',
-        fontFamily: 'Kanit-Bold'
+        fontFamily: 'Kanit-Bold',
+        color: "#FFFFFF"
     }
 });
