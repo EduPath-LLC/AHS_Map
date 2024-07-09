@@ -59,7 +59,7 @@ export default function Home({userId, navigation}) {
           darkMode={darkMode}
         />
             <View style={styles.container}>
-                <Text style={styles.bigText}> Hello {firstName} </Text>
+                <Text style={styles.bigText}> Hello, {firstName} </Text>
 
                 <HomeCarousel userId={userId} navigation={navigation} dark={darkMode} />
             </View>
