@@ -1,3 +1,5 @@
+
+
 import React, { useContext, useEffect, useRef, useState, useCallback } from 'react';
 import { 
   View, 
@@ -9,6 +11,8 @@ import {
 } from 'react-native';
 import MapView, { Polyline } from 'react-native-maps';
 import { LocationContext } from '../LocationContext'; // Adjust this path as needed
+import { MaterialIcons } from '@expo/vector-icons';
+
 
 const polylineCoordinates = [
   { latitude: 33.148972, longitude: -96.695055, reference: 'A' },
@@ -255,8 +259,9 @@ export default function Map() {
   const [destinationCoords, setDestinationCoords] = useState(null);
   const [hasArrived, setHasArrived] = useState(false);
   const [isMapDisabled, setIsMapDisabled] = useState(false);
-  const [currentDirection, setCurrentDirection] = useState('');
+  const [currentDirection, setCurrentDirection] = useState({ text: '', icon: null });
   const [remainingDistance, setRemainingDistance] = useState(0);
+  
 
   const checkDistanceToPolyline = useCallback((userLocation) => {
     if (!userLocation) return;
@@ -333,13 +338,15 @@ export default function Map() {
   
         if (currentSegment < route.length - 2) {
           const turnDirection = calculateTurnDirection(currentBearing, nextBearing);
-          if (remainingDistanceInFeet <= 20) {
-            setCurrentDirection(`Turn ${turnDirection} in ${remainingDistanceInFeet} feet`);
-          } else {
-            setCurrentDirection(`Go straight for ${remainingDistanceInFeet} feet then turn ${turnDirection}`);
-          }
+          setCurrentDirection({
+            text: `Turn ${turnDirection} in ${remainingDistanceInFeet} feet`,
+            turn: turnDirection
+          });
         } else if (currentSegment === route.length - 2) {
-          setCurrentDirection(`Go straight for ${remainingDistanceInFeet} feet and you will arrive at your destination`);
+          setCurrentDirection({
+            text: `Go straight for ${remainingDistanceInFeet} feet and you will arrive at your destination`,
+            turn: null
+          });
         }
   
         const remainingRoute = route.slice(currentSegment);
@@ -355,7 +362,7 @@ export default function Map() {
           destinationCoords.longitude
         );
   
-        if (distanceToDestination <= 20) {
+        if (distanceToDestination <= 10) {
           setHasArrived(true);
           setShowArrivedMessage(true);
           setRoute([]);
@@ -363,8 +370,8 @@ export default function Map() {
           setBearing(0);
           setIsRouteActive(false);
           setEstimatedTime(0);
-          setCurrentDirection('');
-          setSearchQuery(''); // Clear the search query
+          setCurrentDirection({ text: '', turn: null });
+          setSearchQuery('');
           setTimeout(() => setShowArrivedMessage(false), 3000);
         } else {
           if (currentSegment < route.length - 1) {
@@ -375,17 +382,33 @@ export default function Map() {
               const newBearing = calculateBearing(start, end);
               setBearing(newBearing);
             }
+            
+            animateCamera({
+              latitude: location.coords.latitude,
+              longitude: location.coords.longitude,
+            }, bearing);
           }
-          
-          animateCamera({
-            latitude: location.coords.latitude,
-            longitude: location.coords.longitude,
-          }, bearing);
         }
       }
     }
   }, [location, route, destinationCoords, animateCamera, bearing, checkDistanceToPolyline]);
   
+  useInterval(() => {
+    if (location && mapRef.current && !isRouteActive) {
+      mapRef.current.animateCamera({
+        center: {
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+        },
+        heading: 0,
+        pitch: 0,
+        zoom: 18,
+        altitude: 1000,
+      }, { duration: 1000 });
+    }
+  }, 3000);
+  
+  // Modify the existing useInterval hook
   useInterval(() => {
     if (location && mapRef.current && isRouteActive) {
       mapRef.current.animateCamera({
@@ -537,6 +560,8 @@ export default function Map() {
     }, { duration: 3000 });
   }, []);
   
+  
+  
   return (
     <View style={styles.container}>
       <MapView
@@ -584,11 +609,27 @@ export default function Map() {
         </View>
         
         {isRouteActive && (
+  <View style={styles.directionsContainer}>
+    <View style={styles.directionsContent}>
+      {currentDirection.turn === 'left' && (
+        <MaterialIcons name="arrow-back" size={30} color="#007AFF" />
+      )}
+      {currentDirection.turn === 'right' && (
+        <MaterialIcons name="arrow-forward" size={30} color="#007AFF" />
+      )}
+      <Text style={styles.directionsText}>
+        {currentDirection.text}
+      </Text>
+    </View>
+  </View>
+)}
+
+        
+        {isRouteActive && (
           <View style={styles.routeInfoContainer}>
             <Text style={styles.routeInfoText}>
               Estimated time: {estimatedTime} min
             </Text>
-            <Text style={styles.directionText}>{currentDirection}</Text>
             <TouchableOpacity style={styles.exitButton} onPress={handleExitRoute}>
               <Text style={styles.exitButtonText}>Exit Route</Text>
             </TouchableOpacity>
@@ -611,7 +652,8 @@ export default function Map() {
       )}
     </View>
   );
-}
+  }
+  
   const styles = StyleSheet.create({
     container: {
       flex: 1,
@@ -659,6 +701,63 @@ export default function Map() {
       fontSize: 16,
       fontWeight: 'bold',
     },
+    directionsContainer: {
+      marginTop: 10,
+      marginHorizontal: 20,
+      backgroundColor: 'rgba(255, 255, 255, 0.9)',
+      borderRadius: 15,
+      padding: 15,
+      shadowColor: "#000",
+      shadowOffset: {
+        width: 0,
+        height: 2,
+      },
+      shadowOpacity: 0.25,
+      shadowRadius: 3.84,
+      elevation: 5,
+    },
+    directionsContent: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    directionsText: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      textAlign: 'center',
+      textShadowColor: 'white',
+      textShadowOffset: { width: 1, height: 1 },
+      textShadowRadius: 2,
+    },
+    arrowContainer: {
+      width: 24,
+      height: 24,
+      marginRight: 10,
+    },
+    arrowVertical: {
+      position: 'absolute',
+      top: 0,
+      left: 11,
+      width: 2,
+      height: 18,
+      backgroundColor: '#007AFF',
+    },
+    arrowHorizontalLeft: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      width: 12,
+      height: 2,
+      backgroundColor: '#007AFF',
+    },
+    arrowHorizontalRight: {
+      position: 'absolute',
+      top: 0,
+      right: 0,
+      width: 12,
+      height: 2,
+      backgroundColor: '#007AFF',
+    },
     routeInfoContainer: {
       position: 'absolute',
       bottom: 30,
@@ -681,11 +780,6 @@ export default function Map() {
       fontWeight: 'bold',
       marginBottom: 10,
       textAlign: 'center',
-    },
-    directionText: {
-      fontSize: 16,
-      textAlign: 'center',
-      marginBottom: 15,
     },
     exitButton: {
       backgroundColor: '#FF3B30',
