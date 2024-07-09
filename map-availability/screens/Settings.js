@@ -99,8 +99,7 @@ export default function Settings({ userId, navigation }) {
             />
             <View style={styles.container}>
                 <Text style={styles.bigText}> Settings </Text>
-                <TextInput style={styles.firstNameTextInput} placeholder='First Name' />
-                <View style={{flexDirection: 'row'}}>
+                <View style={{flexDirection: 'row', marginTop: 50}}>
                     <Text style={styles.normalText}> Dark Mode </Text>
                     <Switch
                         style={styles.toggleSwitch}
@@ -123,8 +122,8 @@ export default function Settings({ userId, navigation }) {
                     />
                 </View>
                 <View>
-                    <Pressable style={styles.button}>
-                        <Text style={styles.buttonText} onPress={() => navigation.navigate("SetSchedule", {userId: userId})}>Edit Schedule</Text>
+                    <Pressable style={styles.button} onPress={() => navigation.navigate("SetSchedule", {userId: userId})}>
+                        <Text style={styles.buttonText}>Edit Schedule</Text>
                     </Pressable>
                 </View>
                 <View>

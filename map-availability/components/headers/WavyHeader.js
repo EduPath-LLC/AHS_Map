@@ -34,7 +34,7 @@ export default class WavyHeader extends Component {
   
           <Image
               style={[styles.logo, {height: this.props.customImageDimensions * width * 1.2, width: this.props.customImageDimensions * width * 1.6}]}
-              source={require('../../assets/Eagle_Logo.png')}
+              source={require('../../assets/images/Eagle_Logo.png')}
             />
   
         </View>

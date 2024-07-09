@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, KeyboardAvoidingView, Platform } from 'react-native';
 
 import { styles } from '../styles/light/SetSchedule';
@@ -8,6 +8,7 @@ import Carousel from '../components/cards/Carousel';
 
 export default function SetSchedule({ route, navigation }) {
     const { userId } = route.params;
+    const [darkMode, setDarkMode] = useState(false);
 
     return (
         <View style={styles.fullScreen}>
