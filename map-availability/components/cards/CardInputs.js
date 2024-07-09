@@ -1,12 +1,14 @@
 import React, { Component } from 'react'
 import { View, Text, TextInput, KeyboardAvoidingView, Platform } from 'react-native'
-import { styles } from '../../styles/light/CardInputsLight'
+import { stylesLight } from '../../styles/light/CardInputsLight'
+import { stylesDark } from '../../styles/dark/CardInputsDark'
 
 export default class CardInputs extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            arr: {}
+            arr: {},
+            styles: this.props.dark ? stylesDark : stylesLight,
         };
     }
 
@@ -29,34 +31,34 @@ export default class CardInputs extends Component {
         if(this.state.arr.id != 'Lunch'){
             return (
 
-                <View style={styles.card}>
-                    <Text style={styles.period}> {this.state.arr.id} Period </Text>
+                <View style={this.state.styles.card}>
+                    <Text style={this.state.styles.period}> {this.state.arr.id} Period </Text>
 
 
 
                     <TextInput
-                        style={styles.input}
+                        style={this.state.styles.input}
                         placeholder="Class Name"
                         value={this.state.arr.className}
                         onChangeText={(value) => this.handleInputChange('className', value)}
                     />
 
                     <TextInput
-                        style={styles.input}
+                        style={this.state.styles.input}
                         placeholder="Teacher Last Name"
                         value={this.state.arr.teacher}
                         onChangeText={(value) => this.handleInputChange('teacher', value)}
                     />
 
                     <TextInput
-                        style={styles.input}
+                        style={this.state.styles.input}
                         placeholder="Building"
                         value={this.state.arr.building}
                         onChangeText={(value) => this.handleInputChange('building', value)}
                     />
 
                     <TextInput
-                        style={styles.input}
+                        style={this.state.styles.input}
                         placeholder="Room Number"
                         value={this.state.arr.roomNumber}
                         onChangeText={(value) => this.handleInputChange('roomNumber', value)}
@@ -66,18 +68,18 @@ export default class CardInputs extends Component {
             );
         } else {
             return(
-                <View style={styles.card}>
-                    <Text style={styles.period}> {this.state.arr.id} Period </Text>
+                <View style={this.state.styles.card}>
+                    <Text style={this.state.styles.period}> {this.state.arr.id} Period </Text>
 
                     <TextInput
-                        style={styles.input}
+                        style={this.state.styles.input}
                         placeholder="A Day Lunch"
                         value={this.state.arr.a_day}
                         onChangeText={(value) => this.handleInputChange('a_day', value)}
                     />
 
                     <TextInput
-                        style={styles.input}
+                        style={this.state.styles.input}
                         placeholder="B Day Lunch"
                         value={this.state.arr.b_day}
                         onChangeText={(value) => this.handleInputChange('b_day', value)}

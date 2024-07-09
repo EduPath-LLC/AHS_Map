@@ -3,7 +3,7 @@ import { StyleSheet, Dimensions } from 'react-native';
 const width = Dimensions.get('window').width * 0.01;
 const height = Dimensions.get('window').height * 0.01;
 
-export const styles = StyleSheet.create({
+export const stylesDark = StyleSheet.create({
   fullScreen: {
     flex: 1,
     backgroundColor: '#ffffff',
@@ -20,6 +20,7 @@ export const styles = StyleSheet.create({
     fontFamily: 'Kanit-Bold',
     fontSize: 10 * width,
     margin: 5 * width,
-    alignSelf: 'center'
+    alignSelf: 'center',
+    color: '#ffffff'
   }
 });

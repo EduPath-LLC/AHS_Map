@@ -6,7 +6,7 @@ const width = Dimensions.get('window').width * 0.01;
 const height = Dimensions.get('window').height * 0.01;
 
 
-export const styles = StyleSheet.create({
+export const stylesDark = StyleSheet.create({
     container: {
     },
     viewer: {

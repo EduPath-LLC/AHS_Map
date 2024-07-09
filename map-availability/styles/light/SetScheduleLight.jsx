@@ -3,7 +3,7 @@ import { StyleSheet, Dimensions } from 'react-native';
 const width = Dimensions.get('window').width * 0.01;
 const height = Dimensions.get('window').height * 0.01;
 
-export const styles = StyleSheet.create({
+export const stylesLight = StyleSheet.create({
   fullScreen: {
     flex: 1,
     backgroundColor: '#ffffff',

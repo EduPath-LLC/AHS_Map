@@ -3,11 +3,16 @@ import { View, Text, Alert, Image, Pressable, KeyboardAvoidingView, Platform } f
 import { doc, getDocs, collection, setDoc, docRef, updateDoc } from 'firebase/firestore';
 import { db } from '../../firebase'
 
-import { styles } from '../../styles/light/CarouselLight'
+import { stylesLight } from '../../styles/light/CarouselLight'
+import { stylesDark } from '../../styles/dark/CarouselDark'
 
 import Loader from '../Loader';
 import CardInputs from './CardInputs';
-import { loadAsync } from 'expo-font';
+
+import ArrowBack from '../../assets/images/ArrowBack.png';
+import ArrowBackDark from '../../assets/images/ArrowBackDark.png';
+import ArrowForward from '../../assets/images/ArrowForward.png';
+import ArrowForwardDark from '../../assets/images/ArrowForwardDark.png';
 
 export default class Carousel extends Component {
     constructor(props) {
@@ -24,12 +29,16 @@ export default class Carousel extends Component {
             seventh: {},
             eighth: {},
             lunch: {},
-            loading: false
+            loading: false,
+            arrowBack: null,
+            arrowForward: null,
+            styles: this.props.dark ? stylesDark : stylesLight,
         };
     }
 
     componentDidMount() {
         this.fetchSchedule(this.props.userId);
+        this.setState({arrowBack: this.props.dark ? ArrowBackDark : ArrowBack, arrowForward: this.props.dark ? ArrowForwardDark : ArrowForward});
     }
 
     fetchSchedule = async (userId) => {
@@ -107,7 +116,7 @@ export default class Carousel extends Component {
         const scheduleItem = scheduleMap[current];
 
         return scheduleItem && scheduleItem.id ? (
-            <CardInputs key={scheduleItem.id} info={scheduleItem} onInputChange={this.handleClassChange} />
+            <CardInputs key={scheduleItem.id} info={scheduleItem} onInputChange={this.handleClassChange} dark={this.props.dark} />
         ) : (
             <View style={{alignSelf: 'center'}}>
                 <Loader />
@@ -267,19 +276,19 @@ export default class Carousel extends Component {
 
     render() {
         return (
-            <View style={styles.container}>
+            <View style={this.state.styles.container}>
                 {this.state.loading? 
                 ( <Loader /> ) :
                 (
                     <View>
-                        <View style={styles.viewer}>
+                        <View style={this.state.styles.viewer}>
                             <Pressable 
                                 onPress={this.decrease}
-                                style={styles.arrows}
+                                style={this.state.styles.arrows}
                             >
                                 <Image 
-                                    style={styles.image}
-                                    source={require('../../assets/images/ArrowBack.png')}
+                                    style={this.state.styles.image}
+                                    source={this.state.arrowBack}
                                 />
                             </Pressable>
 
@@ -287,20 +296,20 @@ export default class Carousel extends Component {
 
                             <Pressable 
                                 onPress={this.increase}
-                                style={styles.arrows}
+                                style={this.state.styles.arrows}
                             >
                                 <Image 
-                                    style={styles.image}
-                                    source={require('../../assets/images/ArrowForward.png')}
+                                    style={this.state.styles.image}
+                                    source={this.state.arrowForward}
                                 />
                             </Pressable>
                         </View>
 
                         <Pressable 
-                            style={styles.button}
+                            style={this.state.styles.button}
                             onPress={this.handleSubmit}
                         >
-                            <Text style={styles.buttonText}> Finish </Text>
+                            <Text style={this.state.styles.buttonText}> Finish </Text>
                         </Pressable>
                     </View>
             )}

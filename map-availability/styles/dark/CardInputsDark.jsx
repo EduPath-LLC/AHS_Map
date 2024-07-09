@@ -6,7 +6,7 @@ const width = Dimensions.get('window').width * 0.01;
 const height = Dimensions.get('window').height * 0.01;
 
 
-export const styles = StyleSheet.create({
+export const stylesDark = StyleSheet.create({
     card: {
         backgroundColor: 'rgba(255,255,255,0.5)',
         width: 70 * width,
@@ -18,7 +18,8 @@ export const styles = StyleSheet.create({
         fontFamily: 'Kanit-Bold',
         fontSize: 7 * width,
         textAlign: 'center',
-        marginTop: height
+        marginTop: height,
+        color: '#ffffff'
     },
     input: {
         width: 60 * width,

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, Switch, Pressable, Alert } from 'react-native';
 import { signOut } from 'firebase/auth';
 import WavyHeader from '../components/headers/WavyHeader';
-import { doc, getDoc, updateDoc } from 'firebase/firestore'; // Import updateDoc
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { stylesDark } from '../styles/dark/SettingsDark';
 import { stylesLight } from '../styles/light/SettingsLight';
