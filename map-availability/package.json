@@ -24,6 +24,7 @@
     "expo-status-bar": "~1.12.1",
     "firebase": "^10.12.1",
     "graphlib": "^2.1.8",
+    "lottie-react-native": "^6.7.2",
     "react": "18.2.0",
     "react-native": "0.74.2",
     "react-native-geolocation-service": "^5.3.1",
