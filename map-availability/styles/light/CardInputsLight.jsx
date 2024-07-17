@@ -28,5 +28,22 @@ export const stylesLight = StyleSheet.create({
         backgroundColor: "#FFFFFF",
         margin: height,
         alignSelf: 'center'
-    }
+    },
+    container: {
+        backgroundColor: 'white',
+      },
+      dropdown: {
+        height: 7 * height,
+        borderColor: 'gray',
+        borderWidth: 3,
+        borderRadius: 15,
+        paddingHorizontal: 8 * width,
+        marginTop: 7 * width
+      },
+      placeholderStyle: {
+        fontSize: 16,
+      },
+      selectedTextStyle: {
+        fontSize: 16,
+      },
 })

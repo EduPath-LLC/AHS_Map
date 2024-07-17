@@ -2,6 +2,8 @@ import React, { Component } from 'react'
 import { View, Text, TextInput, KeyboardAvoidingView, Platform } from 'react-native'
 import { stylesLight } from '../../styles/light/CardInputsLight'
 import { stylesDark } from '../../styles/dark/CardInputsDark'
+import { Dropdown } from 'react-native-element-dropdown';
+
 
 export default class CardInputs extends Component {
     constructor(props) {
@@ -9,6 +11,12 @@ export default class CardInputs extends Component {
         this.state = {
             arr: {},
             styles: this.props.dark ? stylesDark : stylesLight,
+            lunchOptions: [
+                { label: 'A Lunch', value: 'A' },
+                { label: 'B Lunch', value: 'B' },
+                { label: 'C Lunch', value: 'C' },
+                { label: 'D Lunch', value: 'D' },
+            ]
         };
     }
 
@@ -71,18 +79,34 @@ export default class CardInputs extends Component {
                 <View style={this.state.styles.card}>
                     <Text style={this.state.styles.period}> {this.state.arr.id} Period </Text>
 
-                    <TextInput
+                    {/* <TextInput
                         style={this.state.styles.input}
                         placeholder="A Day Lunch"
                         value={this.state.arr.a_day}
                         onChangeText={(value) => this.handleInputChange('a_day', value)}
+                    /> */}
+                    <Dropdown
+                        style={this.state.styles.dropdown}
+                        placeholderStyle={this.state.styles.placeholderStyle}
+                        selectedTextStyle={this.state.styles.selectedTextStyle}
+                        data={this.state.lunchOptions}
+                        labelField="label"
+                        valueField="value"
+                        placeholder="Select A Day Lunch"
+                        value={this.state.arr.a_day}
+                        onChange={(item) => this.handleInputChange('a_day', item.value)}
                     />
 
-                    <TextInput
-                        style={this.state.styles.input}
-                        placeholder="B Day Lunch"
+                    <Dropdown
+                        style={this.state.styles.dropdown}
+                        placeholderStyle={this.state.styles.placeholderStyle}
+                        selectedTextStyle={this.state.styles.selectedTextStyle}
+                        data={this.state.lunchOptions}
+                        labelField="label"
+                        valueField="value"
+                        placeholder="Select B Day Lunch"
                         value={this.state.arr.b_day}
-                        onChangeText={(value) => this.handleInputChange('b_day', value)}
+                        onChange={(item) => this.handleInputChange('b_day', item.value)}
                     />
 
                 </View>
