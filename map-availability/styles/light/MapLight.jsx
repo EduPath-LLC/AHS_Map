@@ -171,4 +171,18 @@ export  const styles = StyleSheet.create({
       padding: 20,
       color: '#333',
     },
+    customMarker: {
+      width: 20,
+      height: 20,
+      borderRadius: 10,
+      backgroundColor: 'rgba(0, 122, 255, 0.3)',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    markerInner: {
+      width: 10,
+      height: 10,
+      borderRadius: 5,
+      backgroundColor: '#007AFF',
+    },
   });

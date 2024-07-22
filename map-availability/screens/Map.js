@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   Keyboard
 } from 'react-native';
-import MapView, { Polyline } from 'react-native-maps';
+import MapView, { Polyline, Marker } from 'react-native-maps';
 import { LocationContext } from '../components/providers/LocationContext';
 import { MaterialIcons } from '@expo/vector-icons';
 
@@ -16,7 +16,9 @@ import { styles } from '../styles/light/MapLight'
 const polylineCoordinates = [
   { latitude: 33.148972, longitude: -96.695055, reference: 'A' },
   { latitude: 33.151361, longitude: -96.695055, reference: 'B' },
- 
+  { latitude: 33.15141391078327, longitude: -96.69417595358007, reference: 'B1' },
+  { latitude: 33.15116689208641, longitude: -96.6942054578785, reference: 'B2' },
+  { latitude: 33.15141391078327, longitude: -96.69417595358007, reference: 'B3' },
   { latitude: 33.151417, longitude: -96.691777, reference: 'C' },
   { latitude: 33.149250, longitude: -96.691777, reference: 'D' },
   { latitude: 33.149222, longitude: -96.692694, reference: 'E' },
@@ -25,16 +27,6 @@ const polylineCoordinates = [
 ];
 
 // Adjust overlapping segments
-const offsetFactor = 0.00001; // Adjust this value to increase or decrease the offset
-
-polylineCoordinates[2].latitude += offsetFactor;
-polylineCoordinates[2].longitude += offsetFactor;
-
-polylineCoordinates[3].latitude -= offsetFactor;
-polylineCoordinates[3].longitude -= offsetFactor;
-
-polylineCoordinates[4].latitude += offsetFactor;
-polylineCoordinates[4].longitude += offsetFactor;
 
 function distance(point1, point2) {
   const dx = point1.longitude - point2.longitude;
@@ -260,6 +252,7 @@ export default function Map() {
   const [isMapDisabled, setIsMapDisabled] = useState(false);
   const [currentDirection, setCurrentDirection] = useState({ text: '', icon: null });
   const [remainingDistance, setRemainingDistance] = useState(0);
+  const [nearestPoint, setNearestPoint] = useState(null);
   
 
   const checkDistanceToPolyline = useCallback((userLocation) => {
@@ -313,14 +306,17 @@ export default function Map() {
 
   useEffect(() => {
     if (location) {
-      checkDistanceToPolyline({
+      const { point } = findNearestPointOnPolyline({
         latitude: location.coords.latitude,
         longitude: location.coords.longitude
       });
+      setNearestPoint(point);
+  
+      checkDistanceToPolyline(point);
   
       if (route.length > 1 && destinationCoords) {
         const { currentSegment, progress, currentBearing, nextBearing } = findCurrentSegment(
-          { latitude: location.coords.latitude, longitude: location.coords.longitude },
+          point,
           route
         );
   
@@ -355,8 +351,8 @@ export default function Map() {
         setEstimatedTime(updatedEstimatedTime);
   
         const distanceToDestination = calculateDistance(
-          location.coords.latitude,
-          location.coords.longitude,
+          point.latitude,
+          point.longitude,
           destinationCoords.latitude,
           destinationCoords.longitude
         );
@@ -382,10 +378,7 @@ export default function Map() {
               setBearing(newBearing);
             }
             
-            animateCamera({
-              latitude: location.coords.latitude,
-              longitude: location.coords.longitude,
-            }, bearing);
+            animateCamera(point, bearing);
           }
         }
       }
@@ -393,13 +386,13 @@ export default function Map() {
   }, [location, route, destinationCoords, animateCamera, bearing, checkDistanceToPolyline]);
   
   useInterval(() => {
-    if (location && mapRef.current && !isRouteActive) {
+    if (nearestPoint && mapRef.current) {
       mapRef.current.animateCamera({
         center: {
-          latitude: location.coords.latitude,
-          longitude: location.coords.longitude,
+          latitude: nearestPoint.latitude,
+          longitude: nearestPoint.longitude,
         },
-        heading: 0,
+        heading: isRouteActive ? bearing : 0,
         pitch: 0,
         zoom: 18,
         altitude: 1000,
@@ -409,11 +402,11 @@ export default function Map() {
   
   // Modify the existing useInterval hook
   useInterval(() => {
-    if (location && mapRef.current && isRouteActive) {
+    if (nearestPoint && mapRef.current && isRouteActive) {
       mapRef.current.animateCamera({
         center: {
-          latitude: location.coords.latitude,
-          longitude: location.coords.longitude,
+          latitude: nearestPoint.latitude,
+          longitude: nearestPoint.longitude,
         },
         heading: bearing,
         pitch: 0,
@@ -434,16 +427,16 @@ export default function Map() {
     setDestination(null);
     setBearing(0);
     setIsRouteActive(false);
-    setSearchQuery(''); // Add this line to clear the search query
+    setSearchQuery('');
     setDestinationCoords(null);
   
-    if (location) {
+    if (nearestPoint) {
       animateCamera({
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
+        latitude: nearestPoint.latitude,
+        longitude: nearestPoint.longitude,
       }, 0);
     }
-  }, [location, animateCamera]);
+  }, [nearestPoint, animateCamera]);
 
   const performSearch = useCallback(() => {
     if (location && destination) {
@@ -511,15 +504,15 @@ export default function Map() {
   ]);
 
   const handleSearch = useCallback(() => {
-    if (location && searchQuery) {
-      Keyboard.dismiss(); // Dismiss the keyboard
+    if (nearestPoint && searchQuery) {
+      Keyboard.dismiss();
       setHasArrived(false);
       const newDestination = searchQuery.toUpperCase();
       setDestination(newDestination);
       setIsRouteActive(true);
       
       const newRoute = calculateRoute(
-        { latitude: location.coords.latitude, longitude: location.coords.longitude },
+        { latitude: nearestPoint.latitude, longitude: nearestPoint.longitude },
         newDestination
       );
       setRoute(newRoute);
@@ -537,14 +530,11 @@ export default function Map() {
           const destPoint = newRoute[newRoute.length - 1];
           setDestinationCoords(destPoint);
           
-          animateCamera({
-            latitude: location.coords.latitude,
-            longitude: location.coords.longitude,
-          }, newBearing);
+          animateCamera(nearestPoint, newBearing);
         }
       }
     }
-  }, [location, searchQuery, calculateRoute, calculateBearing, animateCamera, calculateTotalDistance]);
+  }, [nearestPoint, searchQuery, calculateRoute, calculateBearing, animateCamera, calculateTotalDistance]);
   
   const animateCamera = useCallback((targetLocation, targetBearing) => {
     mapRef.current?.animateCamera({
@@ -568,15 +558,14 @@ export default function Map() {
         style={styles.map}
         initialCamera={{
           center: {
-            latitude: location?.coords.latitude || 0,
-            longitude: location?.coords.longitude || 0,
+            latitude: nearestPoint?.latitude || location?.coords.latitude || 0,
+            longitude: nearestPoint?.longitude || location?.coords.longitude || 0,
           },
           pitch: 0,
           heading: 0,
           altitude: 1000,
           zoom: 18,
         }}
-        showsUserLocation={true}
         showsCompass={!isRouteActive}
       >
         <Polyline
@@ -590,6 +579,18 @@ export default function Map() {
             strokeColor="#007AFF"
             strokeWidth={4}
           />
+        )}
+        {nearestPoint && (
+          <Marker
+            coordinate={{
+              latitude: nearestPoint.latitude,
+              longitude: nearestPoint.longitude
+            }}
+          >
+            <View style={styles.customMarker}>
+              <View style={styles.markerInner} />
+            </View>
+          </Marker>
         )}
       </MapView>
       
@@ -608,21 +609,20 @@ export default function Map() {
         </View>
         
         {isRouteActive && (
-  <View style={styles.directionsContainer}>
-    <View style={styles.directionsContent}>
-      {currentDirection.turn === 'left' && (
-        <MaterialIcons name="arrow-back" size={30} color="#007AFF" />
-      )}
-      {currentDirection.turn === 'right' && (
-        <MaterialIcons name="arrow-forward" size={30} color="#007AFF" />
-      )}
-      <Text style={styles.directionsText}>
-        {currentDirection.text}
-      </Text>
-    </View>
-  </View>
-)}
-
+          <View style={styles.directionsContainer}>
+            <View style={styles.directionsContent}>
+              {currentDirection.turn === 'left' && (
+                <MaterialIcons name="arrow-back" size={30} color="#007AFF" />
+              )}
+              {currentDirection.turn === 'right' && (
+                <MaterialIcons name="arrow-forward" size={30} color="#007AFF" />
+              )}
+              <Text style={styles.directionsText}>
+                {currentDirection.text}
+              </Text>
+            </View>
+          </View>
+        )}
         
         {isRouteActive && (
           <View style={styles.routeInfoContainer}>
