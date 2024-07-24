@@ -674,15 +674,48 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { styles } from '../styles/light/MapLight'
 
 const polylineCoordinates = [
-  { latitude: 33.148972, longitude: -96.695055, reference: 'A' },
-  { latitude: 33.151361, longitude: -96.695055, reference: 'B' },
-  { latitude: 33.15141391078327, longitude: -96.69417595358007, reference: 'B1' },
-  { latitude: 33.151417, longitude: -96.691777, reference: 'C' },
-  { latitude: 33.149250, longitude: -96.691777, reference: 'D' },
-  { latitude: 33.149222, longitude: -96.692694, reference: 'E' },
-  { latitude: 33.148944, longitude: -96.692694, reference: 'F' },
-  { latitude: 33.148972, longitude: -96.695055, reference: 'G' },
+  { latitude: 33.10955218, longitude: -96.66107382, reference: 'F108 Hall' },
+  { latitude: 33.10949087, longitude: -96.66116680, reference: 'F111 Hall' },
+  { latitude: 33.10951721, longitude: -96.66112686, reference: 'F110 Hall' },
+  { latitude: 33.10946359, longitude: -96.66120816, reference: 'F112 Hall' },
+  { latitude: 33.10941872, longitude: -96.66127622, reference: 'F114 Hall' },
+  { latitude: 33.10939153, longitude: -96.66131744, reference: 'F115 Hall' },
+  { latitude: 33.10936915, longitude: -96.66135138, reference: 'F116 Hall' },
+  { latitude: 33.10933977, longitude: -96.66139594, reference: 'F117 Hall' },
+  { latitude: 33.10928326, longitude: -96.66148163, reference: 'F120 Hall' },
+  { latitude: 33.10932618, longitude: -96.66141655, reference: 'F119 Hall' },
+  { latitude: 33.10932480, longitude: -96.66141863, reference: 'S18' },
+  { latitude: 33.10922702, longitude: -96.66156692, reference: 'F123 Hall' },
+  { latitude: 33.10922085, longitude: -96.66157627, reference: 'F124 Hall' },
+  { latitude: 33.10918304, longitude: -96.66163361, reference: 'F125 Hall' },
+  { latitude: 33.10916888, longitude: -96.66165509, reference: 'F126 Hall' },
+  { latitude: 33.10910607, longitude: -96.66175032, reference: 'F128 Hall' },
+  { latitude: 33.10909943, longitude: -96.66176040, reference: 'F129 Hall' },
+  { latitude: 33.10904726, longitude: -96.66183951, reference: 'F130 Hall' },
+  { latitude: 33.10900099, longitude: -96.66190967, reference: 'F133 Hall' },
 ];
+
+const customPoints = {
+  F108: { latitude: 33.10959167, longitude: -96.6611234, reference: 'F108' },
+  F111: { latitude: 33.10953419, longitude: -96.66120964, reference: 'F111' },
+  F110: { latitude: 33.10946790, longitude: -96.66108344, reference: 'F110' },
+  F112: { latitude: 33.10950205, longitude: -96.66126420, reference: 'F112' },
+  F114: { latitude: 33.10937894, longitude: -96.66123695, reference: 'F114' },
+  F115: { latitude: 33.10943479, longitude: -96.66136275, reference: 'F115' },
+  F116: { latitude: 33.10941588, longitude: -96.66139435, reference: 'F116' },
+  F117: { latitude: 33.10930108, longitude: -96.66136090, reference: 'F117' },
+  F120: { latitude: 33.10932997, longitude: -96.66152640, reference: 'F120' },
+  F119: { latitude: 33.10929958, longitude: -96.66139901, reference: 'F119' },
+  F123: { latitude: 33.10919474, longitude: -96.66153375, reference: 'F123' },
+  F124: { latitude: 33.10925905, longitude: -96.66161894, reference: 'F124' },
+  F125: { latitude: 33.10921808, longitude: -96.66167626, reference: 'F125' },
+  F126: { latitude: 33.10913219, longitude: -96.66161789, reference: 'F126' },
+  F128: { latitude: 33.10907955, longitude: -96.66171981, reference: 'F128' },
+  F129: { latitude: 33.10913878, longitude: -96.66180036, reference: 'F129' },
+  F130: { latitude: 33.10908186, longitude: -96.66186708, reference: 'F130' },
+  F131: { latitude: 33.10901877, longitude: -96.66180897, reference: 'F131' },
+  F133: { latitude: 33.10903478, longitude: -96.66193809, reference: 'F133' },
+};
 
 function distance(point1, point2) {
   const dx = point1.longitude - point2.longitude;
@@ -821,15 +854,15 @@ function calculateBearing(start, end) {
 
 function calculateDistance(lat1, lon1, lat2, lon2) {
   const R = 6371e3; // Earth's radius in meters
-  const φ1 = lat1 * Math.PI/180;
-  const φ2 = lat2 * Math.PI/180;
-  const Δφ = (lat2-lat1) * Math.PI/180;
-  const Δλ = (lon2-lon1) * Math.PI/180;
+  const φ1 = lat1 * Math.PI / 180;
+  const φ2 = lat2 * Math.PI / 180;
+  const Δφ = (lat2 - lat1) * Math.PI / 180;
+  const Δλ = (lon2 - lon1) * Math.PI / 180;
 
-  const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
+  const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
             Math.cos(φ1) * Math.cos(φ2) *
-            Math.sin(Δλ/2) * Math.sin(Δλ/2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
   return R * c; // Distance in meters
 }
@@ -908,11 +941,7 @@ function findClosestPolylinePoint(destination) {
 
 function calculateFinalDirection(closestPoint, destination) {
   const bearing = calculateBearing(closestPoint, destination);
-  let direction;
-  if (bearing > 0 && bearing <= 180) direction = 'right';
-  else direction = 'left';
-
-  return { bearing, direction };
+  return { direction: bearing > 0 && bearing <= 180 ? 'right' : 'left' };
 }
 
 export default function Map() {
@@ -933,6 +962,7 @@ export default function Map() {
   const [nearestPoint, setNearestPoint] = useState(null);
   const [closestEndPoint, setClosestEndPoint] = useState(null);
   const [routeStartTime, setRouteStartTime] = useState(null);
+  const [initialDirectionSet, setInitialDirectionSet] = useState(false);
   const checkDistanceToPolyline = useCallback((userLocation) => {
     if (!userLocation) return;
 
@@ -970,7 +1000,13 @@ export default function Map() {
 
   const calculateRoute = useCallback((start, end) => {
     const { point: startPoint, segmentIndex } = findNearestPointOnPolyline(start);
-    const closestEndPoint = findClosestPolylinePoint(end);
+    let closestEndPoint;
+    
+    if (customPoints[end.reference]) {
+      closestEndPoint = findClosestPolylinePoint(end);
+    } else {
+      closestEndPoint = end;
+    }
     
     const graph = {};
     
@@ -991,7 +1027,7 @@ export default function Map() {
     
     graph[polylineCoordinates[segmentIndex].reference][startPoint.reference] = graph[startPoint.reference][polylineCoordinates[segmentIndex].reference];
     graph[polylineCoordinates[(segmentIndex + 1) % polylineCoordinates.length].reference][startPoint.reference] = graph[startPoint.reference][polylineCoordinates[(segmentIndex + 1) % polylineCoordinates.length].reference];
-
+  
     const path = dijkstra(graph, startPoint.reference, closestEndPoint.reference);
     
     const routeCoordinates = [startPoint];
@@ -1000,79 +1036,11 @@ export default function Map() {
       const currentPoint = polylineCoordinates.find(p => p.reference === currentRef) || startPoint;
       routeCoordinates.push(currentPoint);
     }
-
+  
     const simplifiedRouteCoordinates = simplifyRoute(routeCoordinates);
-  return { routeCoordinates: simplifiedRouteCoordinates, closestEndPoint };
+    return { routeCoordinates: simplifiedRouteCoordinates, closestEndPoint };
   }, []);
 
-  useEffect(() => {
-    if (location) {
-      const { point } = findNearestPointOnPolyline({
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude
-      });
-      setNearestPoint(point);
-  
-      checkDistanceToPolyline(point);
-  
-      if (route.length > 1 && destinationCoords) {
-        const { currentSegment, progress, currentBearing, nextBearing } = findCurrentSegment(
-          point,
-          route
-        );
-  
-        const currentSegmentDistance = calculateDistance(
-          route[currentSegment].latitude,
-          route[currentSegment].longitude,
-          route[currentSegment + 1].latitude,
-          route[currentSegment + 1].longitude
-        );
-        const remainingSegmentDistance = currentSegmentDistance * (1 - progress);
-  
-        const remainingDistanceInFeet = Math.round(remainingSegmentDistance * 3.28084 / 5) * 5;
-        setRemainingDistance(remainingDistanceInFeet);
-  
-        if (currentSegment < route.length - 2) {
-          const turnDirection = calculateTurnDirection(currentBearing, nextBearing);
-          setCurrentDirection({
-            text: `Turn ${turnDirection} in ${remainingDistanceInFeet} feet`,
-            turn: turnDirection
-          });
-        } else if (currentSegment === route.length - 2) {
-          if (destinationCoords.reference === 'B2') {
-            const finalDirection = calculateFinalDirection(closestEndPoint, destinationCoords);
-            setCurrentDirection({
-              text: `Continue straight and your destination will be on the ${finalDirection.direction}`,
-              turn: null
-            });
-          } else {
-            setCurrentDirection({
-              text: `Go straight for ${remainingDistanceInFeet} feet and you will arrive at your destination`,
-              turn: null
-            });
-          }
-        }
-  
-        const remainingRoute = route.slice(currentSegment);
-        const remainingDistance = calculateTotalDistance(remainingRoute);
-        const totalRemainingDistanceInFeet = Math.round(Math.round(remainingDistance * 3.28084) / 5) * 5;
-        const updatedEstimatedTime = Math.ceil(totalRemainingDistanceInFeet / 308);
-        setEstimatedTime(updatedEstimatedTime);
-  
-        if (currentSegment < route.length - 1) {
-          const start = route[currentSegment];
-          const end = route[currentSegment + 1];
-  
-          if (start && end) {
-            const newBearing = calculateBearing(start, end);
-            setBearing(newBearing);
-          }
-          
-          animateCamera(point, bearing);
-        }
-      }
-    }
-  }, [location, route, destinationCoords, animateCamera, bearing, checkDistanceToPolyline, closestEndPoint]);
   
   useInterval(() => {
     if (nearestPoint && mapRef.current) {
@@ -1194,22 +1162,17 @@ export default function Map() {
       setHasArrived(false);
       let newDestination;
   
-      // Check if the search query is B2
-      if (searchQuery.toUpperCase() === 'B2') {
-        newDestination = {
-          latitude: 33.15116689208641,
-          longitude: -96.6942054578785,
-          reference: 'B2'
-        };
+      const upperCaseQuery = searchQuery.toUpperCase();
+      if (customPoints[upperCaseQuery]) {
+        newDestination = customPoints[upperCaseQuery];
       } else {
-        // For all other queries, find the corresponding point in polylineCoordinates
-        newDestination = polylineCoordinates.find(point => point.reference === searchQuery.toUpperCase());
+        newDestination = polylineCoordinates.find(point => point.reference.toUpperCase() === upperCaseQuery);
       }
   
       if (newDestination) {
         setDestination(newDestination);
         setIsRouteActive(true);
-        setRouteStartTime(Date.now()); // Set the route start time
+        setRouteStartTime(Date.now());
         
         const { routeCoordinates, closestEndPoint } = calculateRoute(
           { latitude: nearestPoint.latitude, longitude: nearestPoint.longitude },
@@ -1218,7 +1181,9 @@ export default function Map() {
         setRoute(routeCoordinates);
         setClosestEndPoint(closestEndPoint);
         
-        const estimatedTimeInMinutes = Math.ceil(calculateTotalDistance(routeCoordinates) * 3.28084 / 308);
+        const totalDistance = calculateTotalDistance(routeCoordinates);
+        const totalDistanceInFeet = Math.round(totalDistance * 3.28084);
+        const estimatedTimeInMinutes = Math.ceil(totalDistanceInFeet / 308);
         setEstimatedTime(estimatedTimeInMinutes);
         
         if (routeCoordinates.length > 1) {
@@ -1230,15 +1195,105 @@ export default function Map() {
             
             setDestinationCoords(newDestination);
             
+            const finalDirection = calculateFinalDirection(routeCoordinates[routeCoordinates.length - 1], newDestination);
+            
+            setCurrentDirection({
+              text: `Continue straight for ${totalDistanceInFeet} feet and your destination will be on the ${finalDirection.direction}`,
+              turn: null
+            });
+            setInitialDirectionSet(true);
+            
             animateCamera(nearestPoint, newBearing);
           }
         }
       } else {
-        // Handle invalid destination
-        alert('Invalid destination. Please enter a valid reference (A-G or B2).');
+        alert('Invalid destination. Please enter a valid reference (e.g., F108 Hall, F108, etc.).');
       }
     }
   }, [nearestPoint, searchQuery, calculateRoute, calculateBearing, animateCamera, calculateTotalDistance]);
+  
+  useEffect(() => {
+    if (location) {
+      const { point } = findNearestPointOnPolyline({
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude
+      });
+      setNearestPoint(point);
+  
+      checkDistanceToPolyline(point);
+  
+      if (route.length > 1 && destinationCoords) {
+        const { currentSegment, progress, currentBearing, nextBearing } = findCurrentSegment(
+          point,
+          route
+        );
+  
+        const remainingRoute = route.slice(currentSegment);
+        const remainingDistance = calculateTotalDistance(remainingRoute);
+        const remainingDistanceInFeet = Math.round(remainingDistance * 3.28084);
+  
+        const distanceToNextTurn = calculateDistance(
+          point.latitude,
+          point.longitude,
+          route[currentSegment + 1].latitude,
+          route[currentSegment + 1].longitude
+        );
+  
+        if (!initialDirectionSet || distanceToNextTurn <= 50) { // 50 feet before turn
+          if (currentSegment < route.length - 2) {
+            const turnDirection = calculateTurnDirection(currentBearing, nextBearing);
+            const distanceToTurnInFeet = Math.round(distanceToNextTurn * 3.28084);
+            
+            setCurrentDirection({
+              text: `Turn ${turnDirection} in ${distanceToTurnInFeet} feet`,
+              turn: turnDirection
+            });
+          } else {
+            const finalDirection = calculateFinalDirection(closestEndPoint, destinationCoords);
+            setCurrentDirection({
+              text: `Continue straight for ${remainingDistanceInFeet} feet and your destination will be on the ${finalDirection.direction}`,
+              turn: null
+            });
+          }
+  
+          setInitialDirectionSet(true);
+        }
+  
+        const updatedEstimatedTime = Math.ceil(remainingDistanceInFeet / 308);
+        setEstimatedTime(updatedEstimatedTime);
+  
+        if (currentSegment < route.length - 1) {
+          const start = route[currentSegment];
+          const end = route[currentSegment + 1];
+  
+          if (start && end) {
+            const newBearing = calculateBearing(start, end);
+            setBearing(newBearing);
+            
+            animateCamera(point, bearing);
+          }
+        }
+  
+        const distanceToDestination = calculateDistance(
+          point.latitude,
+          point.longitude,
+          destinationCoords.latitude,
+          destinationCoords.longitude
+        );
+  
+        if (distanceToDestination <= 20) {
+          setHasArrived(true);
+          setShowArrivedMessage(true);
+          setRoute([]);
+          setDestination(null);
+          setBearing(0);
+          setIsRouteActive(false);
+          setEstimatedTime(0);
+          setTimeout(() => setShowArrivedMessage(false), 3000);
+        }
+      }
+    }
+  }, [location, route, destinationCoords, animateCamera, bearing, checkDistanceToPolyline, closestEndPoint, initialDirectionSet]);
   
   const animateCamera = useCallback((targetLocation, targetBearing) => {
     if (nearestPoint) {
@@ -1305,7 +1360,7 @@ export default function Map() {
             style={styles.searchInput}
             value={searchQuery}
             onChangeText={setSearchQuery}
-            placeholder="Enter destination (A-G)"
+            placeholder="Enter destination (e.g., F108 Hall, F108)"
             placeholderTextColor="#999"
           />
           <TouchableOpacity style={styles.button} onPress={handleSearch}>
