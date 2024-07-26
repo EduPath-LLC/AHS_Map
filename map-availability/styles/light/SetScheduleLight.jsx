@@ -14,7 +14,7 @@ export const stylesLight = StyleSheet.create({
     alignItems: 'center',
     paddingTop: 10 * width,
     backgroundColor: '#E0EDFC',
-    marginTop: 15 * height
+    // marginTop: 15 * height
   },
   title: {
     fontFamily: 'Kanit-Bold',

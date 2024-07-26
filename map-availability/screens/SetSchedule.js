@@ -53,17 +53,16 @@ export default function SetSchedule({ route, navigation }) {
 
     return (
         <View style={styles.fullScreen}>
-            <WavyHeader 
+            {/* <WavyHeader 
                 customHeight={15}
                 customTop={8}
                 customImageDimensions={20}
                 darkMode={darkMode}
-            />
+            /> */}
             <View style={styles.container}>
             <KeyboardAvoidingView
-                    behavior={Platform.OS === 'ios' ? 'position' : 'height'}
+                    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                     style={{ flex: 1 }}
-                    keyboardVerticalOffset={Platform.OS === 'ios' ? -100 : 0}
                 >
                 <Text style={styles.title} >Schedule Set Up</Text>
                 <Carousel dark={darkMode} userId={userId} navigation={navigation}  />

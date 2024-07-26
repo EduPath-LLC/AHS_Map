@@ -26,5 +26,9 @@ export const stylesLight = StyleSheet.create({
         margin: 2 * width,
         fontSize: 2 * height,
         marginTop: 4 * height
+    },
+    time: {
+        fontFamily: 'Kanit-Black',
+        alignSelf: 'center'
     }
 })
