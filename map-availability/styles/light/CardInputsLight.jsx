@@ -34,11 +34,13 @@ export const stylesLight = StyleSheet.create({
       },
       dropdown: {
         height: 7 * height,
+        width: 60 * width,
+        alignSelf: 'center',
         borderColor: 'gray',
         borderWidth: 3,
         borderRadius: 15,
-        paddingHorizontal: 8 * width,
-        marginTop: 7 * width
+        padding: 2 * width,
+        marginTop: 4 * width,
       },
       placeholderStyle: {
         fontSize: 16,

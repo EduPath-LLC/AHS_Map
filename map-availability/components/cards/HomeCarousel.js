@@ -36,7 +36,6 @@ export default class HomeCarousel extends Component {
 
     componentDidMount() {
         this.fetchSchedule(this.props.userId);
-
     }
 
     fetchSchedule = async (userId) => {
@@ -62,7 +61,7 @@ export default class HomeCarousel extends Component {
                         seventh: scheduleData[6],
                         sixth: scheduleData[7],
                         third: scheduleData[8]
-                    });
+                    }, this.setCurrentPeriod);
                 } else {
                     console.log('No schedule documents found!');
                 }
@@ -74,6 +73,62 @@ export default class HomeCarousel extends Component {
             Alert.alert('Error', 'There was an error fetching the schedule documents.');
         }
     };
+
+    getCurrentPeriod() {
+        const now = new Date();
+        const hours = now.getHours();
+        const minutes = now.getMinutes();
+        const currentTime = hours * 60 + minutes;
+
+        const building = this.state.schedule[0]?.building || "Allen High School";
+
+        const periods = {
+            "Allen High School": [
+                { id: 1, start: 8 * 60 + 45, end: 9 * 60 + 37 },
+                { id: 2, start: 9 * 60 + 43, end: 11 * 60 + 16 },
+                { id: 3, start: 11 * 60 + 22, end: 13 * 60 + 28 },
+                { id: 4, start: 13 * 60 + 35, end: 15 * 60 + 8 },
+                { id: 5, start: 9 * 60 + 43, end: 11 * 60 + 16 },
+                { id: 6, start: 11 * 60 + 22, end: 13 * 60 + 28 },
+                { id: 7, start: 13 * 60 + 35, end: 15 * 60 + 8 },
+                { id: 8, start: 15 * 60 + 14, end: 16 * 60 + 5 },
+            ],
+            "Lowery Freshman Center": [
+                { id: 1, start: 8 * 60 + 45, end: 9 * 60 + 37 },
+                { id: 2, start: 9 * 60 + 43, end: 10 * 60 + 35 },
+                { id: 3, start: 11 * 60 + 28, end: 13 * 60 + 28 },
+                { id: 4, start: 13 * 60 + 35, end: 15 * 60 + 8 },
+                { id: 5, start: 10 * 60 + 41, end: 11 * 60 + 22 },
+                { id: 6, start: 11 * 60 + 22, end: 13 * 60 + 28 },
+                { id: 7, start: 13 * 60 + 35, end: 15 * 60 + 8 },
+                { id: 8, start: 15 * 60 + 14, end: 16 * 60 + 5 },
+            ],
+            "STEAM Center": [
+                { id: 1, start: 8 * 60 + 14, end: 9 * 60 + 8 },
+                { id: 2, start: 9 * 60 + 25, end: 10 * 60 + 58 },
+                { id: 3, start: 11 * 60 + 39, end: 13 * 60 + 12 },
+                { id: 4, start: 14 * 60 + 0, end: 15 * 60 + 33 },
+                { id: 5, start: 9 * 60 + 25, end: 10 * 60 + 58 },
+                { id: 6, start: 11 * 60 + 39, end: 13 * 60 + 12 },
+                { id: 7, start: 14 * 60 + 0, end: 15 * 60 + 33 },
+            ],
+        };
+
+        const buildingPeriods = periods[building] || periods["Allen High School"];
+
+        for (let period of buildingPeriods) {
+            if (currentTime >= period.start && currentTime <= period.end) {
+                return period.id;
+            }
+        }
+
+        return 1;
+    }
+
+    setCurrentPeriod = () => {
+        const currentPeriod = this.getCurrentPeriod();
+        this.setState({ current: currentPeriod });
+    }
 
     handleClassChange = (newArr) => {
         switch(this.state.current){
@@ -159,7 +214,7 @@ export default class HomeCarousel extends Component {
         };
 
         const roomNumber = scheduleMap[this.state.current].roomNumber;
-        this.props.navigation.navigate('Map', {roomNumber: roomNumber});
+        this.props.navigation.navigate('Map', { roomNumber: roomNumber });
     }
 
     render() {
