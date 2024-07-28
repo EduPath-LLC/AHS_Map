@@ -672,6 +672,7 @@ import { LocationContext } from '../components/providers/LocationContext';
 import { MaterialIcons } from '@expo/vector-icons';
 
 import { styles } from '../styles/light/MapLight'
+import { useRoute } from '@react-navigation/native';
 
 const polylineCoordinates = [
   { latitude: 33.10955218, longitude: -96.66107382, reference: 'F108' },
@@ -1101,6 +1102,16 @@ export default function Map() {
   const [isMapDisabled, setIsMapDisabled] = useState(false);
   const [currentDirection, setCurrentDirection] = useState({ text: '', icon: null });
   const [remainingDistance, setRemainingDistance] = useState(0);
+  const routeFromHome = useRoute();
+
+  useEffect(() => {
+    const roomNumber = routeFromHome.params?.roomNumber;
+    if (roomNumber !== undefined) {
+      setSearchQuery(roomNumber);
+    }
+  }, [route.params?.roomNumber]);
+
+
  
   const [nearestPolylinePoint, setNearestPolylinePoint] = useState(null);
   
