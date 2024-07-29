@@ -23,7 +23,7 @@ export const stylesLight = StyleSheet.create({
     button: {
         alignSelf: 'center',
         margin: 5 * height,
-        backgroundColor: '#EE6F6F',
+        backgroundColor: '#F66060',
         width: 35 * width,
         height: 5 * height,
         borderRadius: 5 * width,

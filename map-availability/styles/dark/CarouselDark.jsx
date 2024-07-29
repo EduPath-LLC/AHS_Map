@@ -23,7 +23,7 @@ export const stylesDark = StyleSheet.create({
     button: {
         alignSelf: 'center',
         margin: 5 * height,
-        backgroundColor: '#EE6F6F',
+        backgroundColor: '#0A74DA',
         width: 35 * width,
         height: 5 * height,
         borderRadius: 5 * width,

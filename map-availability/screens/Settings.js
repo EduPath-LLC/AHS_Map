@@ -103,7 +103,7 @@ export default function Settings({ userId, navigation }) {
                     <Text style={styles.normalText}> Dark Mode </Text>
                     <Switch
                         style={styles.toggleSwitch}
-                        trackColor={{false: '#767577', true: '#296fd6'}}
+                        trackColor={{false: '#767577', true: '#007AFF'}}
                         thumbColor={darkMode ? '#f4f3f4' : '#f4f3f4'}
                         ios_backgroundColor="#3e3e3e"
                         onValueChange={changeMode}
@@ -114,7 +114,7 @@ export default function Settings({ userId, navigation }) {
                     <Text style={styles.normalText}> 1 Min Alert  </Text>
                     <Switch
                         style={styles.toggleSwitch}
-                        trackColor={{false: '#767577', true: '#296fd6'}}
+                        trackColor={{false: '#767577', true: '#007AFF'}}
                         thumbColor={minuteAlert ? '#f4f3f4' : '#f4f3f4'}
                         ios_backgroundColor="#3e3e3e"
                         onValueChange={oMAtoggleSwitch}
@@ -127,7 +127,7 @@ export default function Settings({ userId, navigation }) {
                     </Pressable>
                 </View>
                 <View>
-                    <Pressable style={[styles.button, {backgroundColor: "#EE6F6F"}]} onPress={logOut}>
+                    <Pressable style={[styles.button, {backgroundColor: "#F66060"}]} onPress={logOut}>
                         <Text style={styles.buttonText}>Log Out</Text>
                     </Pressable>
                 </View>

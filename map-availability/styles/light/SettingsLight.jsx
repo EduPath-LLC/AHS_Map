@@ -16,7 +16,7 @@ export const stylesLight = StyleSheet.create({
         alignItems: 'center',
         paddingTop: 10 * height,
         backgroundColor: "#E0EDFC",
-        marginTop: 10 * height
+        marginTop: 15 * height
     },
     bigText: {
         fontSize: 10 * width,
@@ -49,7 +49,7 @@ export const stylesLight = StyleSheet.create({
     },
     button: {
         borderRadius: 9999,
-        backgroundColor: '#83B5FF',
+        backgroundColor: '#007AFF',
         width: 50 * width,
         height: 5 * height,
         justifyContent: 'center',
