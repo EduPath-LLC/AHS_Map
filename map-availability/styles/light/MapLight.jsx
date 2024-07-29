@@ -185,4 +185,24 @@ export  const styles = StyleSheet.create({
       borderRadius: 5,
       backgroundColor: '#007AFF',
     },
+    historyContainer: {
+      backgroundColor: 'white',
+      marginHorizontal: 20,
+      padding: 10,
+      borderRadius: 5,
+      shadowColor: "#000",
+      shadowOffset: {
+        width: 0,
+        height: 2,
+      },
+      shadowOpacity: 0.25,
+      shadowRadius: 3.84,
+      elevation: 5,
+    },
+    historyItem: {
+      paddingVertical: 10,
+      borderBottomWidth: 1,
+      borderBottomColor: '#ddd',
+    },
+    
   });
