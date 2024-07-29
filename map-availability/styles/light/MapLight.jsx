@@ -144,21 +144,21 @@ export  const styles = StyleSheet.create({
       fontSize: 16,
       fontWeight: 'bold',
     },
-    arrivedMessageContainer: {
-      position: 'absolute',
-      top: '50%',
-      left: 20,
-      right: 20,
-      backgroundColor: 'rgba(0, 122, 255, 0.9)',
-      borderRadius: 15,
-      padding: 20,
-      alignItems: 'center',
-    },
-    arrivedMessageText: {
-      color: 'white',
-      fontSize: 24,
-      fontWeight: 'bold',
-    },
+     arrivedMessageContainer: {
+       position: 'absolute',
+       top: '50%',
+       left: 20,
+       right: 20,
+       backgroundColor: 'rgba(0, 122, 255, 0.9)',
+       borderRadius: 15,
+       padding: 20,
+       alignItems: 'center',
+     },
+     arrivedMessageText: {
+       color: 'white',
+       fontSize: 24,
+       fontWeight: 'bold',
+     },
     disabledMapContainer: {
       ...StyleSheet.absoluteFillObject,
       justifyContent: 'center',
@@ -185,19 +185,24 @@ export  const styles = StyleSheet.create({
       borderRadius: 5,
       backgroundColor: '#007AFF',
     },
-    floorSelector: {
-      flexDirection: 'row',
-      justifyContent: 'space-around',
-      alignItems: 'center',
+    historyContainer: {
       backgroundColor: 'white',
+      marginHorizontal: 20,
       padding: 10,
-      marginBottom: 10,
+      borderRadius: 5,
+      shadowColor: "#000",
+      shadowOffset: {
+        width: 0,
+        height: 2,
+      },
+      shadowOpacity: 0.25,
+      shadowRadius: 3.84,
+      elevation: 5,
     },
-    selectedFloor: {
-      fontWeight: 'bold',
-      color: '#007AFF',
+    historyItem: {
+      paddingVertical: 10,
+      borderBottomWidth: 1,
+      borderBottomColor: '#ddd',
     },
-    unselectedFloor: {
-      color: 'black',
-    },
+    
   });

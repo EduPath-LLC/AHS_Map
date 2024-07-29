@@ -1055,6 +1055,8 @@ import { LocationContext } from '../components/providers/LocationContext';
 import { MaterialIcons } from '@expo/vector-icons';
 
 import { styles } from '../styles/light/MapLight'
+import { useRoute } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const polylineCoordinates = [
   { latitude: 33.10976665, longitude: -96.66104239, reference: 'mainhall1' },
@@ -1589,7 +1591,7 @@ function findCurrentSegment(location, route) {
   return { currentSegment, progress, currentBearing, nextBearing };
 }
 
-export default function Map() {
+export default function Map({userId}) {
   const { location, errorMsg } = useContext(LocationContext);
   const [estimatedTime, setEstimatedTime] = useState(0);
   const mapRef = useRef(null);
@@ -1604,6 +1606,18 @@ export default function Map() {
   const [isMapDisabled, setIsMapDisabled] = useState(false);
   const [currentDirection, setCurrentDirection] = useState({ text: '', icon: null });
   const [remainingDistance, setRemainingDistance] = useState(0);
+  const [searchHistory, setSearchHistory] = useState([]);
+  const [showHistory, setShowHistory] = useState(false);
+  const routeFromHome = useRoute();
+
+  useEffect(() => {
+    const roomNumber = routeFromHome.params?.roomNumber;
+    if (roomNumber !== undefined) {
+      setSearchQuery(roomNumber);
+    }
+  }, [route.params?.roomNumber]);
+
+
  
   const [nearestPolylinePoint, setNearestPolylinePoint] = useState(null);
   
@@ -1869,38 +1883,73 @@ export default function Map() {
   //   calculateDistance
   // ]);
 
-  const handleSearch = useCallback(() => {
+  useEffect(() => {
+    const fetchHistory = async () => {
+      try {
+        const history = await loadSearchHistory(userId);
+        setSearchHistory(history);
+      } catch (error) {
+        console.error('Error fetching search history:', error);
+      }
+    };
+    fetchHistory();
+  }, [userId]);
+
+  const saveSearchHistory = async (uid, history) => {
+    try {
+      const jsonValue = JSON.stringify(history);
+      await AsyncStorage.setItem(`@search_history_${uid}`, jsonValue);
+    } catch (e) {
+      console.error('Failed to save search history.', e);
+    }
+  };
+
+  const loadSearchHistory = async (uid) => {
+    try {
+      const jsonValue = await AsyncStorage.getItem(`@search_history_${uid}`);
+      return jsonValue != null ? JSON.parse(jsonValue) : [];
+    } catch (e) {
+      console.error('Failed to load search history.', e);
+      return [];
+    }
+  };
+
+  const handleSearch = useCallback(async () => {
     if (nearestPolylinePoint && searchQuery) {
       Keyboard.dismiss();
+
+      const newSearch = { query: searchQuery, timestamp: new Date().toISOString() };
+      const updatedHistory = [...searchHistory, newSearch];
+      setSearchHistory(updatedHistory);
+      await saveSearchHistory(userId, updatedHistory);
+      setShowHistory(false);
+
       setHasArrived(false);
       const newDestination = searchQuery.toUpperCase();
       const destinationPoint = polylineCoordinates.find(point => point.reference.toUpperCase() === newDestination);
-      
+
       if (destinationPoint) {
         setDestination(destinationPoint);
         setIsRouteActive(true);
-        
-        const newRoute = calculateRoute(
-          nearestPolylinePoint,
-          destinationPoint
-        );
-        
+
+        const newRoute = calculateRoute(nearestPolylinePoint, destinationPoint);
+
         if (newRoute.length > 0) {
           setRoute(newRoute);
-          
+
           const estimatedTimeInMinutes = Math.ceil(calculateTotalDistance(newRoute) * 3.28084 / 308);
           setEstimatedTime(estimatedTimeInMinutes);
-          
+
           if (newRoute.length > 1) {
             const start = newRoute[0];
             const end = newRoute[1];
             if (start && end) {
               const newBearing = calculateBearing(start, end);
               setBearing(newBearing);
-              
+
               const combinedDirection = getCombinedDirections(newRoute);
               setCurrentDirection(combinedDirection);
-              
+
               animateCamera(nearestPolylinePoint, newBearing);
             }
           }
@@ -1912,7 +1961,7 @@ export default function Map() {
         alert("Invalid destination. Please enter a valid hall number (e.g., F108).");
       }
     }
-  }, [nearestPolylinePoint, searchQuery, calculateRoute, calculateBearing, animateCamera, calculateTotalDistance, getCombinedDirections]);
+  }, [nearestPolylinePoint, searchQuery, searchHistory, userId, polylineCoordinates, calculateRoute, calculateBearing, animateCamera, calculateTotalDistance, getCombinedDirections]);
   
   // Add this useEffect hook to handle route updates
   useEffect(() => {
@@ -1989,6 +2038,7 @@ export default function Map() {
   
   
   
+  
   return (
     <View style={styles.container}>
       <MapView
@@ -2026,7 +2076,7 @@ export default function Map() {
           <Marker
             coordinate={{
               latitude: nearestPolylinePoint.latitude,
-              longitude: nearestPolylinePoint.longitude
+              longitude: nearestPolylinePoint.longitude,
             }}
           >
             <View style={styles.customMarker}>
@@ -2035,21 +2085,32 @@ export default function Map() {
           </Marker>
         )}
       </MapView>
-      
+  
       <View style={styles.overlay}>
         <View style={styles.searchContainer}>
           <TextInput
             style={styles.searchInput}
             value={searchQuery}
             onChangeText={setSearchQuery}
+            onFocus={() => setShowHistory(true)}
             placeholder="Enter destination (e.g., F108)"
             placeholderTextColor="#999"
           />
-          <TouchableOpacity style={styles.button} onPress={handleSearch}>
+          <TouchableOpacity style={styles.button} onPress={() => handleSearch(searchQuery)}>
             <Text style={styles.buttonText}>Search</Text>
           </TouchableOpacity>
         </View>
-        
+  
+        {showHistory && (
+          <View style={styles.historyContainer}>
+            {searchHistory.map((item, index) => (
+              <TouchableOpacity key={index} onPress={() => handleSearch(item.query)}>
+                <Text style={styles.historyItem}>{item.query}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
+  
         {isRouteActive && (
           <View style={styles.directionsContainer}>
             <View style={styles.directionsContent}>
@@ -2065,7 +2126,7 @@ export default function Map() {
             </View>
           </View>
         )}
-        
+  
         {isRouteActive && (
           <View style={styles.routeInfoContainer}>
             <Text style={styles.routeInfoText}>
@@ -2077,13 +2138,13 @@ export default function Map() {
           </View>
         )}
       </View>
-
+  
       {showArrivedMessage && (
         <View style={styles.arrivedMessageContainer}>
-          <Text style={styles.arrivedMessageText}>You have arrived!</Text>
+          <Text style={styles.arrivedMessageText}>Arrived</Text>
         </View>
       )}
-
+  
       {isMapDisabled && (
         <View style={styles.disabledMapContainer}>
           <Text style={styles.disabledMapText}>
@@ -2093,4 +2154,5 @@ export default function Map() {
       )}
     </View>
   );
+  
 }

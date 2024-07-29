@@ -45,9 +45,7 @@ export default class HomeCards extends Component {
 
         var periodTime;
 
-        if(building == "Allen High School"){
-            periodTime = this.state.ahs.find(item => item.id === period);
-        }
+        periodTime = this.state.ahs.find(item => item.id === period);
 
         if(building == "Lowery Freshman Center"){
             periodTime = this.state.lowery.find(item => item.id === period);

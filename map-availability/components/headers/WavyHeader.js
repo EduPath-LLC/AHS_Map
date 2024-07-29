@@ -15,7 +15,7 @@ export default class WavyHeader extends Component {
     if(this.props.darkMode) {
       bg = '#243741';
     } else {
-      bg = '#83B5FF'
+      bg = '#007AFF'
     }
     return (
       <View style={styles.svgCurve}>

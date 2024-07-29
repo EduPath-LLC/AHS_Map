@@ -50,7 +50,7 @@ export const stylesDark = StyleSheet.create({
     },
     button: {
         borderRadius: 9999,
-        backgroundColor: '#83B5FF',
+        backgroundColor: '#0A74DA',
         width: 50 * width,
         height: 5 * height,
         justifyContent: 'center',

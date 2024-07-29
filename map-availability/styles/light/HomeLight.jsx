@@ -19,8 +19,8 @@ export const stylesLight = StyleSheet.create({
     },
     bigText: {
         fontSize: 10 * width,
-        alignSelf: 'flex-start',
-        textAlign: 'left',
+        alignSelf: 'center',
+        textAlign: 'center',
         fontFamily: 'Kanit-Bold'
     }
 });

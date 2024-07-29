@@ -68,7 +68,7 @@ export default function BottomTab() {
             return <Ionicons name={focused ? 'settings' : 'settings-outline'} size={size} color={color} />;
           }
         },
-        tabBarActiveTintColor: '#83B5FF',
+        tabBarActiveTintColor: '#007AFF',
         tabBarInactiveTintColor: inactive,
         headerShown: false,
         tabBarStyle: {
