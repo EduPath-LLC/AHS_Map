@@ -61,7 +61,7 @@ export default function BottomTab() {
           if (route.name === 'Home') {
             return <Ionicons name={focused ? 'home' : 'home-outline'} size={size} color={color} />;
           } else if (route.name === 'Map') {
-            return <FontAwesome6 name={focused ? 'map-location-dot' : 'map-location-dot'} size={size} color={color} />;
+            return <FontAwesome5 name={focused ? 'map' : 'map'} size={size} color={color} />;
           } else if (route.name === 'Availability') {
             return <FontAwesome5 name={focused ? 'calendar-check' : 'calendar-check'} size={size} color={color} />;
           } else if (route.name === 'Settings') {

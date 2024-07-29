@@ -8,6 +8,7 @@ import SignIn from './screens/auth/SignIn.js';
 import BottomTab from './navigation/BottomTab.js';
 import ResetPassword from './screens/auth/ResetPassword.js';
 import SetSchedule from './screens/SetSchedule.js';
+import Account from './screens/Account.js'
 
 const Stack = createStackNavigator();
 
@@ -21,6 +22,7 @@ const MainNavigator = () => (
     <Stack.Screen name="ResetPassword" component={ResetPassword} />
     <Stack.Screen name="SetSchedule" component={SetSchedule} />
     <Stack.Screen name="BottomTab" component={BottomTab} />
+    <Stack.Screen name="Account" component={Account} />
   </Stack.Navigator>
 );
 
