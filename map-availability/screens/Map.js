@@ -1586,7 +1586,7 @@ export default function Map() {
 
       {showArrivedMessage && (
         <View style={styles.arrivedMessageContainer}>
-          <Text style={styles.arrivedMessageText}>You have arrived!</Text>
+          <Text style={styles.arrivedMessageText}>Arrived</Text>
         </View>
       )}
 

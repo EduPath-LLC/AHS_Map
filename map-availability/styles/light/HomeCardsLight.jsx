@@ -22,13 +22,15 @@ export const stylesLight = StyleSheet.create({
         marginTop: height
     },
     list: {
-        fontFamily: 'Kanit-Black',
+        fontFamily: 'Kanit-Bold',
         margin: 2 * width,
         fontSize: 2 * height,
         marginTop: 4 * height
     },
     time: {
-        fontFamily: 'Kanit-Black',
-        alignSelf: 'center'
+        fontFamily: 'Kanit-Bold',
+        alignSelf: 'center',
+        fontSize: 2.5*height,
+        color: 'black'
     }
 })

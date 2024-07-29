@@ -23,10 +23,16 @@ export const stylesDark = StyleSheet.create({
         color: 'rgb(255, 255, 255)'
     },
     list: {
-        fontFamily: 'Kanit-Black',
+        fontFamily: 'Kanit-Bold',
         margin: 2 * width,
         fontSize: 2 * height,
         marginTop: 4 * height,
         color: 'rgb(255, 255, 255)'
+    },
+    time: {
+        fontFamily: 'Kanit-Bold',
+        alignSelf:'center',
+        color: 'white',
+        fontSize: 2.5*height
     }
 })
