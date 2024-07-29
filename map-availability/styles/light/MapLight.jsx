@@ -185,4 +185,19 @@ export  const styles = StyleSheet.create({
       borderRadius: 5,
       backgroundColor: '#007AFF',
     },
+    floorSelector: {
+      flexDirection: 'row',
+      justifyContent: 'space-around',
+      alignItems: 'center',
+      backgroundColor: 'white',
+      padding: 10,
+      marginBottom: 10,
+    },
+    selectedFloor: {
+      fontWeight: 'bold',
+      color: '#007AFF',
+    },
+    unselectedFloor: {
+      color: 'black',
+    },
   });
