@@ -51,6 +51,10 @@ export default function Settings({ userId, navigation }) {
         };
     
         isDarkMode();
+
+        const interval = setInterval(isDarkMode, 2000);
+    
+        return () => clearInterval(interval);
       }, [userId]);
 
     const changeMode = async () => {
@@ -161,17 +165,6 @@ export default function Settings({ userId, navigation }) {
                         />
                     </Pressable>
 
-                <View style={{flexDirection: 'row', marginTop: 50}}>
-                    <Text style={styles.normalText}> Dark Mode </Text>
-                    <Switch
-                        style={styles.toggleSwitch}
-                        trackColor={{false: '#767577', true: '#007AFF'}}
-                        thumbColor={darkMode ? '#f4f3f4' : '#f4f3f4'}
-                        ios_backgroundColor="#3e3e3e"
-                        onValueChange={changeMode}
-                        value={darkMode}
-                    />
-                </View>
             </View>
         </View>
     );
