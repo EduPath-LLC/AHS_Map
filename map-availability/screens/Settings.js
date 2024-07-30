@@ -53,15 +53,6 @@ export default function Settings({ userId, navigation }) {
         isDarkMode();
       }, [userId]);
 
-    const logOut = async () => {
-        signOut(auth)
-            .then(() => {
-                navigation.navigate("SignIn");
-            }).catch((e) => {
-                Alert.alert("Error", e);
-            });
-    };
-
     const changeMode = async () => {
         try {
             setLoading(true);
@@ -146,7 +137,7 @@ export default function Settings({ userId, navigation }) {
                         />
                     </Pressable>
 
-                    <Pressable style={styles.buttonNew} onPress={() => navigation.navigate("SetSchedule", {userId: userId})}>
+                    <Pressable style={styles.buttonNew} onPress={() => navigation.navigate("HelpAndSupport", {userId: userId})}>
                         <Image
                             source={HelpAndSupportIcon}
                             style={styles.imageStyle}
@@ -158,7 +149,7 @@ export default function Settings({ userId, navigation }) {
                         />
                     </Pressable>
 
-                    <Pressable style={styles.buttonNew} onPress={() => navigation.navigate("SetSchedule", {userId: userId})}>
+                    <Pressable style={styles.buttonNew} onPress={() => navigation.navigate("About", {userId: userId})}>
                         <Image
                             source={AboutIcon}
                             style={styles.imageStyle}
@@ -179,17 +170,6 @@ export default function Settings({ userId, navigation }) {
                         ios_backgroundColor="#3e3e3e"
                         onValueChange={changeMode}
                         value={darkMode}
-                    />
-                </View>
-                <View style={{flexDirection: 'row'}}>
-                    <Text style={styles.normalText}> 1 Min Alert  </Text>
-                    <Switch
-                        style={styles.toggleSwitch}
-                        trackColor={{false: '#767577', true: '#007AFF'}}
-                        thumbColor={minuteAlert ? '#f4f3f4' : '#f4f3f4'}
-                        ios_backgroundColor="#3e3e3e"
-                        onValueChange={oMAtoggleSwitch}
-                        value={minuteAlert}
                     />
                 </View>
             </View>

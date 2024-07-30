@@ -4,7 +4,7 @@ import { signOut } from 'firebase/auth';
 import WavyHeader from '../components/headers/WavyHeader';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../firebase';
-import { stylesDark } from '../styles/dark/SettingsDark';
+import { stylesDark } from '../styles/dark/AccountDark';
 import { stylesLight } from '../styles/light/AccountLight';
 import { auth } from '../firebase';
 import Loader from '../components/Loader';
@@ -25,6 +25,36 @@ export default function Account({navigation}) {
   const route = useRoute();
   const userId = route.params.userId;
 
+  useEffect(() => {
+    const isDarkMode = async () => {
+      try {
+        if (userId) {
+          const userDocRef = doc(db, 'users', userId);
+          const userDocSnap = await getDoc(userDocRef);
+
+          if (userDocSnap.exists()) {
+            const userData = userDocSnap.data();
+
+            if(userData.dark) {
+              setDarkMode(true)
+            } else {
+              setDarkMode(false)
+            }
+
+          } else {
+            console.log('No such document!');
+          }
+        } else {
+          console.error('User ID is undefined');
+        }
+      } catch (error) {
+        console.error('Error fetching document: ', error);
+      }
+    };
+
+    isDarkMode();
+  }, [userId]);
+
   const logOut = async () => {
     signOut(auth)
         .then(() => {
@@ -43,6 +73,7 @@ export default function Account({navigation}) {
           darkMode={darkMode}
         />
     <View style={styles.container}>
+      
       <Pressable style={styles.buttonNew} onPress={() => navigation.navigate("Settings", {userId: userId})}>
           <Image
             source={ArrowBack}
@@ -50,6 +81,7 @@ export default function Account({navigation}) {
           />
           <Text style={styles.buttonNewText}>Back</Text>
         </Pressable>
+        <Text style={styles.bigText}> Account </Text>
         <Pressable style={styles.button} onPress={() => navigation.navigate("SetSchedule", {userId: userId})}>
           <Text style={styles.buttonText}>Edit Schedule</Text>
         </Pressable>

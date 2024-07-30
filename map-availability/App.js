@@ -11,6 +11,8 @@ import SetSchedule from './screens/SetSchedule.js';
 import Account from './screens/Account.js'
 import Notifications from './screens/Notifications.js'
 import Appearance from './screens/Appearance.js';
+import HelpAndSupport from './screens/HelpAndSupport.js'
+import About from './screens/About.js'
 
 const Stack = createStackNavigator();
 
@@ -27,6 +29,8 @@ const MainNavigator = () => (
     <Stack.Screen name="Account" component={Account} />
     <Stack.Screen name="Notifications" component={Notifications} />
     <Stack.Screen name="Appearance" component={Appearance} />
+    <Stack.Screen name="HelpAndSupport" component={HelpAndSupport} />
+    <Stack.Screen name="About" component={About} />
   </Stack.Navigator>
 );
 
