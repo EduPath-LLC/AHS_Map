@@ -15,15 +15,14 @@ export const stylesDark = StyleSheet.create({
         flexDirection: 'column',
         alignItems: 'center',
         paddingTop: 10 * height,
-        backgroundColor: "#001C2D",
-        marginTop: 10 * height
+        backgroundColor: "#E0EDFC",
+        marginTop: 15 * height
     },
     bigText: {
         fontSize: 10 * width,
         alignItems: 'center',
         textAlign: 'left',
         fontFamily: 'Kanit-Bold',
-        color: '#ffffff'
     },
     firstNameTextInput: {
         width: 80 * width,
@@ -45,12 +44,12 @@ export const stylesDark = StyleSheet.create({
         alignSelf: 'flex-start',
         textAlign: 'left',
         fontFamily: 'Kanit-Bold',
+        // marginRight: 40 * width,
         marginBottom: 2 * width,
-        color: '#ffffff'
     },
     button: {
         borderRadius: 9999,
-        backgroundColor: '#0A74DA',
+        backgroundColor: '#007AFF',
         width: 50 * width,
         height: 5 * height,
         justifyContent: 'center',
@@ -58,6 +57,17 @@ export const stylesDark = StyleSheet.create({
         alignContent: 'center',
         marginTop: 2 * width,
         marginBottom: 2 * width
+    },
+    buttonNew: {
+        flexDirection: 'row',
+        width: 80 * width,
+        height: 7 * height,
+        justifyContent: 'space-around',
+        alignItems: 'center',
+        alignContent: 'center',
+        borderBottomColor: 'gray',
+        borderBottomWidth: 1,
+        padding: width,
     },
     buttonText: {
         color: '#FFFFFF',
@@ -67,5 +77,33 @@ export const stylesDark = StyleSheet.create({
         fontFamily: 'Kanit-Bold',
         alignContent: 'center',
         textAlign: 'center',
+    },
+    buttonNewText: {
+        color: '#000000',
+        width: 60 * width,
+        alignSelf: 'flex-end',
+        fontSize: 5 * width,
+        fontFamily: 'Kanit-Bold',
+        alignContent: 'flex-start',
+        textAlign: 'flex-start',
+        marginLeft: width,
+    },
+    imageStyle: {
+        width: 7.5 * width,
+        height: 7.5 * width,
+        alignSelf: 'flex-end',
+        justifyContent: 'center',
+        alignItems: 'left',
+        alignContent: 'flex-start',
+        alignSelf: 'flex-end',
+    },
+    imageArrowStyle: {
+        width: 5 * width,
+        height: 7.5 * width,
+        alignSelf: 'flex-end',
+        justifyContent: 'center',
+        alignItems: 'left',
+        alignContent: 'flex-start',
+        alignSelf: 'flex-end',
     }
 })

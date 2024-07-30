@@ -58,6 +58,17 @@ export const stylesLight = StyleSheet.create({
         marginTop: 2 * width,
         marginBottom: 2 * width
     },
+    buttonNew: {
+        flexDirection: 'row',
+        width: 80 * width,
+        height: 7 * height,
+        justifyContent: 'space-around',
+        alignItems: 'center',
+        alignContent: 'center',
+        borderBottomColor: 'gray',
+        borderBottomWidth: 1,
+        padding: width,
+    },
     buttonText: {
         color: '#FFFFFF',
         width: 50 * width,
@@ -66,5 +77,33 @@ export const stylesLight = StyleSheet.create({
         fontFamily: 'Kanit-Bold',
         alignContent: 'center',
         textAlign: 'center',
+    },
+    buttonNewText: {
+        color: '#000000',
+        width: 60 * width,
+        alignSelf: 'flex-end',
+        fontSize: 5 * width,
+        fontFamily: 'Kanit-Bold',
+        alignContent: 'flex-start',
+        textAlign: 'flex-start',
+        marginLeft: width,
+    },
+    imageStyle: {
+        width: 7.5 * width,
+        height: 7.5 * width,
+        alignSelf: 'flex-end',
+        justifyContent: 'center',
+        alignItems: 'left',
+        alignContent: 'flex-start',
+        alignSelf: 'flex-end',
+    },
+    imageArrowStyle: {
+        width: 5 * width,
+        height: 7.5 * width,
+        alignSelf: 'flex-end',
+        justifyContent: 'center',
+        alignItems: 'left',
+        alignContent: 'flex-start',
+        alignSelf: 'flex-end',
     }
 })
