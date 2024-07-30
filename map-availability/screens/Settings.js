@@ -96,6 +96,8 @@ export default function Settings({ userId, navigation }) {
         )
     }
 
+    
+
     return (
         <View style={styles.fullScreen}>
             <WavyHeader 
@@ -193,11 +195,6 @@ export default function Settings({ userId, navigation }) {
                 <View>
                     <Pressable style={styles.button} onPress={() => navigation.navigate("SetSchedule", {userId: userId})}>
                         <Text style={styles.buttonText}>Edit Schedule</Text>
-                    </Pressable>
-                </View>
-                <View>
-                    <Pressable style={[styles.button, {backgroundColor: "#F66060"}]} onPress={logOut}>
-                        <Text style={styles.buttonText}>Log Out</Text>
                     </Pressable>
                 </View>
             </View> 

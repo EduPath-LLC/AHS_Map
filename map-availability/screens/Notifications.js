@@ -8,7 +8,6 @@ import { stylesDark } from '../styles/dark/SettingsDark';
 import { stylesLight } from '../styles/light/AccountLight';
 import { auth } from '../firebase';
 import Loader from '../components/Loader';
-import { useRoute } from '@react-navigation/native';
 
 import AccountIcon from '../assets/images/Account_Icon.png';
 import NotificationIcon from '../assets/images/Notification_Icon.png';
@@ -19,11 +18,9 @@ import ArrowForward from '../assets/images/ArrowForward.png';
 import ArrowBack from '../assets/images/ArrowBack.png'
 
 
-export default function Account({navigation}) {
+export default function Account({userId, navigation}) {
   const [darkMode, setDarkMode] = useState(false);
   let styles = darkMode ? stylesDark : stylesLight;
-  const route = useRoute();
-  const userId = route.params.userId;
 
   const logOut = async () => {
     signOut(auth)
@@ -33,7 +30,6 @@ export default function Account({navigation}) {
             Alert.alert("Error", e);
         });
 };
-
   return (
     <View style={styles.fullScreen}>
         <WavyHeader 
@@ -50,11 +46,8 @@ export default function Account({navigation}) {
           />
           <Text style={styles.buttonNewText}>Back</Text>
         </Pressable>
-        <Pressable style={styles.button} onPress={() => navigation.navigate("SetSchedule", {userId: userId})}>
-          <Text style={styles.buttonText}>Edit Schedule</Text>
-        </Pressable>
         <Pressable style={[styles.button, {backgroundColor: "#F66060"}]} onPress={logOut}>
-          <Text style={styles.buttonText}>Log Out</Text>
+            <Text style={styles.buttonText}>Log Out</Text>
         </Pressable>
     </View>
     </View>
