@@ -198,11 +198,22 @@ export  const styles = StyleSheet.create({
       shadowOpacity: 0.25,
       shadowRadius: 3.84,
       elevation: 5,
+      alignContent: 'center',
+      maxHeight: 25 * height,
+      marginTop: width,
     },
-    historyItem: {
+    historyItemContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
       paddingVertical: 10,
-      borderBottomWidth: 1,
-      borderBottomColor: '#ddd',
+    },
+    historyItemTextContainer: {
+      flex: 1,
+      width: 50 * width
+    },
+    historyItemText: {
+      fontSize: 16,
     },
     
   });
