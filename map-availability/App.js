@@ -9,6 +9,8 @@ import BottomTab from './navigation/BottomTab.js';
 import ResetPassword from './screens/auth/ResetPassword.js';
 import SetSchedule from './screens/SetSchedule.js';
 import Account from './screens/Account.js'
+import Notifications from './screens/Notifications.js'
+import Appearance from './screens/Appearance.js';
 
 const Stack = createStackNavigator();
 
@@ -23,6 +25,8 @@ const MainNavigator = () => (
     <Stack.Screen name="SetSchedule" component={SetSchedule} />
     <Stack.Screen name="BottomTab" component={BottomTab} />
     <Stack.Screen name="Account" component={Account} />
+    <Stack.Screen name="Notifications" component={Notifications} />
+    <Stack.Screen name="Appearance" component={Appearance} />
   </Stack.Navigator>
 );
 

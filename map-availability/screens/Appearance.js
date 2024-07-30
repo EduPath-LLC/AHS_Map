@@ -7,7 +7,7 @@ import { stylesDark } from '../styles/dark/SettingsDark';
 import { stylesLight } from '../styles/light/NotificationsLight';
 import ArrowBack from '../assets/images/ArrowBack.png';
 
-export default function Notifications({ userId, navigation }) {
+export default function Account({ userId, navigation }) {
   const [darkMode, setDarkMode] = useState(false);
   const styles = darkMode ? stylesDark : stylesLight;
   const [minuteAlert, setMinuteAlert] = useState(false);

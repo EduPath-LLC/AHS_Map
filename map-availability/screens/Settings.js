@@ -122,7 +122,7 @@ export default function Settings({ userId, navigation }) {
                         />
                     </Pressable>
 
-                    <Pressable style={styles.buttonNew} onPress={() => navigation.navigate("SetSchedule", {userId: userId})}>
+                    <Pressable style={styles.buttonNew} onPress={() => navigation.navigate("Notifications", {userId: userId})}>
                         <Image
                             source={NotificationIcon}
                             style={styles.imageStyle}
@@ -134,7 +134,7 @@ export default function Settings({ userId, navigation }) {
                         />
                     </Pressable>
 
-                    <Pressable style={styles.buttonNew} onPress={() => navigation.navigate("SetSchedule", {userId: userId})}>
+                    <Pressable style={styles.buttonNew} onPress={() => navigation.navigate("Appearance", {userId: userId})}>
                         <Image
                             source={AppearanceIcon}
                             style={styles.imageStyle}
@@ -192,12 +192,7 @@ export default function Settings({ userId, navigation }) {
                         value={minuteAlert}
                     />
                 </View>
-                <View>
-                    <Pressable style={styles.button} onPress={() => navigation.navigate("SetSchedule", {userId: userId})}>
-                        <Text style={styles.buttonText}>Edit Schedule</Text>
-                    </Pressable>
-                </View>
-            </View> 
+            </View>
         </View>
     );
 }
