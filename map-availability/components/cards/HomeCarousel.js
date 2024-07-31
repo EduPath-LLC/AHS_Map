@@ -1,10 +1,11 @@
-import React, { Component } from 'react'
-import { View, Text, Pressable, Image, Alert } from 'react-native'
+import React, { Component } from 'react';
+import { View, Text, Pressable, Image, Alert } from 'react-native';
 import { getDocs, collection } from 'firebase/firestore';
-import { db } from '../../firebase'
+import { db } from '../../firebase';
+import { PanGestureHandler, State } from 'react-native-gesture-handler';
 
-import { stylesLight } from '../../styles/light/HomeCarouselLight'
-import { stylesDark } from '../../styles/dark/HomeCarouselDark'
+import { stylesLight } from '../../styles/light/HomeCarouselLight';
+import { stylesDark } from '../../styles/dark/HomeCarouselDark';
 import HomeCards from './HomeCards';
 
 import ArrowBack from '../../assets/images/ArrowBack.png';
@@ -214,8 +215,19 @@ export default class HomeCarousel extends Component {
         };
 
         const roomNumber = scheduleMap[this.state.current].roomNumber;
+        Alert.alert('Navigating to room', `Room number: ${roomNumber}`);
         this.props.navigation.navigate('Map', { roomNumber: roomNumber });
     }
+
+    handleSwipe = ({ nativeEvent }) => {
+        if (nativeEvent.state === State.END) {
+            if (nativeEvent.translationX < -10) {
+                this.increase();
+            } else if (nativeEvent.translationX > 10) {
+                this.decrease();
+            }
+        }
+    };
 
     render() {
         return (
@@ -231,7 +243,11 @@ export default class HomeCarousel extends Component {
                         />
                     </Pressable>
 
-                    {this.renderCarousel(this.state.current)}
+                    <PanGestureHandler onHandlerStateChange={this.handleSwipe}>
+                        <View>
+                            {this.renderCarousel(this.state.current)}
+                        </View>
+                    </PanGestureHandler>
 
                     <Pressable 
                         onPress={this.increase}
