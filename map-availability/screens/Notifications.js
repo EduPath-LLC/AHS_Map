@@ -78,7 +78,7 @@ export default function Notifications({ navigation }) {
         </Pressable>
         <Text style={styles.bigText}> Notifications </Text>
         <View style={styles.switchContainer}>
-          <Text style={styles.normalText}>1 Min Alert</Text>
+          <Text style={styles.normalText}>1 Minute Alert</Text>
           <Switch
             style={styles.toggleSwitch}
             trackColor={{ false: '#767577', true: '#007AFF' }}
