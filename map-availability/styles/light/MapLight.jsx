@@ -21,7 +21,7 @@ export  const styles = StyleSheet.create({
       bottom: 0,
     },
     searchContainer: {
-      flexDirection: 'row',
+      flexDirection: 'column',
       marginTop: 50,
       marginHorizontal: 20,
       borderRadius: 25,
@@ -36,16 +36,17 @@ export  const styles = StyleSheet.create({
       elevation: 5,
     },
     searchInput: {
-      flex: 1,
       height: 50,
       paddingHorizontal: 20,
       fontSize: 16,
+      borderBottomWidth: 1,
+      borderBottomColor: '#ddd',
     },
     button: {
       backgroundColor: '#007AFF',
-      paddingHorizontal: 20,
-      justifyContent: 'center',
-      borderTopRightRadius: 25,
+      paddingVertical: 15,
+      alignItems: 'center',
+      borderBottomLeftRadius: 25,
       borderBottomRightRadius: 25,
     },
     buttonText: {
@@ -54,33 +55,36 @@ export  const styles = StyleSheet.create({
       fontWeight: 'bold',
     },
     directionsContainer: {
-      marginTop: 10,
-      marginHorizontal: 20,
+      position: 'absolute',
+      bottom: 20,
+      left: 20,
+      right: 20,
       backgroundColor: 'rgba(255, 255, 255, 0.9)',
-      borderRadius: 15,
-      padding: 15,
-      shadowColor: "#000",
-      shadowOffset: {
-        width: 0,
-        height: 2,
-      },
-      shadowOpacity: 0.25,
-      shadowRadius: 3.84,
-      elevation: 5,
+      padding: 10,
+      borderRadius: 10,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+    },
+    directionsInnerContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      flex: 1,
+    },
+    directionsText: {
+      fontSize: 16,
+      color: '#333',
+      flex: 1,
+    },
+    turnIcon: {
+      marginLeft: 10,
     },
     directionsContent: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
     },
-    directionsText: {
-      fontSize: 18,
-      fontWeight: 'bold',
-      textAlign: 'center',
-      textShadowColor: 'white',
-      textShadowOffset: { width: 1, height: 1 },
-      textShadowRadius: 2,
-    },
+    
     arrowContainer: {
       width: 24,
       height: 24,
@@ -119,6 +123,10 @@ export  const styles = StyleSheet.create({
       borderRadius: 15,
       padding: 15,
       shadowColor: "#000",
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    
       shadowOffset: {
         width: 0,
         height: 2,
@@ -132,6 +140,18 @@ export  const styles = StyleSheet.create({
       fontWeight: 'bold',
       marginBottom: 10,
       textAlign: 'center',
+    },
+    routeSegment: {
+      strokeColor: '#007AFF',
+      strokeWidth: 4,
+    },
+    startingPointMarker: {
+      width: 20,
+      height: 20,
+      borderRadius: 10,
+      backgroundColor: 'green',
+      borderColor: 'white',
+      borderWidth: 2,
     },
     exitButton: {
       backgroundColor: '#FF3B30',
@@ -185,24 +205,61 @@ export  const styles = StyleSheet.create({
       borderRadius: 5,
       backgroundColor: '#007AFF',
     },
-    historyContainer: {
-      backgroundColor: 'white',
-      marginHorizontal: 20,
+    
+    endSegmentButton: {
+      backgroundColor: '#4CAF50',
+      paddingVertical: 10,
+      paddingHorizontal: 15,
+      borderRadius: 20,
+      marginRight: 10,
+      marginVertical:100,
+    },
+    endSegmentButtonText: {
+      color: 'white',
+      fontSize: 16,
+      fontWeight: 'bold',
+    },
+    floorSwitchContainer: {
+      position: 'absolute',
+      top: 20,
+      right: 20,
+      flexDirection: 'row',
+    },
+    floorButton: {
+      backgroundColor: '#fff',
+      padding: 10,
+      marginHorizontal: 5,
+      borderRadius: 5,
+    },
+    activeFloorButton: {
+      backgroundColor: '#007AFF',
+    },
+    floorButtonText: {
+      color: '#000',
+    },
+    floorToggleButton: {
+      backgroundColor: '#007AFF',
       padding: 10,
       borderRadius: 5,
-      shadowColor: "#000",
-      shadowOffset: {
-        width: 0,
-        height: 2,
-      },
-      shadowOpacity: 0.25,
-      shadowRadius: 3.84,
-      elevation: 5,
+      marginTop: 10,
+      alignSelf: 'center',
+      top:-5,
+      paddingHorizontal:80
     },
-    historyItem: {
-      paddingVertical: 10,
-      borderBottomWidth: 1,
-      borderBottomColor: '#ddd',
+    floorToggleButtonText: {
+      color: 'white',
+      fontWeight: 'bold',
+      top:0
     },
-    
+    progressBarContainer: {
+      width: '100%',
+      height: 5,
+      backgroundColor: '#e0e0e0',
+      position: 'absolute',
+      bottom: 0,
+    },
+    progressBar: {
+      height: '100%',
+      backgroundColor: '#007AFF',
+    },
   });
