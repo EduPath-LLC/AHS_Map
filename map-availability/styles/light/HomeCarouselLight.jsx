@@ -5,7 +5,6 @@ import { StyleSheet, Dimensions } from 'react-native'
 const width = Dimensions.get('window').width * 0.01;
 const height = Dimensions.get('window').height * 0.01;
 
-
 export const stylesLight = StyleSheet.create({
     container: {
     },
@@ -19,6 +18,7 @@ export const stylesLight = StyleSheet.create({
     arrows: {
         alignSelf: 'center',
         margin: 3 * width,
+        padding: 3 * width,
     },
     button: {
         alignSelf: 'center',
@@ -33,4 +33,4 @@ export const stylesLight = StyleSheet.create({
     buttonText: {
         color: '#FFFFFF',
     }
-})
+});

@@ -9,7 +9,7 @@ export const styles = StyleSheet.create({
     svgCurve: {
         position: 'absolute',
         width: 100 * width,
-        zIndex: 500,
+        zIndex: 999,
     },
     logo: {
         alignSelf: 'center',

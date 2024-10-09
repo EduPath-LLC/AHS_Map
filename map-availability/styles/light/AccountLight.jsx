@@ -16,7 +16,7 @@ export const stylesLight = StyleSheet.create({
         alignItems: 'center',
         paddingTop: 10 * height,
         backgroundColor: "#E0EDFC",
-        marginTop: 15 * height
+        marginTop: 10 * height
     },
     bigText: {
         fontSize: 10 * width,
@@ -56,18 +56,16 @@ export const stylesLight = StyleSheet.create({
         alignItems: 'center',
         alignContent: 'center',
         marginTop: 2 * width,
-        marginBottom: 2 * width
+        marginBottom: 2 * width,
     },
     buttonNew: {
         flexDirection: 'row',
         width: 80 * width,
         height: 7 * height,
         justifyContent: 'space-around',
-        alignItems: 'center',
-        alignContent: 'center',
         borderBottomColor: 'gray',
-        borderBottomWidth: 1,
         padding: width,
+        right: 10 * width
     },
     buttonText: {
         color: '#FFFFFF',
@@ -86,7 +84,7 @@ export const stylesLight = StyleSheet.create({
         fontFamily: 'Kanit-Bold',
         alignContent: 'flex-start',
         textAlign: 'flex-start',
-        marginLeft: width,
+        marginLeft: -7 * width,
     },
     imageStyle: {
         width: 7.5 * width,
@@ -100,10 +98,6 @@ export const stylesLight = StyleSheet.create({
     imageArrowStyle: {
         width: 5 * width,
         height: 7.5 * width,
-        alignSelf: 'flex-end',
-        justifyContent: 'center',
-        alignItems: 'left',
-        alignContent: 'flex-start',
         alignSelf: 'flex-end',
     }
 })

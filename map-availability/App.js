@@ -8,6 +8,11 @@ import SignIn from './screens/auth/SignIn.js';
 import BottomTab from './navigation/BottomTab.js';
 import ResetPassword from './screens/auth/ResetPassword.js';
 import SetSchedule from './screens/SetSchedule.js';
+import Account from './screens/Account.js'
+import Notifications from './screens/Notifications.js'
+import Appearance from './screens/Appearance.js';
+import HelpAndSupport from './screens/HelpAndSupport.js'
+import About from './screens/About.js'
 
 const Stack = createStackNavigator();
 
@@ -21,6 +26,11 @@ const MainNavigator = () => (
     <Stack.Screen name="ResetPassword" component={ResetPassword} />
     <Stack.Screen name="SetSchedule" component={SetSchedule} />
     <Stack.Screen name="BottomTab" component={BottomTab} />
+    <Stack.Screen name="Account" component={Account} />
+    <Stack.Screen name="Notifications" component={Notifications} />
+    <Stack.Screen name="Appearance" component={Appearance} />
+    <Stack.Screen name="HelpAndSupport" component={HelpAndSupport} />
+    <Stack.Screen name="About" component={About} />
   </Stack.Navigator>
 );
 
