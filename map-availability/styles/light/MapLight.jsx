@@ -199,20 +199,23 @@ export  const styles = StyleSheet.create({
     },
     historyContainer: {
       position: 'absolute',
-      top: 50,
-      left: 0,
-      right: 0,
+      top: 250,
+      left: 20,
+      right: 20,
       backgroundColor: '#FFF',
       borderColor: '#CCC',
       borderWidth: 1,
       zIndex: 1,
       maxHeight: 200,
       overflow: 'scroll',
+      alignItems: 'center',
+      borderRadius: 30
     },
     historyItem: {
       padding: 10,
-      fontSize: 14,
+      fontSize: 28,
       color: '#000',
+      alignItems: 'center',
     },
     customMarker: {
       width: 20,
