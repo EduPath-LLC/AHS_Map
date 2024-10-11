@@ -1236,6 +1236,7 @@ return (
           placeholder="Enter starting point (e.g., F108)"
           placeholderTextColor="#999"
         />
+        
         <TextInput
           style={styles.searchInput}
           value={searchQuery}
@@ -1263,7 +1264,7 @@ return (
         <View style={styles.historyContainer}>
           {searchHistory.map((item, index) => (
             <TouchableOpacity key={index} onPress={() => handleSearch(item.query)}>
-              <Text style={styles.historyItem}>{item.query}</Text>
+              <Text style={styles.histroyItem}>{item.query}</Text>
             </TouchableOpacity>
           ))}
         </View>
