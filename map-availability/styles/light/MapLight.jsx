@@ -65,6 +65,7 @@ export  const styles = StyleSheet.create({
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
+      
     },
     directionsInnerContainer: {
       flexDirection: 'row',
@@ -75,6 +76,10 @@ export  const styles = StyleSheet.create({
       fontSize: 16,
       color: '#333',
       flex: 1,
+      alignText: 'center',
+      justifyContent: 'center',
+      fontWeight: 'bold',
+      textAlign: 'center',
     },
     turnIcon: {
       marginLeft: 10,
@@ -123,9 +128,9 @@ export  const styles = StyleSheet.create({
       borderRadius: 15,
       padding: 15,
       shadowColor: "#000",
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
+      flexDirection: 'column',
+      
+      
     
       shadowOffset: {
         width: 0,
@@ -138,8 +143,8 @@ export  const styles = StyleSheet.create({
     routeInfoText: {
       fontSize: 18,
       fontWeight: 'bold',
-      marginBottom: 10,
       textAlign: 'center',
+      marginBottom: 20,
     },
     routeSegment: {
       strokeColor: '#007AFF',
@@ -155,9 +160,10 @@ export  const styles = StyleSheet.create({
     },
     exitButton: {
       backgroundColor: '#FF3B30',
-      paddingVertical: 10,
+      paddingVertical: 20,
       borderRadius: 20,
       alignItems: 'center',
+      marginBottom: 20
     },
     exitButtonText: {
       color: 'white',
@@ -191,6 +197,26 @@ export  const styles = StyleSheet.create({
       padding: 20,
       color: '#333',
     },
+    historyContainer: {
+      position: 'absolute',
+      top: 250,
+      left: 20,
+      right: 20,
+      backgroundColor: '#FFF',
+      borderColor: '#CCC',
+      borderWidth: 1,
+      zIndex: 1,
+      maxHeight: 200,
+      overflow: 'scroll',
+      alignItems: 'center',
+      borderRadius: 30
+    },
+    historyItem: {
+      padding: 10,
+      fontSize: 28,
+      color: '#000',
+      alignItems: 'center',
+    },
     customMarker: {
       width: 20,
       height: 20,
@@ -208,11 +234,10 @@ export  const styles = StyleSheet.create({
     
     endSegmentButton: {
       backgroundColor: '#4CAF50',
-      paddingVertical: 10,
-      paddingHorizontal: 15,
+      paddingVertical: 20,
       borderRadius: 20,
-      marginRight: 10,
-      marginVertical:100,
+      alignItems: 'center',
+      marginBottom: 20
     },
     endSegmentButtonText: {
       color: 'white',
