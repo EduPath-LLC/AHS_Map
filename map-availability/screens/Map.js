@@ -7,6 +7,7 @@ import { debounce } from 'lodash';
 import { styles } from '../styles/light/MapLight'
 import { useRoute } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Magnetometer } from 'expo-sensors';
 
 function determineRealTurns(route) {
   const segments = [];
@@ -803,21 +804,15 @@ const [startingPointQuery, setStartingPointQuery] = useState('');
 const [directions, setDirections] = useState({ text: '', turn: 'straight' });
 const [showFirstFloor, setShowFirstFloor] = useState(true);
 const [currentFloor, setCurrentFloor] = useState(1);
-
+const [heading, setHeading] = useState(0);
 
 
 const handleEndSegment = useCallback(() => {
   if (currentSegmentIndex < routeSegments.length - 1) {
-    const currentSegment = routeSegments[currentSegmentIndex];
-    const nextSegment = routeSegments[currentSegmentIndex + 1];
-
-    // Determine the floor of the current and next segments
-    const currentFloor = currentSegment[0].reference.startsWith('S2') ? 2 : 1;
-    const nextFloor = nextSegment[0].reference.startsWith('S2') ? 2 : 1;
-
     const nextIndex = currentSegmentIndex + 1;
     setCurrentSegmentIndex(nextIndex);
 
+    const nextSegment = routeSegments[nextIndex];
     const newBearing = calculateBearing(nextSegment[0], nextSegment[nextSegment.length - 1]);
     setBearing(newBearing);
 
@@ -834,7 +829,9 @@ const handleEndSegment = useCallback(() => {
     const updatedEstimatedTime = Math.ceil(remainingDistance * 3.28084 / 308);
     setEstimatedTime(updatedEstimatedTime);
 
-    // Only change floor when actually moving to a staircase
+    // Handle floor changes
+    const currentSegment = routeSegments[currentSegmentIndex];
+    const nextFloor = nextSegment[0].reference.startsWith('S2') ? 2 : 1;
     if (currentSegment[currentSegment.length - 1].reference.startsWith('S') && currentFloor !== nextFloor) {
       setCurrentFloor(nextFloor);
       setShowFirstFloor(nextFloor === 1);
@@ -852,7 +849,7 @@ const handleEndSegment = useCallback(() => {
     setDirections({ text: '', turn: null });
     setTimeout(() => setShowArrivedMessage(false), 3000);
   }
-}, [currentSegmentIndex, routeSegments, calculateBearing, animateCamera, searchQuery, calculateTotalDistance]);
+}, [currentSegmentIndex, routeSegments, calculateBearing, animateCamera, searchQuery, calculateTotalDistance, currentFloor]);
 const routeBetweenFloors = (start, end, startFloorCoordinates, endFloorCoordinates, startFloorStaircases, endFloorStaircases) => {
   // Find nearest staircase on start floor
   const nearestStartStaircase = findNearestPoint(start, startFloorStaircases);
@@ -915,7 +912,81 @@ const routeBetweenFloors = (start, end, startFloorCoordinates, endFloorCoordinat
   return shortestRoute.route;
 };
 
+useEffect(() => {
+  let subscription;
+  let lastUpdateTime = 0;
+  const updateInterval = 2000; // 2 seconds in milliseconds
 
+  const startMagnetometer = async () => {
+    try {
+      await Magnetometer.requestPermissionsAsync();
+      Magnetometer.setUpdateInterval(updateInterval);
+      subscription = Magnetometer.addListener((data) => {
+        const currentTime = Date.now();
+        if (currentTime - lastUpdateTime >= updateInterval) {
+          const newHeading = Math.round((Math.atan2(data.y, data.x) * 180) / Math.PI);
+          setHeading(newHeading);
+          lastUpdateTime = currentTime;
+        }
+      });
+    } catch (error) {
+      console.log('Error setting up magnetometer:', error);
+    }
+  };
+
+  startMagnetometer();
+
+  return () => {
+    if (subscription) {
+      subscription.remove();
+    }
+  };
+}, []);
+
+const getHeadingDifference = useCallback(() => {
+  if (!isRouteActive || routeSegments.length === 0) return null;
+
+  const currentSegment = routeSegments[currentSegmentIndex];
+  if (!currentSegment || currentSegment.length < 2) return null;
+
+  // Check if the current segment is for stairs (assuming stair segments have references starting with 'S')
+  const isStairSegment = currentSegment[0].reference.startsWith('S') || currentSegment[currentSegment.length - 1].reference.startsWith('S');
+
+  if (isStairSegment) {
+    // For stair segments, we don't provide directional guidance
+    return null;
+  }
+
+  const segmentStart = currentSegment[0];
+  const segmentEnd = currentSegment[currentSegment.length - 1];
+  const segmentBearing = calculateBearing(segmentStart, segmentEnd);
+
+  let difference = segmentBearing - heading;
+  if (difference < -180) difference += 360;
+  if (difference > 180) difference -= 360;
+
+  return difference;
+}, [isRouteActive, routeSegments, currentSegmentIndex, heading, calculateBearing]);
+
+const getDirectionGuidance = useCallback(() => {
+  const difference = getHeadingDifference();
+  if (difference === null) {
+    // Check if it's a stair segment
+    const currentSegment = routeSegments[currentSegmentIndex];
+    if (currentSegment && (currentSegment[0].reference.startsWith('S') || currentSegment[currentSegment.length - 1].reference.startsWith('S'))) {
+      return 'Proceed to the stairs';
+    }
+    return '';
+  }
+
+  if (Math.abs(difference) <= 45) {
+    return 'You are heading in the right direction';
+  } else if (difference < 0) {
+    return `Turn left ${Math.abs(Math.round(difference))}°`;
+  } else {
+    return `Turn right ${Math.round(difference)}°`;
+  }
+}, [getHeadingDifference, routeSegments, currentSegmentIndex]);
 
 
 useEffect(() => {
@@ -1371,7 +1442,6 @@ return (
           placeholder="Enter starting point (e.g., F108)"
           placeholderTextColor="#999"
         />
-        
         <TextInput
           style={styles.searchInput}
           value={searchQuery}
@@ -1399,7 +1469,7 @@ return (
         <View style={styles.historyContainer}>
           {searchHistory.map((item, index) => (
             <TouchableOpacity key={index} onPress={() => handleSearch(item.query)}>
-              <Text style={styles.histroyItem}>{item.query}</Text>
+              <Text style={styles.historyItem}>{item.query}</Text>
             </TouchableOpacity>
           ))}
         </View>
@@ -1431,15 +1501,17 @@ return (
       </View>
     )}
     {isRouteActive && (
-      <SafeAreaView style={styles.directionsContainer}>
-        <Text style={styles.directionsText}>{directions.text}</Text>
-        {directions.turn !== 'straight' && (
-          <MaterialIcons 
-            name={directions.turn === 'left' ? 'turn-left' : 'turn-right'} 
-            size={24} 
-            color="#007AFF" 
-          />
-        )}
+        <SafeAreaView style={styles.directionsContainer}>
+          <Text style={styles.directionsText}>{directions.text}</Text>
+          {directions.turn !== 'straight' && (
+            <MaterialIcons 
+              name={directions.turn === 'left' ? 'turn-left' : 'turn-right'} 
+              size={24} 
+              color="#007AFF" 
+            />
+          )}
+          <Text style={styles.headingGuidance}>{getDirectionGuidance()}</Text>
+        
       </SafeAreaView>
     )}
   </View>

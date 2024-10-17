@@ -287,4 +287,10 @@ export  const styles = StyleSheet.create({
       height: '100%',
       backgroundColor: '#007AFF',
     },
+    headingGuidance: {
+      fontSize: 16,
+      color: '#007AFF',
+      marginTop: 8,
+    },
+
   });
