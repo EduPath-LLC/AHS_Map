@@ -12,33 +12,46 @@ function determineRealTurns(route) {
   const segments = [];
   let currentSegment = [route[0]];
   let lastSignificantBearing = calculateBearing(route[0], route[1]);
+  let currentFloor = getFloor(route[0]);
 
   for (let i = 1; i < route.length; i++) {
-    currentSegment.push(route[i]);
-    if (i < route.length - 1) {
-      const newBearing = calculateBearing(route[i], route[i + 1]);
-      let bearingDifference = Math.abs(newBearing - lastSignificantBearing);
-      
-      if (bearingDifference > 180) {
-        bearingDifference = 360 - bearingDifference;
+    const nextPoint = route[i];
+    const nextFloor = getFloor(nextPoint);
+
+    // Only treat the staircase as a transition point if there's a floor change
+    if (isFloorChange(route[i - 1], nextPoint)) {
+      segments.push(currentSegment); // End the current segment
+
+      // Create a special staircase segment
+      segments.push([route[i - 1], nextPoint]);
+
+      currentSegment = [nextPoint]; // Start a new segment on the new floor
+      currentFloor = nextFloor;
+
+      // Update the bearing
+      if (i < route.length - 1) {
+        lastSignificantBearing = calculateBearing(nextPoint, route[i + 1]);
       }
-      
-      if (bearingDifference >= 80 && bearingDifference <= 100 ||
-          (route[i].reference.startsWith('S') && isFloorChange(route[i], route[i+1]))) {
-        segments.push(currentSegment);
-        currentSegment = [route[i]];
-        lastSignificantBearing = newBearing;
+    } else {
+      currentSegment.push(nextPoint); // Regular node behavior
+
+      if (i < route.length - 1) {
+        const newBearing = calculateBearing(nextPoint, route[i + 1]);
+        let bearingDifference = Math.abs(newBearing - lastSignificantBearing);
         
-        // Add this condition to create a new segment after stairs (for both directions)
-        if (route[i].reference.startsWith('S')) {
-          segments.push([route[i], route[i+1]]);
-          currentSegment = [route[i+1]];
-          i++;
+        if (bearingDifference > 180) {
+          bearingDifference = 360 - bearingDifference;
+        }
+
+        if (bearingDifference >= 85 && bearingDifference <= 96) {
+          segments.push(currentSegment);
+          currentSegment = [nextPoint];
+          lastSignificantBearing = newBearing;
         }
       }
     }
   }
-  
+
   if (currentSegment.length > 0) {
     segments.push(currentSegment);
   }
@@ -46,12 +59,21 @@ function determineRealTurns(route) {
   return segments;
 }
 
+
+// Helper function to determine the floor of a point
+function getFloor(point) {
+  return point.reference.startsWith('S1') || point.reference.startsWith('1') ? 1 : 2;
+}
+
 // Helper function to determine if there's a floor change
 function isFloorChange(point1, point2) {
-  const isFirstFloor1 = firstFloorCoordinates.some(coord => coord.reference === point1.reference);
-  const isFirstFloor2 = firstFloorCoordinates.some(coord => coord.reference === point2.reference);
-  return isFirstFloor1 !== isFirstFloor2;
+  // If the points are in different floors (based on their staircase references)
+  const isS1 = point1.reference.startsWith('S1') || point2.reference.startsWith('S1');
+  const isS2 = point1.reference.startsWith('S2') || point2.reference.startsWith('S2');
+
+  return isS1 && isS2;  // This means there's a floor change between staircases
 }
+
 const firstFloorCoordinates = [
   { latitude: 33.11012705174, longitude: -96.66134610000, reference: 'mainhall1' },
   { latitude: 33.11005377415, longitude: -96.66127730000, reference: 'mainhall2' },
@@ -81,7 +103,7 @@ const firstFloorCoordinates = [
 {latitude:33.1091114, longitude:-96.6613463, reference: 'midhallcut12'},
 {latitude:33.1092741, longitude:-96.6614961, reference: 'midhallcut13'},
 { latitude: 33.10932618, longitude: -96.66141655, reference: 'F119' },
-{ latitude: 33.10932480, longitude: -96.66141863, reference: 'S18' },
+{ latitude: 33.10932480, longitude: -96.66141863, reference: 'S1_8' },
 { latitude: 33.10922702, longitude: -96.66156692, reference: 'F123' },
 { latitude: 33.10922085, longitude: -96.66157627, reference: 'F124' },
 { latitude: 33.10918304, longitude: -96.66163361, reference: 'F125' },
@@ -107,7 +129,7 @@ const firstFloorCoordinates = [
 { latitude: 33.10901118, longitude: -96.66149677, reference: 'F144' },
 { latitude: 33.10904075, longitude: -96.66145269, reference: 'F145' },
 { latitude: 33.10907032, longitude: -96.66140860, reference: 'F146' },
-{ latitude: 33.10909989, longitude: -96.66136452, reference: 'F148' },
+{ latitude: 33.10909989, longitude: -96.66136452, reference: 'S1_7' },
 { latitude: 33.10912945, longitude: -96.66132043, reference: 'F149' },
 { latitude: 33.10915902, longitude: -96.66127635, reference: 'F153' },
 { latitude: 33.10918859, longitude: -96.66123226, reference: 'F154' },
@@ -139,7 +161,7 @@ const firstFloorCoordinates = [
  { latitude: 33.10961085444, longitude: -96.66043517237, reference: 'A126' },
  { latitude: 33.10968441530, longitude: -96.66032553941, reference: 'A121' },
  { latitude: 33.10970620484, longitude: -96.66029306490, reference: 'A124' },
- { latitude: 33.10972164366, longitude: -96.66027005533, reference: 'A122' },
+ { latitude: 33.10972164366, longitude: -96.66027005533, reference: 'S1_2' },
 { latitude: 33.10955886827335, longitude: -96.66011928918694, reference: 'A116' },
 { latitude: 33.10954361813029, longitude: -96.66014275443264, reference: 'A114' },
 { latitude: 33.10952469860161, longitude: -96.66017186572604, reference: 'A115' },
@@ -156,14 +178,106 @@ const firstFloorCoordinates = [
 ];
 
 const secondFloorCoordinates = [
-  { latitude: 33.10932480, longitude: -96.66141863, reference: 'S18' },
-  { latitude: 33.10951721, longitude: -96.66112686, reference: 'F210' },
-  { latitude: 33.10939558, longitude: -96.66092367, reference: 'F264' },
+
+
+
+  { latitude: 33.11012705174, longitude: -96.66134610000, reference: '2mainhall1' },
+  { latitude: 33.11005377415, longitude: -96.66127730000, reference: '2mainhall2' },
+  { latitude: 33.11001053185, longitude: -96.66123670000, reference: '2mainhall3' },
+  { latitude: 33.10978398907, longitude: -96.66102400000, reference: '2mainhall4' },
+  { latitude: 33.10958417983, longitude: -96.66083640000, reference: '2mainhall5' },
+  { latitude: 33.10957086632, longitude: -96.66082390000, reference: '2f entrance' },
+{ latitude: 33.10947149, longitude: -96.6609794, reference: '2f mid front' },
+{ latitude: 33.1095631, longitude: -96.66106426, reference: '2TLF' },
+
+
+
+
+
+
+
+{ latitude: 33.10955218, longitude: -96.66107382, reference: '2F108' },
+{ latitude: 33.10949087, longitude: -96.66116680, reference: '2F111' },
+{ latitude: 33.10951721, longitude: -96.66112686, reference: '2F110' },
+{ latitude: 33.10946359, longitude: -96.66120816, reference: '2F112' },
+{ latitude: 33.10941872, longitude: -96.66127622, reference: '2F114' },
+{ latitude: 33.10939153, longitude: -96.66131744, reference: '2F115' },
+{ latitude: 33.10936915, longitude: -96.66135138, reference: '2F116' },
+{ latitude: 33.10933977, longitude: -96.66139594, reference: '2F117' },
+{ latitude: 33.10928326, longitude: -96.66148163, reference: '2F120' },
+{latitude:33.1092741, longitude:-96.6614961, reference: '2midhallcut1'},
+{latitude:33.1091114, longitude:-96.6613463, reference: '2midhallcut12'},
+{latitude:33.1092741, longitude:-96.6614961, reference: '2midhallcut13'},
+{ latitude: 33.10932618, longitude: -96.66141655, reference: '2F119' },
+{ latitude: 33.10932480, longitude: -96.66141863, reference: 'S2_8' },
+{ latitude: 33.10922702, longitude: -96.66156692, reference: '2F123' },
+{ latitude: 33.10922085, longitude: -96.66157627, reference: '2F124' },
+{ latitude: 33.10918304, longitude: -96.66163361, reference: '2F125' },
+{ latitude: 33.10916888, longitude: -96.66165509, reference: '2F126' },
+{ latitude: 33.10910607, longitude: -96.66175032, reference: '2F128' },
+{ latitude: 33.10909943, longitude: -96.66176040, reference: '2F129' },
+{ latitude: 33.10904726, longitude: -96.66183951, reference: '2F130' },
+{ latitude: 33.10900099, longitude: -96.66190967, reference: '2F133' },
+
+
+
+
+
+
+
+
+{ latitude: 33.10883376, longitude: -96.66176128, reference: '2F136' },
+{ latitude: 33.10886333, longitude: -96.66171719, reference: '2F137' },
+{ latitude: 33.10889290, longitude: -96.66167311, reference: '2F138' },
+{ latitude: 33.10892247, longitude: -96.66162902, reference: '2F139' },
+{ latitude: 33.10895204, longitude: -96.66158494, reference: '2F140' },
+{ latitude: 33.10898161, longitude: -96.66154086, reference: '2F141' },
+{ latitude: 33.10901118, longitude: -96.66149677, reference: '2F144' },
+{ latitude: 33.10904075, longitude: -96.66145269, reference: '2F145' },
+{ latitude: 33.10907032, longitude: -96.66140860, reference: '2F146' },
+{ latitude: 33.10909989, longitude: -96.66136452, reference: 'S2_7' },
+{ latitude: 33.10912945, longitude: -96.66132043, reference: '2F149' },
+{ latitude: 33.10915902, longitude: -96.66127635, reference: '2F153' },
+{ latitude: 33.10918859, longitude: -96.66123226, reference: '2F154' },
+{ latitude: 33.10921816, longitude: -96.66118818, reference: '2F155' },
+{ latitude: 33.10924773, longitude: -96.66114409, reference: '2F156' },
+{ latitude: 33.10927730, longitude: -96.66110001, reference: '2F158' },
+{ latitude: 33.10930687, longitude: -96.66105592, reference: '2F160' },
+{ latitude: 33.10933644, longitude: -96.66101184, reference: '2F161' },
+{ latitude: 33.10936601, longitude: -96.66096776, reference: '2F163' },
+{ latitude: 33.10939558, longitude: -96.66092367, reference: '2F164' },
+{ latitude: 33.1094010, longitude: -96.6609141, reference: '2TRF' },
+{ latitude: 33.10947149, longitude: -96.6609794, reference: '2f mid front' },
+{ latitude: 33.10957086632, longitude: -96.66082390000, reference: '2f entrance' },
+{ latitude: 33.10937095057, longitude: -96.66063620000, reference: '2a entrance' },
+ { latitude: 33.10946603787324, longitude:  -96.66049207061944, reference: '2amidfront' },
+ {latitude:33.1095109380455, longitude:-96.66053368788533, reference:'2A134'},
+ { latitude: 33.10953135976243, longitude: -96.66055364224918, reference: 'A1' },
+ { latitude: 33.10956178414, longitude: -96.66050830533, reference: '2A130' },
+ { latitude: 33.10961167985, longitude: -96.66043394220, reference: '2A128' },
+ { latitude: 33.10963654762, longitude: -96.66039688000, reference: '2A125' },
+ { latitude: 33.10961085444, longitude: -96.66043517237, reference: '2A126' },
+ { latitude: 33.10968441530, longitude: -96.66032553941, reference: '2A121' },
+ { latitude: 33.10970620484, longitude: -96.66029306490, reference: '2A124' },
+ { latitude: 33.10972164366, longitude: -96.66027005533, reference: 'S2_2' },
+{ latitude: 33.10955886827335, longitude: -96.66011928918694, reference: '2A116' },
+{ latitude: 33.10954361813029, longitude: -96.66014275443264, reference: '2A114' },
+{ latitude: 33.10952469860161, longitude: -96.66017186572604, reference: '2A115' },
+{ latitude: 33.10946234482971, longitude: -96.6602678088639, reference: '2A112' },
+{ latitude: 33.10944770286005, longitude: -96.66029033831916, reference: '2A110' },
+{ latitude: 33.10947839516472, longitude: -96.6602431123707, reference: '2A109' },
+{ latitude: 33.109399795176294, longitude: -96.66036405340273, reference: '2A108' },
+{ latitude: 33.109372346964086, longitude: -96.66040628769791, reference: '2A106' },
+{ latitude:33.10940547854645, longitude:-96.66043593912865, reference:'2A104'},
+{ latitude: 33.10946603787324, longitude:  -96.66049207061944, reference: '2amidfront' },
+{ latitude: 33.10937095057, longitude: -96.66063620000, reference: '2a entrance' },
+{ latitude: 33.10913120078, longitude: -96.66041110000, reference: '2g entrance' },
+{ latitude: 33.10885800744, longitude: -96.66015460000, reference: '2k entrance' }
 ];
 
 
-const firstFloorStaircases = firstFloorCoordinates.filter(coord => coord.reference.startsWith('S'));
-const secondFloorStaircases = secondFloorCoordinates.filter(coord => coord.reference.startsWith('S'));
+const firstFloorStaircases = firstFloorCoordinates.filter(coord => coord.reference.startsWith('S1'));
+const secondFloorStaircases = secondFloorCoordinates.filter(coord => coord.reference.startsWith('S2'));
 
 
 
@@ -198,7 +312,7 @@ F141: { latitude: 33.10893572, longitude: -96.66154236 },
 F144: { latitude: 33.10898758, longitude: -96.66146447 },
 F145: { latitude: 33.10904345, longitude: -96.66151760 },
 F146: { latitude: 33.10900063, longitude: -96.66143651 },
-F148: { latitude: 33.10908299, longitude: -96.66131832 },
+// F148: { latitude: 33.10908299, longitude: -96.66131832 },
 F149: { latitude: 33.10915934, longitude: -96.66133285 },
 F153: { latitude: 33.10920637, longitude: -96.66127296 },
 F154: { latitude: 33.10916137, longitude: -96.66119282 },
@@ -582,19 +696,6 @@ for (let i = 0; i < polyline.length; i++) {
 }
 return nearestIndex;
 }
-function calculateRouteLengthInFeet(route) {
-let totalDistance = 0;
-for (let i = 0; i < route.length - 1; i++) {
-  totalDistance += calculateDistance(
-    route[i].latitude,
-    route[i].longitude,
-    route[i + 1].latitude,
-    route[i + 1].longitude
-  );
-}
-// Convert meters to feet and round to nearest 5
-return Math.round(totalDistance * 3.28084 / 5) * 5;
-}
 
 function findCurrentSegment(location, route) {
 if (!location || !route || route.length < 2) {
@@ -694,8 +795,6 @@ const [remainingDistance, setRemainingDistance] = useState(0);
 const [searchHistory, setSearchHistory] = useState([]);
 const [showHistory, setShowHistory] = useState(false);
 const routeFromHome = useRoute();
-const [initialSegmentCount, setInitialSegmentCount] = useState(0);
-const [lastValidBearing, setLastValidBearing] = useState(0);
 const [currentSegment, setCurrentSegment] = useState(0);
 const [startingPoint, setStartingPoint] = useState(null);
 const [currentSegmentIndex, setCurrentSegmentIndex] = useState(0);
@@ -704,30 +803,21 @@ const [startingPointQuery, setStartingPointQuery] = useState('');
 const [directions, setDirections] = useState({ text: '', turn: 'straight' });
 const [showFirstFloor, setShowFirstFloor] = useState(true);
 const [currentFloor, setCurrentFloor] = useState(1);
-const [completedSegments, setCompletedSegments] = useState([]);
 
-
-const toggleFloor = useCallback(() => {
-  setShowFirstFloor(prev => !prev);
-  setCurrentFloor(prev => prev === 1 ? 2 : 1);
-}, []);
 
 
 const handleEndSegment = useCallback(() => {
   if (currentSegmentIndex < routeSegments.length - 1) {
     const currentSegment = routeSegments[currentSegmentIndex];
     const nextSegment = routeSegments[currentSegmentIndex + 1];
-    
-    // Check if we're at a staircase
-    if (currentSegment[currentSegment.length - 1].reference.startsWith('S')) {
-      // Change floor
-      setCurrentFloor(prev => prev === 1 ? 2 : 1);
-      setShowFirstFloor(prev => !prev);
-    }
+
+    // Determine the floor of the current and next segments
+    const currentFloor = currentSegment[0].reference.startsWith('S2') ? 2 : 1;
+    const nextFloor = nextSegment[0].reference.startsWith('S2') ? 2 : 1;
 
     const nextIndex = currentSegmentIndex + 1;
     setCurrentSegmentIndex(nextIndex);
-    
+
     const newBearing = calculateBearing(nextSegment[0], nextSegment[nextSegment.length - 1]);
     setBearing(newBearing);
 
@@ -743,6 +833,12 @@ const handleEndSegment = useCallback(() => {
     const remainingDistance = calculateTotalDistance(remainingRoute);
     const updatedEstimatedTime = Math.ceil(remainingDistance * 3.28084 / 308);
     setEstimatedTime(updatedEstimatedTime);
+
+    // Only change floor when actually moving to a staircase
+    if (currentSegment[currentSegment.length - 1].reference.startsWith('S') && currentFloor !== nextFloor) {
+      setCurrentFloor(nextFloor);
+      setShowFirstFloor(nextFloor === 1);
+    }
   } else {
     // Route is complete
     setHasArrived(true);
@@ -757,31 +853,70 @@ const handleEndSegment = useCallback(() => {
     setTimeout(() => setShowArrivedMessage(false), 3000);
   }
 }, [currentSegmentIndex, routeSegments, calculateBearing, animateCamera, searchQuery, calculateTotalDistance]);
-
-
 const routeBetweenFloors = (start, end, startFloorCoordinates, endFloorCoordinates, startFloorStaircases, endFloorStaircases) => {
   // Find nearest staircase on start floor
   const nearestStartStaircase = findNearestPoint(start, startFloorStaircases);
 
-  // Route to nearest staircase on start floor
-  const startToStaircaseGraphData = createConstrainedGraph(startFloorCoordinates);
-  const startSegment = findNearestSegment(start, startFloorCoordinates);
-  const staircaseSegment = findNearestSegment(nearestStartStaircase, startFloorCoordinates);
-  const startToStaircasePath = constrainedDijkstra(startToStaircaseGraphData, startSegment, staircaseSegment);
-  const startToStaircaseRoute = startToStaircasePath.map(index => startFloorCoordinates[index]);
+  if (!nearestStartStaircase) {
+    console.error('No nearest staircase found on the start floor');
+    return []; // Return an empty route if no staircase is found
+  }
 
-  // Find corresponding staircase on end floor
-  const correspondingStaircase = endFloorStaircases.find(stair => stair.reference === nearestStartStaircase.reference);
+  // Find all possible routes through different staircases
+  const possibleRoutes = startFloorStaircases.map(startStaircase => {
+    // Extract the staircase number
+    const staircaseNumber = startStaircase.reference.match(/_(\d+)$/)[1];
 
-  // Route from staircase to destination on end floor
-  const staircaseToEndGraphData = createConstrainedGraph(endFloorCoordinates);
-  const correspondingStaircaseSegment = findNearestSegment(correspondingStaircase, endFloorCoordinates);
-  const endSegment = findNearestSegment(end, endFloorCoordinates);
-  const staircaseToEndPath = constrainedDijkstra(staircaseToEndGraphData, correspondingStaircaseSegment, endSegment);
-  const staircaseToEndRoute = staircaseToEndPath.map(index => endFloorCoordinates[index]);
+    // Find the corresponding staircase on the other floor
+    let correspondingStaircase;
+    if (startStaircase.reference.startsWith('S1_')) {
+      correspondingStaircase = endFloorStaircases.find(stair => stair.reference === `S2_${staircaseNumber}`);
+    } else if (startStaircase.reference.startsWith('S2_')) {
+      correspondingStaircase = endFloorStaircases.find(stair => stair.reference === `S1_${staircaseNumber}`);
+    }
 
-  return [...startToStaircaseRoute, ...staircaseToEndRoute];
+    if (!correspondingStaircase) {
+      console.error(`No corresponding staircase found between floors for S1/S2_${staircaseNumber}`);
+      return null;
+    }
+
+    // Route to staircase on start floor
+    const startToStaircaseGraphData = createConstrainedGraph(startFloorCoordinates);
+    const startSegment = findNearestSegment(start, startFloorCoordinates);
+    const staircaseSegment = findNearestSegment(startStaircase, startFloorCoordinates);
+    const startToStaircasePath = constrainedDijkstra(startToStaircaseGraphData, startSegment, staircaseSegment);
+    const startToStaircaseRoute = startToStaircasePath.map(index => startFloorCoordinates[index]);
+
+    // Route from corresponding staircase to destination on the end floor
+    const staircaseToEndGraphData = createConstrainedGraph(endFloorCoordinates);
+    const correspondingStaircaseSegment = findNearestSegment(correspondingStaircase, endFloorCoordinates);
+    const endSegment = findNearestSegment(end, endFloorCoordinates);
+    const staircaseToEndPath = constrainedDijkstra(staircaseToEndGraphData, correspondingStaircaseSegment, endSegment);
+    const staircaseToEndRoute = staircaseToEndPath.map(index => endFloorCoordinates[index]);
+
+    // Combine routes and calculate total distance
+    const fullRoute = [...startToStaircaseRoute, ...staircaseToEndRoute];
+    const totalDistance = calculateTotalDistance(fullRoute);
+
+    return { route: fullRoute, distance: totalDistance, startStaircase, endStaircase: correspondingStaircase };
+  }).filter(Boolean); // Remove null routes
+
+  if (possibleRoutes.length === 0) {
+    console.error('No valid routes found between floors');
+    return [];
+  }
+
+  // Find the shortest route
+  const shortestRoute = possibleRoutes.reduce((shortest, current) => 
+    current.distance < shortest.distance ? current : shortest
+  );
+
+  console.log(`Chosen route uses staircases: ${shortestRoute.startStaircase.reference} to ${shortestRoute.endStaircase.reference}`);
+  return shortestRoute.route;
 };
+
+
+
 
 useEffect(() => {
   const roomNumber = routeFromHome.params?.roomNumber;
@@ -863,7 +998,7 @@ const calculateRoute = useCallback((start, end) => {
     const endFloor = firstFloorCoordinates.some(coord => coord.reference === end.reference) ? 1 : 2;
 
     if (startFloor === endFloor) {
-      // Same floor routing (unchanged)
+      // Same floor routing
       const coordinates = startFloor === 1 ? firstFloorCoordinates : secondFloorCoordinates;
       const startSegment = findNearestSegment(start, coordinates);
       const endSegment = findNearestSegment(end, coordinates);
@@ -1310,314 +1445,3 @@ return (
 );
 }
 
-
-
-// import React, { useState } from 'react';
-    // import { View, TextInput, TouchableOpacity, Text, StyleSheet } from 'react-native';
-    // import MapView, { Polyline, Marker } from 'react-native-maps';
-
-    // const firstFloorCoordinates = [
-    //   { name: "Main Hall 1", latitude: 33.11012705174, longitude: -96.66134610000 },
-    //   { name: "Main Hall 2", latitude: 33.11005377415, longitude: -96.66127730000 },
-    //   { name: "Main Hall 3", latitude: 33.11001053185, longitude: -96.66123670000 },
-    //   { name: "Main Hall 4", latitude: 33.10978398907, longitude: -96.66102400000 },
-    //   { name: "Main Hall 5", latitude: 33.10958417983, longitude: -96.66083640000 },
-    //   { name: "Front Entrance", latitude: 33.10957086632, longitude: -96.66082390000 },
-    //   { name: "Front Mid", latitude: 33.10947149, longitude: -96.6609794 },
-    //   { name: "TLF", latitude: 33.1095631, longitude: -96.66106426 },
-    //   { name: "F108", latitude: 33.10955218, longitude: -96.66107382 },
-    //   { name: "F111", latitude: 33.10949087, longitude: -96.66116680 },
-    //   { name: "F110", latitude: 33.10951721, longitude: -96.66112686 },
-    //   { name: "F112", latitude: 33.10946359, longitude: -96.66120816 },
-    //   { name: "F114", latitude: 33.10941872, longitude: -96.66127622 },
-    //   { name: "F115", latitude: 33.10939153, longitude: -96.66131744 },
-    //   { name: "F116", latitude: 33.10936915, longitude: -96.66135138 },
-    //   { name: "F117", latitude: 33.10933977, longitude: -96.66139594 },
-    //   { name: "F120", latitude: 33.10928326, longitude: -96.66148163 },
-    //   { name: "Mid Hall Cut 1", latitude: 33.1092741, longitude: -96.6614961 },
-    //   { name: "Mid Hall Cut 12", latitude: 33.1091114, longitude: -96.6613463 },
-    //   { name: "Mid Hall Cut 13", latitude: 33.1092741, longitude: -96.6614961 },
-    //   { name: "F119", latitude: 33.10932618, longitude: -96.66141655 },
-    //   { name: "S18", latitude: 33.10932480, longitude: -96.66141863 },
-    //   { name: "F123", latitude: 33.10922702, longitude: -96.66156692 },
-    //   { name: "F124", latitude: 33.10922085, longitude: -96.66157627 },
-    //   { name: "F125", latitude: 33.10918304, longitude: -96.66163361 },
-    //   { name: "F126", latitude: 33.10916888, longitude: -96.66165509 },
-    //   { name: "F128", latitude: 33.10910607, longitude: -96.66175032 },
-    //   { name: "F129", latitude: 33.10909943, longitude: -96.66176040 },
-    //   { name: "F130", latitude: 33.10904726, longitude: -96.66183951 },
-    //   { name: "F133", latitude: 33.10900099, longitude: -96.66190967 },
-    //   { name: "F136", latitude: 33.10883376, longitude: -96.66176128 },
-    //   { name: "F137", latitude: 33.10886333, longitude: -96.66171719 },
-    //   { name: "F138", latitude: 33.10889290, longitude: -96.66167311 },
-    //   { name: "F139", latitude: 33.10892247, longitude: -96.66162902 },
-    //   { name: "F140", latitude: 33.10895204, longitude: -96.66158494 },
-    //   { name: "F141", latitude: 33.10898161, longitude: -96.66154086 },
-    //   { name: "F144", latitude: 33.10901118, longitude: -96.66149677 },
-    //   { name: "F145", latitude: 33.10904075, longitude: -96.66145269 },
-    //   { name: "F146", latitude: 33.10907032, longitude: -96.66140860 },
-    //   { name: "F148", latitude: 33.10909989, longitude: -96.66136452 },
-    //   { name: "F149", latitude: 33.10912945, longitude: -96.66132043 },
-    //   { name: "F153", latitude: 33.10915902, longitude: -96.66127635 },
-    //   { name: "F154", latitude: 33.10918859, longitude: -96.66123226 },
-    //   { name: "F155", latitude: 33.10921816, longitude: -96.66118818 },
-    //   { name: "F156", latitude: 33.10924773, longitude: -96.66114409 },
-    //   { name: "F158", latitude: 33.10927730, longitude: -96.66110001 },
-    //   { name: "F160", latitude: 33.10930687, longitude: -96.66105592 },
-    //   { name: "F161", latitude: 33.10933644, longitude: -96.66101184 },
-    //   { name: "F163", latitude: 33.10936601, longitude: -96.66096776 },
-    //   { name: "F164", latitude: 33.10939558, longitude: -96.66092367 },
-    //   { name: "TRF", latitude: 33.1094010, longitude: -96.6609141 },
-    //   { name: "A Entrance", latitude: 33.10937095057, longitude: -96.66063620000 },
-    //   { name: "A Mid Front", latitude: 33.10946603787324, longitude: -96.66049207061944 },
-    //   { name: "A134", latitude: 33.1095109380455, longitude: -96.66053368788533 },
-    //   { name: "A1", latitude: 33.10953135976243, longitude: -96.66055364224918 },
-    //   { name: "A130", latitude: 33.10956178414, longitude: -96.66050830533 },
-    //   { name: "A128", latitude: 33.10961167985, longitude: -96.66043394220 },
-    //   { name: "A125", latitude: 33.10963654762, longitude: -96.66039688000 },
-    //   { name: "A126", latitude: 33.10961085444, longitude: -96.66043517237 },
-    //   { name: "A121", latitude: 33.10968441530, longitude: -96.66032553941 },
-    //   { name: "A124", latitude: 33.10970620484, longitude: -96.66029306490 },
-    //   { name: "A122", latitude: 33.10972164366, longitude: -96.66027005533 },
-    //   { name: "A116", latitude: 33.10955886827335, longitude: -96.66011928918694 },
-    //   { name: "A114", latitude: 33.10954361813029, longitude: -96.66014275443264 },
-    //   { name: "A115", latitude: 33.10952469860161, longitude: -96.66017186572604 },
-    //   { name: "A112", latitude: 33.10946234482971, longitude: -96.6602678088639 },
-    //   { name: "A110", latitude: 33.10944770286005, longitude: -96.66029033831916 },
-    //   { name: "A109", latitude: 33.10947839516472, longitude: -96.6602431123707 },
-    //   { name: "A108", latitude: 33.109399795176294, longitude: -96.66036405340273 },
-    //   { name: "A106", latitude: 33.109372346964086, longitude: -96.66040628769791 },
-    //   { name: "A104", latitude: 33.10940547854645, longitude: -96.66043593912865 },
-    //   { name: "G Entrance", latitude: 33.10913120078, longitude: -96.66041110000 },
-    //   { name: "K Entrance", latitude: 33.10885800744, longitude: -96.66015460000 }
-    // ];
-
-    // const secondFloorCoordinates = [
-    //   { name: "S18", latitude: 33.10932480, longitude: -96.66141863 },
-    //   { name: "F210", latitude: 33.10951721, longitude: -96.66112686 },
-    //   { name: "F264", latitude: 33.10939558, longitude: -96.66092367 }
-    // ];
-
-    // function calculateDistance(coord1, coord2) {
-    //   const R = 6371e3; // Earth's radius in meters
-    //   const φ1 = coord1.latitude * Math.PI / 180;
-    //   const φ2 = coord2.latitude * Math.PI / 180;
-    //   const Δφ = (coord2.latitude - coord1.latitude) * Math.PI / 180;
-    //   const Δλ = (coord2.longitude - coord1.longitude) * Math.PI / 180;
-
-    //   const a = Math.sin(Δφ/2) * Math.sin(Δφ/2) +
-    //             Math.cos(φ1) * Math.cos(φ2) *
-    //             Math.sin(Δλ/2) * Math.sin(Δλ/2);
-    //   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-
-    //   return R * c;
-    // }
-
-    // function findNearestPoint(point, points, excludeSelf = true) {
-    //   let nearest = null;
-    //   let minDistance = Infinity;
-
-    //   for (const p of points) {
-    //     if (excludeSelf && p.name === point.name) continue;
-    //     const distance = calculateDistance(point, p);
-    //     if (distance < minDistance) {
-    //       minDistance = distance;
-    //       nearest = p;
-    //     }
-    //   }
-
-    //   return nearest;
-    // }
-
-    // function generateConnections(firstFloorCoordinates, secondFloorCoordinates) {
-    //   const allCoordinates = [
-    //     ...firstFloorCoordinates.map(coord => ({ ...coord, floor: 1, connections: [] })),
-    //     ...secondFloorCoordinates.map(coord => ({ ...coord, floor: 2, connections: [] }))
-    //   ];
-
-    //   // Connect points sequentially on the same floor
-    //   for (let i = 0; i < allCoordinates.length - 1; i++) {
-    //     const current = allCoordinates[i];
-    //     const next = allCoordinates[i + 1];
-        
-    //     if (current.floor === next.floor) {
-    //       current.connections.push(next.name);
-    //       next.connections.push(current.name);
-    //     }
-    //   }
-
-    //   // Connect 'S' points between floors and to nearest points on the same floor
-    //   allCoordinates.forEach(point => {
-    //     if (point.name.startsWith('S')) {
-    //       // Connect to the corresponding point on the other floor
-    //       const otherFloorPoint = allCoordinates.find(p => p.name === point.name && p.floor !== point.floor);
-    //       if (otherFloorPoint) {
-    //         point.connections.push(otherFloorPoint.name);
-    //         otherFloorPoint.connections.push(point.name);
-    //       }
-
-    //       // Connect to the nearest point on the same floor
-    //       const sameFloorPoints = allCoordinates.filter(p => p.floor === point.floor);
-    //       const nearest = findNearestPoint(point, sameFloorPoints);
-    //       if (nearest) {
-    //         point.connections.push(nearest.name);
-    //         nearest.connections.push(point.name);
-    //       }
-    //     }
-    //   });
-
-    //   return [
-    //     allCoordinates.filter(coord => coord.floor === 1),
-    //     allCoordinates.filter(coord => coord.floor === 2)
-    //   ];
-    // }
-
-    // const buildingGraph = generateConnections(firstFloorCoordinates, secondFloorCoordinates);
-
-    // function dijkstra3D(graph, start, end) {
-    //   const nodes = graph.flat();
-    //   const distances = {};
-    //   const previous = {};
-    //   const queue = [];
-
-    //   nodes.forEach(node => {
-    //     distances[`${node.floor}-${node.name}`] = Infinity;
-    //     previous[`${node.floor}-${node.name}`] = null;
-    //     queue.push(node);
-    //   });
-
-    //   distances[`${start.floor}-${start.name}`] = 0;
-
-    //   while (queue.length > 0) {
-    //     queue.sort((a, b) => distances[`${a.floor}-${a.name}`] - distances[`${b.floor}-${b.name}`]);
-    //     const current = queue.shift();
-
-    //     if (current.name === end.name && current.floor === end.floor) break;
-
-    //     current.connections.forEach(neighborName => {
-    //       const neighbor = nodes.find(node => node.name === neighborName);
-    //       if (neighbor) {
-    //         const alt = distances[`${current.floor}-${current.name}`] + 1; // Assuming unit distance between connected nodes
-    //         if (alt < distances[`${neighbor.floor}-${neighbor.name}`]) {
-    //           distances[`${neighbor.floor}-${neighbor.name}`] = alt;
-    //           previous[`${neighbor.floor}-${neighbor.name}`] = current;
-    //         }
-    //       }
-    //     });
-    //   }
-
-    //   // Reconstruct path
-    //   const path = [];
-    //   let current = nodes.find(node => node.name === end.name && node.floor === end.floor);
-    //   while (current !== null) {
-    //     path.unshift(current);
-    //     current = previous[`${current.floor}-${current.name}`];
-    //   }
-
-    //   return path;
-    // }
-
-    // const Map = () => {
-    //   const [route, setRoute] = useState([]);
-    //   const [startLocation, setStartLocation] = useState('');
-    //   const [endLocation, setEndLocation] = useState('');
-
-    //   const handleRoutePress = () => {
-    //     const start = buildingGraph.flat().find(node => node.name.toLowerCase() === startLocation.toLowerCase());
-    //     const end = buildingGraph.flat().find(node => node.name.toLowerCase() === endLocation.toLowerCase());
-
-    //     if (start && end) {
-    //       const routePath = dijkstra3D(buildingGraph, start, end);
-    //       setRoute(routePath);
-    //     } else {
-    //       alert('Invalid start or end location');
-    //     }
-    //   };
-
-    //   return (
-    //     <View style={styles.container}>
-    //       <MapView
-    //         style={styles.map}
-    //         initialRegion={{
-    //           latitude: firstFloorCoordinates[0]?.latitude || 0,
-    //           longitude: firstFloorCoordinates[0]?.longitude || 0,
-    //           latitudeDelta: 0.001,
-    //           longitudeDelta: 0.001,
-    //         }}
-    //       >
-    //         <Polyline
-    //           coordinates={firstFloorCoordinates}
-    //           strokeColor="#000" // Black color for floor layout
-    //           strokeWidth={2}
-    //         />
-    //         {route.map((point, index) => (
-    //           <Marker
-    //             key={index}
-    //             coordinate={{
-    //               latitude: point.latitude,
-    //               longitude: point.longitude,
-    //             }}
-    //             title={point.name}
-    //           />
-    //         ))}
-    //         <Polyline
-    //           coordinates={route}
-    //           strokeColor="#0000FF" // Blue color for route
-    //           strokeWidth={3}
-    //         />
-    //       </MapView>
-    //       <View style={styles.inputContainer}>
-    //         <TextInput
-    //           style={styles.input}
-    //           placeholder="Start Location"
-    //           value={startLocation}
-    //           onChangeText={setStartLocation}
-    //         />
-    //         <TextInput
-    //           style={styles.input}
-    //           placeholder="End Location"
-    //           value={endLocation}
-    //           onChangeText={setEndLocation}
-    //         />
-    //         <TouchableOpacity style={styles.button} onPress={handleRoutePress}>
-    //           <Text>Route</Text>
-    //         </TouchableOpacity>
-    //       </View>
-    //     </View>
-    //   );
-    // };
-
-    // const styles = StyleSheet.create({
-    //   container: {
-    //     ...StyleSheet.absoluteFillObject,
-    //   },
-    //   map: {
-    //     ...StyleSheet.absoluteFillObject,
-    //   },
-    //   inputContainer: {
-    //     position: 'absolute',
-    //     top: 80,
-    //     left: 20,
-    //     right: 20,
-    //     flexDirection: 'row',
-    //     justifyContent: 'space-between',
-    //     alignItems: 'center',
-    //   },
-    //   input: {
-    //     flex: 1,
-    //     height: 40,
-    //     borderColor: 'gray',
-    //     borderWidth: 1,
-    //     borderRadius: 5,
-    //     paddingHorizontal: 10,
-    //     backgroundColor: 'white',
-    //     marginRight: 10,
-    //   },
-    //   button: {
-    //     backgroundColor: 'white',
-    //     padding: 10,
-    //     borderRadius: 5,
-    //   },
-    // });
-
-    // export default Map;

@@ -241,7 +241,6 @@ export  const styles = StyleSheet.create({
       backgroundColor: '#007AFF',
       padding: 10,
       borderRadius: 5,
-<<<<<<< HEAD
       marginTop: 10,
       alignSelf: 'center',
       top:-5,
@@ -262,31 +261,5 @@ export  const styles = StyleSheet.create({
     progressBar: {
       height: '100%',
       backgroundColor: '#007AFF',
-=======
-      shadowColor: "#000",
-      shadowOffset: {
-        width: 0,
-        height: 2,
-      },
-      shadowOpacity: 0.25,
-      shadowRadius: 3.84,
-      elevation: 5,
-      alignContent: 'center',
-      maxHeight: 25 * height,
-      marginTop: width,
-    },
-    historyItemContainer: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      paddingVertical: 10,
-    },
-    historyItemTextContainer: {
-      flex: 1,
-      width: 50 * width
-    },
-    historyItemText: {
-      fontSize: 16,
->>>>>>> 3b950f2d450ed2cf0672bab6c880d42bb92a88c9
     },
   });
