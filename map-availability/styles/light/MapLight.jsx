@@ -56,12 +56,13 @@ export  const styles = StyleSheet.create({
     },
     directionsContainer: {
       position: 'absolute',
-      bottom: 20,
+      bottom: 235,
       left: 20,
       right: 20,
-      backgroundColor: 'rgba(255, 255, 255, 0.9)',
+      backgroundColor: 'rgba(255, 255, 255, 1)',
       padding: 10,
-      borderRadius: 10,
+      borderTopRightRadius: 10,
+      borderTopLeftRadius: 10,
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
@@ -71,6 +72,7 @@ export  const styles = StyleSheet.create({
       flexDirection: 'row',
       alignItems: 'center',
       flex: 1,
+      padding: 10,
     },
     directionsText: {
       fontSize: 16,
@@ -80,6 +82,7 @@ export  const styles = StyleSheet.create({
       justifyContent: 'center',
       fontWeight: 'bold',
       textAlign: 'center',
+      paddingTop: 10,
     },
     turnIcon: {
       marginLeft: 10,
@@ -124,8 +127,9 @@ export  const styles = StyleSheet.create({
       bottom: 30,
       left: 20,
       right: 20,
-      backgroundColor: 'rgba(255, 255, 255, 0.9)',
-      borderRadius: 15,
+      backgroundColor: 'rgba(255, 255, 255, 1)',
+      borderBottomRightRadius: 20,
+      borderBottomLeftRadius: 20,
       padding: 15,
       shadowColor: "#000",
       flexDirection: 'column',
@@ -163,7 +167,7 @@ export  const styles = StyleSheet.create({
       paddingVertical: 20,
       borderRadius: 20,
       alignItems: 'center',
-      marginBottom: 20
+      marginBottom: 10
     },
     exitButtonText: {
       color: 'white',
@@ -237,7 +241,7 @@ export  const styles = StyleSheet.create({
       paddingVertical: 20,
       borderRadius: 20,
       alignItems: 'center',
-      marginBottom: 20
+      marginBottom: 10
     },
     endSegmentButtonText: {
       color: 'white',
@@ -289,8 +293,11 @@ export  const styles = StyleSheet.create({
     },
     headingGuidance: {
       fontSize: 16,
-      color: '#007AFF',
-      marginTop: 8,
+      // color: '#007AFF',
+      color: '#000000',
+      top: 8,
+      right: 10,
+      fontWeight: 'bold',
     },
 
   });

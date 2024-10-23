@@ -980,11 +980,11 @@ const getDirectionGuidance = useCallback(() => {
   }
 
   if (Math.abs(difference) <= 45) {
-    return 'You are heading in the right direction';
+    return ' ✔°';
   } else if (difference < 0) {
-    return `Turn left ${Math.abs(Math.round(difference))}°`;
+    return `◀ ${Math.abs(Math.round(difference))}°`;
   } else {
-    return `Turn right ${Math.round(difference)}°`;
+    return `▶ ${Math.round(difference)}°`;
   }
 }, [getHeadingDifference, routeSegments, currentSegmentIndex]);
 
