@@ -273,7 +273,8 @@ const secondFloorCoordinates = [
 { latitude: 33.10946603787324, longitude:  -96.66049207061944, reference: '2amidfront' },
 { latitude: 33.10937095057, longitude: -96.66063620000, reference: '2a entrance' },
 { latitude: 33.10913120078, longitude: -96.66041110000, reference: '2g entrance' },
-{ latitude: 33.10885800744, longitude: -96.66015460000, reference: '2k entrance' }
+{ latitude: 33.10885800744, longitude: -96.66015460000, reference: '2k entrance' },
+
 ];
 
 
