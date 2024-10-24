@@ -291,10 +291,13 @@ export  const styles = StyleSheet.create({
       height: '100%',
       backgroundColor: '#007AFF',
     },
-    guidanceContainer: {
+    headingGuidance: {
       fontSize: 16,
-      color: '#007AFF',
-      marginTop: 8,
+      // color: '#007AFF',
+      color: '#000000',
+      top: 8,
+      right: 10,
+      fontWeight: 'bold',
     },
 
   });
