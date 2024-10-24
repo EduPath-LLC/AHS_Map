@@ -261,12 +261,12 @@ const secondFloorCoordinates = [
  { latitude: 33.10968441530, longitude: -96.66032553941, reference: '2A121' },
  { latitude: 33.10970620484, longitude: -96.66029306490, reference: '2A124' },
  { latitude: 33.10972164366, longitude: -96.66027005533, reference: 'S2_2' },
-{ latitude: 33.10955886827335, longitude: -96.66011928918694, reference: '2A116' },
+{ latitude: 33.10955886827335, longitude: -96.66011928918694, reference: 'A2116' },
 { latitude: 33.10954361813029, longitude: -96.66014275443264, reference: '2A114' },
 { latitude: 33.10952469860161, longitude: -96.66017186572604, reference: '2A115' },
-{ latitude: 33.10946234482971, longitude: -96.6602678088639, reference: '2A112' },
+{ latitude: 33.10946234482971, longitude: -96.6602678088639, reference: 'A2112' },
 { latitude: 33.10944770286005, longitude: -96.66029033831916, reference: '2A110' },
-{ latitude: 33.10947839516472, longitude: -96.6602431123707, reference: '2A109' },
+{ latitude: 33.10947839516472, longitude: -96.6602431123707, reference: 'A2109' },
 { latitude: 33.109399795176294, longitude: -96.66036405340273, reference: '2A108' },
 { latitude: 33.109372346964086, longitude: -96.66040628769791, reference: '2A106' },
 { latitude:33.10940547854645, longitude:-96.66043593912865, reference:'2A104'},
@@ -340,7 +340,9 @@ A112: { latitude: 33.10943266, longitude: -96.66023274 },
 A109: { latitude: 33.10950628, longitude: -96.66026768 },
 A115: { latitude: 33.10956253, longitude: -96.66020162 },
 A114: { latitude: 33.10951497, longitude: -96.66011318 },
-A116: { latitude: 33.10952823, longitude: -96.66009189 }
+A116: { latitude: 33.10952823, longitude: -96.66009189 },
+A116: { latitude: 33.10952823, longitude: -96.66009189 },
+A2109: { latitude: 33.10950628, longitude: -96.66026768 },
 
 
 
@@ -915,7 +917,7 @@ const routeBetweenFloors = (start, end, startFloorCoordinates, endFloorCoordinat
 useEffect(() => {
   let subscription;
   let lastUpdateTime = 0;
-  const updateInterval = 2000; // 2 seconds in milliseconds
+  const updateInterval = 500; // 2 seconds in milliseconds
 
   const startMagnetometer = async () => {
     try {
@@ -982,9 +984,9 @@ const getDirectionGuidance = useCallback(() => {
   if (Math.abs(difference) <= 45) {
     return 'You are heading in the right direction';
   } else if (difference < 0) {
-    return `Turn left ${Math.abs(Math.round(difference))}°`;
+    return `Rotate left ${Math.abs(Math.round(difference))}°`;
   } else {
-    return `Turn right ${Math.round(difference)}°`;
+    return `Rotate right ${Math.round(difference)}°`;
   }
 }, [getHeadingDifference, routeSegments, currentSegmentIndex]);
 
@@ -1163,7 +1165,7 @@ useEffect(() => {
       heading: bearing,
       pitch: 0,
       zoom: 18,
-      altitude: 2000,
+      altitude: 1000,
     }, { duration: 1000 });
   }
 }, 3000);
@@ -1273,7 +1275,7 @@ const handleSearch = useCallback(async () => {
         setRouteSegments(routeSegments);
         setCurrentSegmentIndex(0);
 
-        const estimatedTimeInMinutes = Math.ceil(calculateTotalDistance(newRoute) * 3.28084 / 308);
+        const estimatedTimeInMinutes = Math.ceil(calculateTotalDistance(newRoute) * 3.28084 / 250);
         setEstimatedTime(estimatedTimeInMinutes);
 
         if (routeSegments.length > 0) {
@@ -1361,8 +1363,8 @@ const animateCamera = useCallback((targetLocation, targetBearing) => {
     heading: targetBearing,
     pitch: 0,
     zoom: 18,
-    altitude: 2000,
-  }, { duration: 100 });
+    altitude: 1000,
+  }, { duration: 1000 });
 }, []);
 return (
   <View style={styles.container}>
@@ -1376,7 +1378,7 @@ return (
         },
         pitch: 0,
         heading: 0,
-        altitude: 2000,
+        altitude: 1000,
         zoom: 18,
       }}
       showsCompass={!isRouteActive}
@@ -1501,19 +1503,26 @@ return (
       </View>
     )}
     {isRouteActive && (
-        <SafeAreaView style={styles.directionsContainer}>
-          <Text style={styles.directionsText}>{directions.text}</Text>
-          {directions.turn !== 'straight' && (
-            <MaterialIcons 
-              name={directions.turn === 'left' ? 'turn-left' : 'turn-right'} 
-              size={24} 
-              color="#007AFF" 
-            />
-          )}
-          <Text style={styles.headingGuidance}>{getDirectionGuidance()}</Text>
-        
-      </SafeAreaView>
-    )}
+  <>
+    {/* Directions Container */}
+    <SafeAreaView style={styles.directionsContainer}>
+      <Text style={styles.directionsText}>{directions.text}</Text>
+      {directions.turn !== 'straight' && (
+        <MaterialIcons
+          name={directions.turn === 'left' ? 'turn-left' : 'turn-right'}
+          size={24}
+          color="#007AFF"
+        />
+      )}
+    </SafeAreaView>
+
+    {/* Guidance Container */}
+    <SafeAreaView style={styles.guidanceContainer}>
+      <Text style={styles.headingGuidance}>{getDirectionGuidance()}</Text>
+    </SafeAreaView>
+  </>
+)}
+
   </View>
 );
 }
