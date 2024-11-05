@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useRef, useState, useCallback } from 'rea
 import { View, TextInput, Text, TouchableOpacity, Keyboard, SafeAreaView } from 'react-native';
 import MapView, { Polyline, Marker } from 'react-native-maps';
 import { LocationContext } from '../components/providers/LocationContext';
-import { MaterialIcons } from '@expo/vector-icons';
+import {FontAwesome6, FontAwesome} from '@expo/vector-icons';
 import { debounce } from 'lodash';
 import { styles } from '../styles/light/MapLight'
 import { useRoute } from '@react-navigation/native';
@@ -587,7 +587,7 @@ function getCombinedDirections(route) {
         const turn = nextBearing > currentBearing ? 'right' : 'left';
         directions.push({
           text: `Go straight for ${Math.round(combinedDistance * 3.28084 / 5) * 5} feet, then turn ${turn}`,
-          turn: turn
+          turn: turn,
         });
         combinedDistance = 0;
       }
@@ -626,50 +626,59 @@ function getSegmentDirections(segment, isLastSegment, destination) {
   const end = segment[segment.length - 1];
   const distance = calculateTotalDistance(segment);
   const distanceInFeet = Math.round(distance * 3.28084 / 5) * 5;
-  
-  if (segment.length < 2) {
-    return { text: "Continue on your current path", turn: 'straight' };
-  }
-
-  const currentBearing = calculateBearing(start, segment[1]);
-  const nextBearing = calculateBearing(segment[segment.length - 2], end);
-  let bearingDifference = nextBearing - currentBearing;
-  
-  if (bearingDifference > 180) bearingDifference -= 360;
-  if (bearingDifference < -180) bearingDifference += 360;
-
-  let turn = 'straight';
-  if (Math.abs(bearingDifference) >= 80 && Math.abs(bearingDifference) <= 100) {
-    turn = bearingDifference > 0 ? 'right' : 'left';
-  }
 
   let text = `Go straight for ${distanceInFeet} feet`;
-  
-  if (start.reference.startsWith('S')) {
-    const floorDirection = firstFloorCoordinates.some(coord => coord.reference === end.reference) ? 'down' : 'up';
-    text = `Take the stairs ${floorDirection} to the ${floorDirection === 'up' ? 'second' : 'first'} floor`;
-    turn = 'stairs';
-  } else if (segment.length === 2 && segment[0].reference.startsWith('S')) {
-    // This is the segment immediately after stairs
-    const floorDirection = firstFloorCoordinates.some(coord => coord.reference === end.reference) ? 'first' : 'second';
-    text = `After taking the stairs, go straight for ${distanceInFeet} feet on the ${floorDirection} floor`;
-  } else if (isLastSegment) {
-    const destCoords = findRoomCoordinates(destination);
-    if (destCoords) {
-      const finalBearing = calculateBearing(segment[segment.length - 2], end);
-      const roomBearing = calculateBearing(end, destCoords);
-      let relativeAngle = roomBearing - finalBearing;
-      if (relativeAngle < -180) relativeAngle += 360;
-      if (relativeAngle > 180) relativeAngle -= 360;
-      const side = relativeAngle > 0 ? 'right' : 'left';
-      text += `. Your destination will be on the ${side}`;
+  let turn = 'straight';
+
+  // Check if the segment involves stairs
+  const isStaircaseStart = start.reference.startsWith('S');
+  const isStaircaseEnd = end.reference.startsWith('S');
+  const isGoingUp = start.reference.startsWith('S1') && end.reference.startsWith('S2');
+  const isGoingDown = start.reference.startsWith('S2') && end.reference.startsWith('S1');
+
+  if (!isStaircaseStart && isStaircaseEnd) {
+    // First prompt to proceed to the stairs
+    text = `Proceed to the stairs`;
+    turn = 'stairs-start';
+  } else if (isStaircaseStart && isStaircaseEnd) {
+    // Climbing stairs segment
+    text = `Climb the stairs to the ${isGoingUp ? 'second' : 'first'} floor`;
+    turn = 'stairs-climb';
+  } else if (isStaircaseStart && !isStaircaseEnd) {
+    // Exiting the stairs on the destination floor
+    text = `From stairs, walk forward ${distanceInFeet} feet`;
+    turn = 'walk-forward';
+  } else {
+    // Handle turns and destination arrival
+    const currentBearing = calculateBearing(start, segment[1]);
+    const nextBearing = calculateBearing(segment[segment.length - 2], end);
+    let bearingDifference = nextBearing - currentBearing;
+
+    if (bearingDifference > 180) bearingDifference -= 360;
+    if (bearingDifference < -180) bearingDifference += 360;
+
+    if (Math.abs(bearingDifference) >= 80 && Math.abs(bearingDifference) <= 100) {
+      turn = bearingDifference > 0 ? 'right' : 'left';
+      text += `, then turn ${turn}`;
     }
-  } else if (turn !== 'straight') {
-    text += `, then turn ${turn}`;
+
+    if (isLastSegment) {
+      const destCoords = findRoomCoordinates(destination);
+      if (destCoords) {
+        const finalBearing = calculateBearing(segment[segment.length - 2], end);
+        const roomBearing = calculateBearing(end, destCoords);
+        let relativeAngle = roomBearing - finalBearing;
+        if (relativeAngle < -180) relativeAngle += 360;
+        if (relativeAngle > 180) relativeAngle -= 360;
+        const side = relativeAngle > 0 ? 'right' : 'left';
+        text += `. Your destination will be on the ${side}`;
+      }
+    }
   }
 
   return { text, turn };
 }
+
 function calculateDistance(lat1, lon1, lat2, lon2) {
 const R = 6371e3; // Earth's radius in meters
 const φ1 = lat1 * Math.PI/180;
@@ -807,6 +816,7 @@ const [directions, setDirections] = useState({ text: '', turn: 'straight' });
 const [showFirstFloor, setShowFirstFloor] = useState(true);
 const [currentFloor, setCurrentFloor] = useState(1);
 const [heading, setHeading] = useState(0);
+const [showSearch, setShowSearch] = useState(true);
 
 
 const handleEndSegment = useCallback(() => {
@@ -842,6 +852,7 @@ const handleEndSegment = useCallback(() => {
     // Route is complete
     setHasArrived(true);
     setShowArrivedMessage(true);
+    setShowSearch(true);
     setRoute([]);
     setRouteSegments([]);
     setDestination(null);
@@ -970,19 +981,13 @@ const getHeadingDifference = useCallback(() => {
   return difference;
 }, [isRouteActive, routeSegments, currentSegmentIndex, heading, calculateBearing]);
 
-const getDirectionGuidance = useCallback(() => {
+  
+// Initial orientation guidance
+const getFirstHeadingDirection = useCallback(() => {
   const difference = getHeadingDifference();
-  if (difference === null) {
-    // Check if it's a stair segment
-    const currentSegment = routeSegments[currentSegmentIndex];
-    if (currentSegment && (currentSegment[0].reference.startsWith('S') || currentSegment[currentSegment.length - 1].reference.startsWith('S'))) {
-      return 'Proceed to the stairs';
-    }
-    return '';
-  }
 
   if (Math.abs(difference) <= 45) {
-    return 'You are heading in the right direction';
+    return 'You are facing the right way';
   } else if (difference < 0) {
     return `Rotate left ${Math.abs(Math.round(difference))}°`;
   } else {
@@ -990,37 +995,48 @@ const getDirectionGuidance = useCallback(() => {
   }
 }, [getHeadingDifference, routeSegments, currentSegmentIndex]);
 
-
-useEffect(() => {
-  const roomNumber = routeFromHome.params?.roomNumber;
-  if (roomNumber !== undefined) {
-    setSearchQuery(roomNumber);
+const getDirectionGuidance = useCallback(() => {
+  const nextSegmentIndex = currentSegmentIndex + 1;
+  const nextSegment = routeSegments[nextSegmentIndex];
+  
+  // If no next segment, return final directions text from directions
+  if (!nextSegment) {
+    return directions.text;
   }
-}, [route.params?.roomNumber]);
+  
+  // Calculate heading difference for the next segment
+  const difference = getHeadingDifference(nextSegment);
 
+  // Extract distance from directions.text for turn guidance
+  let distance = directions.text.match(/(\d+)/);
+  distance = distance ? `${distance[0]} feet` : 'unknown distance';
 
+  if(directions.text.startsWith("From stairs")) {
+    let secondary = ""
+    if (difference > 0) {
+      secondary = `Turn left`;
+    } else {
+      secondary = `Turn right`;
+    }
 
+    return directions.text + " and " + secondary.toLowerCase()
+  }
 
+  // If there's no heading difference, just return directions.text
+  if (difference === null) {
+    return directions.text;
+  }
 
-
-
-
-
-
-
-
-
-
+  // Provide turn instructions based on the heading difference
+  if (difference > 0) {
+    return `Turn left in ${distance}`;
+  } else {
+    return `Turn right in ${distance}`;
+  }
+}, [getHeadingDifference, routeSegments, currentSegmentIndex, directions.text]);
 
 
 const [nearestPolylinePoint, setNearestPolylinePoint] = useState(null);
-
-
-
-
-
-
-
 
 const checkDistanceToPolyline = useCallback((userLocation) => {
   if (!userLocation) return;
@@ -1124,6 +1140,7 @@ useEffect(() => {
         if (distanceToDestination <= 10) {
           setHasArrived(true);
           setShowArrivedMessage(true);
+          setShowSearch(true);
           setRoute([]);
           setDestination(null);
           setBearing(0);
@@ -1180,6 +1197,7 @@ const handleExitRoute = useCallback(() => {
   setStartingPointQuery('');  // Add this line
   setDestinationCoords(null);
   setStartingPoint(null);
+  setShowSearch(true);
 
   if (startingPoint) {
     animateCamera({
@@ -1244,6 +1262,8 @@ const loadSearchHistory = async (uid) => {
 const handleSearch = useCallback(async () => {
   if (startingPointQuery && searchQuery) {
     Keyboard.dismiss();
+    setShowSearch(false);
+
 
     const newSearch = { query: searchQuery, timestamp: new Date().toISOString() };
     const updatedHistory = [...searchHistory, newSearch];
@@ -1294,6 +1314,7 @@ const handleSearch = useCallback(async () => {
       }
     } else {
       alert("Invalid starting point or destination. Please enter valid hall numbers (e.g., F108, S18).");
+      setShowSearch(true);
     }
   } else {
     alert("Please enter both a starting point and a destination.");
@@ -1309,7 +1330,8 @@ const handleSearch = useCallback(async () => {
   calculateBearing,
   animateCamera,
   calculateTotalDistance,
-  saveSearchHistory
+  saveSearchHistory,
+  setShowSearch
 ]);
  // Add this useEffect hook to handle route updates
  useEffect(() => {
@@ -1436,6 +1458,7 @@ return (
       )}
     </MapView>
     <View style={styles.overlay}>
+    {showSearch && (
       <View style={styles.searchContainer}>
         <TextInput
           style={styles.searchInput}
@@ -1467,6 +1490,7 @@ return (
           <Text style={styles.buttonText}>Search</Text>
         </TouchableOpacity>
       </View>
+    )}
       {showHistory && (
         <View style={styles.historyContainer}>
           {searchHistory.map((item, index) => (
@@ -1503,27 +1527,30 @@ return (
       </View>
     )}
     {isRouteActive && (
-  <>
-    {/* Directions Container */}
-    <SafeAreaView style={styles.directionsContainer}>
-      <Text style={styles.directionsText}>{directions.text}</Text>
-      {directions.turn !== 'straight' && (
-        <MaterialIcons
-          name={directions.turn === 'left' ? 'turn-left' : 'turn-right'}
-          size={24}
-          color="#007AFF"
-        />
-      )}
-    </SafeAreaView>
+  <View style={{display: 'flex', flexDirection: 'row', alignContent: 'center', alignItems: 'center', justifyContent: 'center'}}>
 
-    {/* Guidance Container */}
-    <SafeAreaView style={styles.guidanceContainer}>
-      <Text style={styles.headingGuidance}>{getDirectionGuidance()}</Text>
-    </SafeAreaView>
-  </>
+    <View style={styles.rotationContainer}>
+          <Text style={styles.directionsText}>
+            Rotation
+          </Text>
+
+          {getFirstHeadingDirection().startsWith("Rotate left") 
+            ? <FontAwesome6 name="arrow-rotate-left" size={24} color="black" />
+            : getFirstHeadingDirection().startsWith("Rotate right")
+              ? <FontAwesome6 name="arrow-rotate-right" size={24} color="black" />
+              : <FontAwesome name="check" size={24} color="black" />
+            }
+    </View>
+
+    <View style={styles.guidanceContainer}>
+          <Text style={styles.directionsText}>
+            {getDirectionGuidance()}
+          </Text>
+      </View>
+
+  </View>
 )}
 
   </View>
 );
 }
-
