@@ -54,35 +54,11 @@ export  const styles = StyleSheet.create({
       fontSize: 16,
       fontWeight: 'bold',
     },
-    directionsContainer: {
-      position: 'absolute',
-      bottom: 235,
-      left: 20,
-      right: 20,
-      backgroundColor: 'rgba(255, 255, 255, 1)',
-      padding: 10,
-      borderTopRightRadius: 10,
-      borderTopLeftRadius: 10,
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      
-    },
     directionsInnerContainer: {
       flexDirection: 'row',
       alignItems: 'center',
       flex: 1,
       padding: 10,
-    },
-    directionsText: {
-      fontSize: 16,
-      color: '#333',
-      flex: 1,
-      alignText: 'center',
-      justifyContent: 'center',
-      fontWeight: 'bold',
-      textAlign: 'center',
-      paddingTop: 10,
     },
     turnIcon: {
       marginLeft: 10,
@@ -128,8 +104,7 @@ export  const styles = StyleSheet.create({
       left: 20,
       right: 20,
       backgroundColor: 'rgba(255, 255, 255, 1)',
-      borderBottomRightRadius: 20,
-      borderBottomLeftRadius: 20,
+      borderRadius: 20,
       padding: 15,
       shadowColor: "#000",
       flexDirection: 'column',
@@ -291,13 +266,37 @@ export  const styles = StyleSheet.create({
       height: '100%',
       backgroundColor: '#007AFF',
     },
-    headingGuidance: {
-      fontSize: 16,
-      // color: '#007AFF',
-      color: '#000000',
-      top: 8,
-      right: 10,
+    directionsText: {
+      fontSize: 15,
+      color: '#333',
       fontWeight: 'bold',
+      textAlign: 'center'
     },
+    guidanceContainer: {
+      backgroundColor: '#FFFFFF',
+      height: 10 * height,
+      width: 61 * width,
+      alignSelf: 'center',
+      marginVertical: 10 * height,
+      borderRadius: 5 * width,
+      display: 'flex',
+      justifyContent: 'center',
+      alignContent: 'center',
+      alignItems: 'center',
+      marginHorizontal: 4 * width
+    },
+    rotationContainer: {
+      backgroundColor: 'white',
+      width: 23 * width,
+      height: 10 * height,
+      marginVertical: 10 * height,
+      marginHorizontal: 4 * width,
+      borderRadius: 5 * width,
+      display: 'flex',
+      justifyContent: 'center',
+      alignContent: 'center',
+      alignItems: 'center',
+      flexDirection: 'column'
+    }
 
   });
