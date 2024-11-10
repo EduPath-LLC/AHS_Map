@@ -44,7 +44,7 @@ function determineRealTurns(route) {
           bearingDifference = 360 - bearingDifference;
         }
 
-        if (bearingDifference >= 75 && bearingDifference <= 100) {
+        if (bearingDifference >= 75 && bearingDifference <= 110) {
           segments.push(currentSegment);
           currentSegment = [nextPoint];
           lastSignificantBearing = newBearing;
