@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useRef, useState, useCallback } from 'react';
 import { View, TextInput, Text, TouchableOpacity, Keyboard, SafeAreaView } from 'react-native';
-import MapView, { Polyline, Marker } from 'react-native-maps';
+import MapView, { Polyline, Marker,} from 'react-native-maps';
 import { LocationContext } from '../components/providers/LocationContext';
 import {FontAwesome6, FontAwesome} from '@expo/vector-icons';
 import { debounce } from 'lodash';
@@ -1509,6 +1509,7 @@ return (
   <View style={styles.container}>
     <MapView
       ref={mapRef}
+      
       style={styles.map}
       initialCamera={{
         center: {
