@@ -1280,6 +1280,7 @@ function getSegmentDirections(segment, isLastSegment, destination) {
     // Exiting the stairs on the destination floor
     text = `From stairs, walk forward ${distanceInFeet} feet`;
     turn = 'walk-forward';
+    
   } else {
     // Handle turns and destination arrival
     const currentBearing = calculateBearing(start, segment[1]);
@@ -1616,7 +1617,8 @@ const getHeadingDifference = useCallback(() => {
   
 // Initial orientation guidance
 const getFirstHeadingDirection = useCallback(() => {
-  const difference = getHeadingDifference();
+  const difference = getHeadingDifference(currentSegmentIndex);
+
 
   if (Math.abs(difference) <= 45) {
     return 'You are facing the right way';
@@ -1627,45 +1629,84 @@ const getFirstHeadingDirection = useCallback(() => {
   }
 }, [getHeadingDifference, routeSegments, currentSegmentIndex]);
 
+
+
 const getDirectionGuidance = useCallback(() => {
   const nextSegmentIndex = currentSegmentIndex + 1;
   const nextSegment = routeSegments[nextSegmentIndex];
-  
-  // If no next segment, return final directions text from directions
+  const currentSegment = routeSegments[currentSegmentIndex];
+
+  if (!currentSegment) {
+    return;
+  }
+
   if (!nextSegment) {
     return directions.text;
   }
   
-  // Calculate heading difference for the next segment
-  const difference = getHeadingDifference(nextSegment);
+
+  const point1_lat = currentSegment[0].latitude;
+  const point1_long = currentSegment[0].longitude;
+  const point2_lat = currentSegment[currentSegment.length - 1].latitude;
+  const point2_long = currentSegment[currentSegment.length - 1].longitude;
+  const point3_lat = nextSegment[0].latitude;
+  const point3_long = nextSegment[0].longitude;
+  const point4_lat = nextSegment[nextSegment.length - 1].latitude;
+  const point4_long = nextSegment[nextSegment.length - 1].longitude;
+
+
+  // If no next segment, return final directions text from directions
+
+
+  function calculateAngle() {
+    const vector1_x = point2_long - point1_long;
+    const vector1_y = point2_lat - point1_lat;
+    const vector2_x = point4_long - point3_long;
+    const vector2_y = point4_lat - point3_lat;
+
+    // Calculate the dot product and magnitudes of the vectors
+    const dotProduct = vector1_x * vector2_x + vector1_y * vector2_y;
+    const mag1 = Math.sqrt(vector1_x ** 2 + vector1_y ** 2);
+    const mag2 = Math.sqrt(vector2_x ** 2 + vector2_y ** 2);
+    const cosTheta = dotProduct / (mag1 * mag2);
+    let angleInDegrees = Math.acos(cosTheta) * (180 / Math.PI);
+
+    // Calculate cross product to determine turn direction
+    const crossProduct = vector1_x * vector2_y - vector1_y * vector2_x;
+
+    // If cross product is negative, the angle should be to the right
+    if (crossProduct < 0) {
+        angleInDegrees = 360 - angleInDegrees; // Convert to right turn angle
+    }
+
+    return angleInDegrees;
+}
+
+  const angle = calculateAngle();
 
   // Extract distance from directions.text for turn guidance
   let distance = directions.text.match(/(\d+)/);
-  distance = distance ? `${distance[0]} feet` : 'unknown distance';
 
-  if(directions.text.startsWith("From stairs")) {
-    let secondary = ""
-    if (difference > 0) {
-      secondary = `Turn left`;
-    } else {
-      secondary = `Turn right`;
-    }
-
-    return directions.text + " and " + secondary.toLowerCase()
-  }
-
-  // If there's no heading difference, just return directions.text
-  if (difference === null) {
+  if (directions.text.startsWith('Proceed') || directions.text.startsWith('Climb')){
     return directions.text;
   }
 
-  // Provide turn instructions based on the heading difference
-  if (difference > 0) {
+
+  distance = distance ? `${distance[0]} feet` : 'unknown distance';
+
+  if (directions.text.startsWith("From stairs")) {
+    let secondary = angle < 180 ? `Turn left` : `Turn right`;
+    return directions.text + " and " + secondary.toLowerCase();
+  }
+
+  // Provide turn instructions based on the angle
+  if (angle < 180) {
     return `Turn left in ${distance}`;
   } else {
     return `Turn right in ${distance}`;
   }
-}, [getHeadingDifference, routeSegments, currentSegmentIndex, directions.text]);
+}, [routeSegments, currentSegmentIndex, directions.text]);
+
 
 
 const [nearestPolylinePoint, setNearestPolylinePoint] = useState(null);
