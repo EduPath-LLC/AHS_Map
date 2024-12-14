@@ -3,16 +3,15 @@ import { View, Text, Alert, Image, Pressable, KeyboardAvoidingView, Platform } f
 import { doc, getDocs, collection, setDoc, docRef, updateDoc } from 'firebase/firestore';
 import { db } from '../../firebase'
 
-import { stylesLight } from '../../styles/light/CarouselLight'
-import { stylesDark } from '../../styles/dark/CarouselDark'
+import { styles } from '../../styles/light/CarouselLight'
 
 import Loader from '../Loader';
 import CardInputs from './CardInputs';
 
 import ArrowBack from '../../assets/images/ArrowBack.png';
-import ArrowBackDark from '../../assets/images/ArrowBackDark.png';
+// import ArrowBackDark from '../../assets/images/ArrowBackDark.png';
 import ArrowForward from '../../assets/images/ArrowForward.png';
-import ArrowForwardDark from '../../assets/images/ArrowForwardDark.png';
+// import ArrowForwardDark from '../../assets/images/ArrowForwardDark.png';
 
 export default class Carousel extends Component {
     constructor(props) {
@@ -32,13 +31,12 @@ export default class Carousel extends Component {
             loading: false,
             arrowBack: null,
             arrowForward: null,
-            styles: this.props.dark ? stylesDark : stylesLight,
         };
     }
 
     componentDidMount() {
         this.fetchSchedule(this.props.userId);
-        this.setState({arrowBack: this.props.dark ? ArrowBackDark : ArrowBack, arrowForward: this.props.dark ? ArrowForwardDark : ArrowForward});
+        this.setState({arrowBack: ArrowBack, arrowForward: ArrowForward});
     }
 
     fetchSchedule = async (userId) => {
@@ -276,18 +274,18 @@ export default class Carousel extends Component {
 
     render() {
         return (
-            <View style={this.state.styles.container}>
+            <View style={styles.container}>
                 {this.state.loading? 
                 ( <Loader /> ) :
                 (
                     <View>
-                        <View style={this.state.styles.viewer}>
+                        <View style={styles.viewer}>
                             <Pressable 
                                 onPress={this.decrease}
-                                style={this.state.styles.arrows}
+                                style={styles.arrows}
                             >
                                 <Image 
-                                    style={this.state.styles.image}
+                                    style={styles.image}
                                     source={this.state.arrowBack}
                                 />
                             </Pressable>
@@ -296,20 +294,20 @@ export default class Carousel extends Component {
 
                             <Pressable 
                                 onPress={this.increase}
-                                style={this.state.styles.arrows}
+                                style={styles.arrows}
                             >
                                 <Image 
-                                    style={this.state.styles.image}
+                                    style={styles.image}
                                     source={this.state.arrowForward}
                                 />
                             </Pressable>
                         </View>
 
                         <Pressable 
-                            style={this.state.styles.button}
+                            style={styles.button}
                             onPress={this.handleSubmit}
                         >
-                            <Text style={this.state.styles.buttonText}> Finish </Text>
+                            <Text style={styles.buttonText}> Finish </Text>
                         </Pressable>
                     </View>
             )}

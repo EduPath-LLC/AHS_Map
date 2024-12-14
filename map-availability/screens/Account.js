@@ -4,7 +4,7 @@ import { signOut } from 'firebase/auth';
 import WavyHeader from '../components/headers/WavyHeader';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../firebase';
-import { stylesDark } from '../styles/dark/AccountDark';
+// import { stylesDark } from '../styles/dark/AccountDark';
 import { stylesLight } from '../styles/light/AccountLight';
 import { auth } from '../firebase';
 import Loader from '../components/Loader';
@@ -21,39 +21,9 @@ import ArrowBack from '../assets/images/ArrowBack.png'
 
 export default function Account({navigation}) {
   const [darkMode, setDarkMode] = useState(false);
-  let styles = darkMode ? stylesDark : stylesLight;
+  let styles = stylesLight;
   const route = useRoute();
   const userId = route.params.userId;
-
-  useEffect(() => {
-    const isDarkMode = async () => {
-      try {
-        if (userId) {
-          const userDocRef = doc(db, 'users', userId);
-          const userDocSnap = await getDoc(userDocRef);
-
-          if (userDocSnap.exists()) {
-            const userData = userDocSnap.data();
-
-            if(userData.dark) {
-              setDarkMode(true)
-            } else {
-              setDarkMode(false)
-            }
-
-          } else {
-            console.log('No such document!');
-          }
-        } else {
-          console.error('User ID is undefined');
-        }
-      } catch (error) {
-        console.error('Error fetching document: ', error);
-      }
-    };
-
-    isDarkMode();
-  }, [userId]);
 
   const logOut = async () => {
     signOut(auth)

@@ -16,42 +16,8 @@ export default function BottomTab() {
   const route = useRoute();
   const { userId } = route.params;
   const [darkMode, setDarkMode] = useState(true);
-  let inactive = darkMode ? "#ffffff" : "#000000"
-  let bg = darkMode ? '#243741' : '#ffffff'
-
-  useEffect(() => {
-    const isDarkMode = async () => {
-      try {
-        if (userId) {
-          const userDocRef = doc(db, 'users', userId);
-          const userDocSnap = await getDoc(userDocRef);
-
-          if (userDocSnap.exists()) {
-            const userData = userDocSnap.data();
-
-            if(userData.dark) {
-              setDarkMode(true)
-            } else {
-              setDarkMode(false)
-            }
-
-          } else {
-            console.log('No such document!');
-          }
-        } else {
-          console.error('User ID is undefined');
-        }
-      } catch (error) {
-        console.error('Error fetching document: ', error);
-      }
-    };
-
-    isDarkMode();
-
-    const interval = setInterval(isDarkMode, 2000);
-
-    return () => clearInterval(interval);
-  }, [userId]);
+  let inactive = "#000000"
+  let bg = '#ffffff'
 
   return (
     <Tab.Navigator 

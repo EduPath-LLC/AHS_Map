@@ -3,7 +3,7 @@ import { View, Text, Switch, Pressable, Alert, Image } from 'react-native';
 import { signOut } from 'firebase/auth';
 import WavyHeader from '../components/headers/WavyHeader';
 import { auth } from '../firebase';
-import { stylesDark } from '../styles/dark/AppearanceDark';
+// import { stylesDark } from '../styles/dark/AppearanceDark';
 import { stylesLight } from '../styles/light/AppearanceLight';
 import ArrowBack from '../assets/images/ArrowBack.png';
 import Loader from '../components/Loader';
@@ -13,7 +13,7 @@ import { db } from '../firebase';
 
 export default function Appearance({ navigation }) {
   const [darkMode, setDarkMode] = useState(false);
-  const styles = darkMode ? stylesDark : stylesLight;
+  const styles = stylesLight;
   const [minuteAlert, setMinuteAlert] = useState(false);
   const [dayAlert, setDayAlert] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -23,35 +23,6 @@ export default function Appearance({ navigation }) {
   const oMAtoggleSwitch = () => setMinuteAlert(previousState => !previousState);
   const dayToggleSwitch = () => setDayAlert(previousState => !previousState);
 
-    useEffect(() => {
-      const isDarkMode = async () => {
-        try {
-          if (userId) {
-            const userDocRef = doc(db, 'users', userId);
-            const userDocSnap = await getDoc(userDocRef);
-
-            if (userDocSnap.exists()) {
-              const userData = userDocSnap.data();
-
-              if(userData.dark) {
-                setDarkMode(true)
-              } else {
-                setDarkMode(false)
-              }
-
-            } else {
-              console.log('No such document!');
-            }
-          } else {
-            console.error('User ID is undefined');
-          }
-        } catch (error) {
-          console.error('Error fetching document: ', error);
-        }
-      };
-
-      isDarkMode();
-    }, [userId]);
 
   const changeMode = async () => {
       try {
@@ -104,17 +75,6 @@ if (loading) {
           <Text style={styles.buttonNewText}>Back</Text>
         </Pressable>
         <Text style={styles.bigText}> Appearance </Text>
-        <View style={styles.switchContainer}>
-          <Text style={styles.normalText}>Dark Mode</Text>
-          <Switch
-            style={styles.toggleSwitch}
-            trackColor={{false: '#767577', true: '#007AFF'}}
-            thumbColor={darkMode ? '#f4f3f4' : '#f4f3f4'}
-            ios_backgroundColor="#3e3e3e"
-            onValueChange={changeMode}
-            value={darkMode}
-          />
-        </View>
       </View>
     </View>
   );

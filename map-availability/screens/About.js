@@ -3,7 +3,7 @@ import { View, Text, Switch, Pressable, Alert, Image } from 'react-native';
 import { signOut } from 'firebase/auth';
 import WavyHeader from '../components/headers/WavyHeader';
 import { auth } from '../firebase';
-import { stylesDark } from '../styles/dark/AboutDark';
+// import { stylesDark } from '../styles/dark/AboutDark';
 import { stylesLight } from '../styles/light/AboutLight';
 import ArrowBack from '../assets/images/ArrowBack.png';
 import { useRoute } from '@react-navigation/native';
@@ -12,7 +12,7 @@ import { db } from '../firebase';
 
 export default function About({ navigation }) {
   const [darkMode, setDarkMode] = useState(false);
-  const styles = darkMode ? stylesDark : stylesLight;
+  const styles = stylesLight;
   const [minuteAlert, setMinuteAlert] = useState(false);
   const [dayAlert, setDayAlert] = useState(false);
   const route = useRoute();
@@ -20,36 +20,6 @@ export default function About({ navigation }) {
 
   const oMAtoggleSwitch = () => setMinuteAlert(previousState => !previousState);
   const dayToggleSwitch = () => setDayAlert(previousState => !previousState);
-
-  useEffect(() => {
-    const isDarkMode = async () => {
-      try {
-        if (userId) {
-          const userDocRef = doc(db, 'users', userId);
-          const userDocSnap = await getDoc(userDocRef);
-
-          if (userDocSnap.exists()) {
-            const userData = userDocSnap.data();
-
-            if(userData.dark) {
-              setDarkMode(true)
-            } else {
-              setDarkMode(false)
-            }
-
-          } else {
-            console.log('No such document!');
-          }
-        } else {
-          console.error('User ID is undefined');
-        }
-      } catch (error) {
-        console.error('Error fetching document: ', error);
-      }
-    };
-
-    isDarkMode();
-  }, [userId]);
 
   const logOut = async () => {
     try {

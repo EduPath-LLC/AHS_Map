@@ -2,13 +2,13 @@ import React, { Component } from 'react';
 import { View, Text } from 'react-native';
 
 import { stylesLight } from '../../styles/light/HomeCardsLight';
-import { stylesDark } from '../../styles/dark/HomeCardsDark';
+// import { stylesDark } from '../../styles/dark/HomeCardsDark';
 
 export default class HomeCards extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            styles: this.props.dark ? stylesDark : stylesLight,
+            styles: stylesLight,
             ahs: [
                 { id: "First", value: "8:45 - 9:37" },
                 { id: "Second", value: "9:43 - 11:16" },
