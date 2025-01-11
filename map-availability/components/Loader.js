@@ -1,10 +1,11 @@
-import React, { Component } from 'react'
-import { ActivityIndicator } from 'react-native'
+import React, { Component } from 'react';
+import { ActivityIndicator } from 'react-native';
 
 export default class Loader extends Component {
   render() {
     return (
-      <ActivityIndicator size="large" color="#574BE5" />
-    )
+      <ActivityIndicator size={50} color="#574BE5" />
+    );
   }
 }
+

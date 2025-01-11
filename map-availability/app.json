@@ -9,34 +9,46 @@
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff",
-      "plugins": [
+      "backgroundColor": "#ffffff"
+    },
+    "plugins": [
       [
         "expo-location",
         {
           "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location."
         }
       ]
-    ]
-    },
+    ],
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "This app needs access to location when open.",
         "NSLocationAlwaysAndWhenInUseUsageDescription": "This app needs access to location when open and in the background."
-      }
+      },
+      "newArchEnabled": true,
+      "bundleIdentifier": "com.rishinigam.mapavailability"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
       },
-      "permissions": ["ACCESS_COARSE_LOCATION", "ACCESS_FINE_LOCATION"]
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION"
+      ],
+      "newArchEnabled": true,
+      "package": "com.rishinigam.mapavailability"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "1a25fcd1-37fe-455c-ac97-71b24627c4e6"
+      }
     }
   }
 }
-
-
