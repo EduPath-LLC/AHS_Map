@@ -5,7 +5,7 @@ import { db } from '../../firebase';
 import { PanGestureHandler, State } from 'react-native-gesture-handler';
 
 import { stylesLight } from '../../styles/light/HomeCarouselLight';
-import { stylesDark } from '../../styles/dark/HomeCarouselDark';
+// import { stylesDark } from '../../styles/dark/HomeCarouselDark';
 import HomeCards from './HomeCards';
 
 import ArrowBack from '../../assets/images/ArrowBack.png';
@@ -31,7 +31,7 @@ export default class HomeCarousel extends Component {
             loading: false,
             arrowBack: this.props.dark ? ArrowBackDark : ArrowBack,
             arrowForward: this.props.dark ? ArrowForwardDark : ArrowForward,
-            styles: this.props.dark ? stylesDark : stylesLight,
+            styles: stylesLight,
         };
     }
 
