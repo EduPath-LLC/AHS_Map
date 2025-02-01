@@ -49,8 +49,8 @@ export default function About({ navigation }) {
         <Text style={styles.bigText}> About </Text>
         <Text style={styles.normalText}>What is AHS Map?</Text>
         <Text style={styles.normalTextBorder}>AHS Map is a tool developed by incoming seniors that is meant to help incoming sophomores and new people to successfully adjust to Allen High School's size.</Text>
-        <Text style={styles.normalText}>Who are the creators?</Text>
-        <Text style={styles.normalTextBorder}>AHS Map was created by Rishi Nigam, Jayadeep Velagapudi, and Anish Choudhury.</Text>
+        <Text style={styles.normalText}>What is the purpose of AHS Map?</Text>
+        <Text style={styles.normalTextBorder}>AHS Map is meant to show how technology can make our lives in every way, both indoors and outdoors.</Text>
       </View>
     </View>
   );

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState, useCallback } from 'react';
+import React, { useContext, useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { View, TextInput, Text, TouchableOpacity, Keyboard, SafeAreaView } from 'react-native';
 import MapView, { Polyline, Marker,} from 'react-native-maps';
 import { LocationContext } from '../components/providers/LocationContext';
@@ -56,7 +56,7 @@ function determineRealTurns(route) {
           bearingDifference = 360 - bearingDifference;
         }
 
-        if (bearingDifference >= 75 && bearingDifference <= 110) {
+        if (bearingDifference >= 55 && bearingDifference <= 100) {
           segments.push(currentSegment);
           currentSegment = [nextPoint];
           lastSignificantBearing = newBearing;
@@ -92,7 +92,7 @@ const firstFloorCoordinates = [
   { latitude: 33.109768672191244, longitude: -96.66105221607514, reference: 'Cafe' },
   { latitude: 33.11002453134270951, longitude: -96.66066677016860353, reference: 'Entrance' },
   { latitude: 33.109768672191244, longitude: -96.66105221607516, reference: 'Mid' },
-  { latitude: 33.109549184264225, longitude: -96.6608491206446, reference: 'S1_1' },
+  { latitude: 33.109549184264225, longitude: -96.6608491206446, reference: 'F135' },
   { latitude: 33.10945194354582, longitude: -96.66100404668036, reference: 'F mid' },
   { latitude: 33.109483345573686, longitude: -96.66103270225616, reference: 'F105' },
   { latitude: 33.10954345131491, longitude: -96.66108818354715, reference: 'Corner' },
@@ -142,7 +142,7 @@ const firstFloorCoordinates = [
   { latitude: 33.10937929679408, longitude: -96.66093665884165, reference: 'F164' },
   { latitude: 33.10941692859606, longitude: -96.66097139530632, reference: 'F165' },
   { latitude: 33.10945194354582, longitude: -96.66100404668036, reference: 'F mid' },
-  { latitude: 33.10954918426422, longitude: -96.66084912064460, reference: 'S1_1' },
+  { latitude: 33.10954918426422, longitude: -96.66084912064460, reference: 'F135' },
   { latitude: 33.10934693614330, longitude: -96.66066226859509, reference: 'S1_14' },
   { latitude: 33.10944234865774, longitude: -96.66051814553069, reference: 'A mid' },
   { latitude: 33.10949115105158, longitude: -96.66056318284635, reference: 'A134' },
@@ -192,7 +192,7 @@ const firstFloorCoordinates = [
   { latitude: 33.10861239099607, longitude: -96.66139400573383, reference: 'G127' },
   { latitude: 33.10853146243038, longitude: -96.66151635819290, reference: 'G128' },
   { latitude: 33.10851678364739, longitude: -96.66153855042106, reference: 'S1_5' },
-  { latitude: 33.10835308826282, longitude: -96.66138774313453, reference: 'S1_1' },
+  { latitude: 33.10835308826282, longitude: -96.66138774313453, reference: 'F135' },
   { latitude: 33.10836926588401, longitude: -96.66136322952454, reference: 'G138' },
   { latitude: 33.10841888660577, longitude: -96.66128804028583, reference: 'G139' },
   { latitude: 33.10844886016316, longitude: -96.66124262198313, reference: 'G140' },
@@ -244,7 +244,7 @@ const secondFloorCoordinates = [
 
   { latitude: 33.109971381724904, longitude: -96.66130147923262, reference: '2mainhall' },
   { latitude: 33.10952242109021, longitude: -96.66088922805024, reference: '2fentrance' },
-  { latitude: 33.109545215126175, longitude: -96.66085454284246, reference: 'S2_1' },
+  { latitude: 33.109545215126175, longitude: -96.66085454284246, reference: 'F235' },
   { latitude: 33.10956921622493, longitude: -96.66081717996883, reference: '2entrance' },
  
 { latitude: 33.10945468699747, longitude: -96.66099546935033, reference: '2f mid front' },
@@ -322,7 +322,7 @@ const secondFloorCoordinates = [
 { latitude: 33.108581705223514, longitude: -96.66144327508565, reference: "g227" },
 { latitude: 33.10853124877592, longitude: -96.66152020270945, reference: "g228" },
 { latitude: 33.10851308693722, longitude: -96.66154789286921, reference: "S2_5" },
-{ latitude: 33.10834535768775, longitude: -96.6613946199867, reference: "S2_1" },
+{ latitude: 33.10834535768775, longitude: -96.6613946199867, reference: "F235" },
 { latitude: 33.1083641486784, longitude: -96.66136620875649, reference: "g236" },
 { latitude: 33.10841559016205, longitude: -96.66128790580876, reference: "g237" },
 { latitude: 33.10844641688495, longitude: -96.66124098213743, reference: "g238" },
@@ -1965,6 +1965,30 @@ return (
         </TouchableOpacity>
       </View>
     )}
+    {(() => {
+      const { location } = useContext(LocationContext);
+      const distance = useMemo(() => {
+        if (!location?.coords) return Infinity;
+        return calculateDistance(
+          location.coords.latitude,
+          location.coords.longitude,
+          33.1096996205575,
+          -96.66076983204718
+        );
+      }, [location]);
+
+      if (distance > 750) {
+        return (
+          <View style={styles.distanceOverlay}>
+            <Text style={styles.distanceOverlayText}>
+              Please move closer to the building to use this feature.
+              {'\n'}You are {Math.round(distance / 1000)} km away.
+            </Text>
+          </View>
+        );
+      }
+      return null;
+    })()}
       {/* {showHistory && (
         <View style={styles.historyContainer}>
           {searchHistory.map((item, index) => (

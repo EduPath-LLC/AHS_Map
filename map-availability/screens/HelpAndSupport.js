@@ -48,14 +48,14 @@ export default function HelpAndSupport({ navigation }) {
           <Text style={styles.buttonNewText}>Back</Text>
         </Pressable>
         <Text style={styles.bigText}> Help And Support </Text>
-        <Text style={styles.normalText}>Issues with the map? Contact:</Text>
+        <Text style={styles.normalText}>Issues with anything in the app? Contact:</Text>
         <Text style={styles.normalTextBorder}>rishi.nigam@student.allenisd.org</Text>
         
-        <Text style={styles.normalText}>Issues with your account? Contact:</Text>
+        {/* <Text style={styles.normalText}>Issues with your account? Contact:</Text>
         <Text style={styles.normalTextBorder}>jayadeep.velagapudi@student.allenisd.org</Text>
         
         <Text style={styles.normalText}>Issues with the UI/UX? Contact:</Text>
-        <Text style={styles.normalTextBorder}>anish.choudhury@student.allenisd.org</Text>
+        <Text style={styles.normalTextBorder}>anish.choudhury@student.allenisd.org</Text> */}
       </View>
     </View>
   );

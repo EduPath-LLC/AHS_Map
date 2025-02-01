@@ -176,6 +176,24 @@ export  const styles = StyleSheet.create({
       padding: 20,
       color: '#333',
     },
+    distanceOverlay: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'rgba(0, 0, 0, 01)',
+      justifyContent: 'center',
+      alignItems: 'center',
+      zIndex: 1000,
+    },
+    distanceOverlayText: {
+      color: 'white',
+      fontSize: 18,
+      textAlign: 'center',
+      padding: 20,
+      fontWeight: 'bold',
+    },
     historyContainer: {
       position: 'absolute',
       top: 100, // Adjust based on your layout
