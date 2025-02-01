@@ -8,6 +8,18 @@ import { styles } from '../styles/light/MapLight'
 import { useRoute } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Magnetometer } from 'expo-sensors';
+function isValidStaircasePair(point1, point2) {
+  const isStaircase1 = point1.reference.startsWith('S');
+  const isStaircase2 = point2.reference.startsWith('S');
+
+  if (isStaircase1 && isStaircase2) {
+    const pair1 = point1.reference.split('_')[1];
+    const pair2 = point2.reference.split('_')[1];
+    return pair1 === pair2; // Valid pair if numbers after "_" are the same
+  }
+  return false;
+}
+
 
 function determineRealTurns(route) {
   const segments = [];
@@ -19,8 +31,8 @@ function determineRealTurns(route) {
     const nextPoint = route[i];
     const nextFloor = getFloor(nextPoint);
 
-    // Only treat the staircase as a transition point if there's a floor change
-    if (isFloorChange(route[i - 1], nextPoint)) {
+    // Only treat the staircase as a transition point if there's a valid staircase pair
+    if (isFloorChange(route[i - 1], nextPoint) && isValidStaircasePair(route[i - 1], nextPoint)) {
       segments.push(currentSegment); // End the current segment
 
       // Create a special staircase segment
@@ -39,7 +51,7 @@ function determineRealTurns(route) {
       if (i < route.length - 1) {
         const newBearing = calculateBearing(nextPoint, route[i + 1]);
         let bearingDifference = Math.abs(newBearing - lastSignificantBearing);
-        
+
         if (bearingDifference > 180) {
           bearingDifference = 360 - bearingDifference;
         }
@@ -60,7 +72,6 @@ function determineRealTurns(route) {
   return segments;
 }
 
-
 // Helper function to determine the floor of a point
 function getFloor(point) {
   return point.reference.startsWith('S1') || point.reference.startsWith('1') ? 1 : 2;
@@ -68,18 +79,19 @@ function getFloor(point) {
 
 // Helper function to determine if there's a floor change
 function isFloorChange(point1, point2) {
-  // If the points are in different floors (based on their staircase references)
   const isS1 = point1.reference.startsWith('S1') || point2.reference.startsWith('S1');
   const isS2 = point1.reference.startsWith('S2') || point2.reference.startsWith('S2');
-
-  return isS1 && isS2;  // This means there's a floor change between staircases
+  return isS1 && isS2;
 }
+
 
 const firstFloorCoordinates = [
   { latitude: 33.11000677620671, longitude: -96.66127237288006, reference: 'Library' },
   { latitude: 33.109768672191244, longitude: -96.66105221607516, reference: 'S1_9' },
-  { latitude: 33.11002453134270951, longitude: -96.66066677016860353, reference: 'Entrance b' },
-  { latitude: 33.109768672191244, longitude: -96.66105221607516, reference: 'Entrance' },
+  { latitude: 33.109768672191244, longitude: -96.66105221607515, reference: 'Cafeteria' },
+  { latitude: 33.109768672191244, longitude: -96.66105221607514, reference: 'Cafe' },
+  { latitude: 33.11002453134270951, longitude: -96.66066677016860353, reference: 'Entrance' },
+  { latitude: 33.109768672191244, longitude: -96.66105221607516, reference: 'Mid' },
   { latitude: 33.109549184264225, longitude: -96.6608491206446, reference: 'S1_1' },
   { latitude: 33.10945194354582, longitude: -96.66100404668036, reference: 'F mid' },
   { latitude: 33.109483345573686, longitude: -96.66103270225616, reference: 'F105' },
@@ -94,6 +106,8 @@ const firstFloorCoordinates = [
   { latitude: 33.10932042879837, longitude: -96.66142617169038, reference: 'F117' },
   { latitude: 33.10930435051054, longitude: -96.66145051621429, reference: 'S1_7' },
   { latitude: 33.10926906150741, longitude: -96.66150394814619, reference: 'F120' },
+  { latitude: 33.10925627852489, longitude: -96.66152330316875, reference: 'Midcut1' },
+  { latitude: 33.10909240405331, longitude: -96.66136957400717, reference: 'Midcut2' },
   { latitude: 33.10925627852489, longitude: -96.66152330316875, reference: 'Midcut1' },
   { latitude: 33.10921164679766, longitude: -96.66159088114483, reference: 'F123' },
   { latitude: 33.10920717458255, longitude: -96.66159765263374, reference: 'F124' },
@@ -167,6 +181,8 @@ const firstFloorCoordinates = [
   { latitude: 33.10885542280503, longitude: -96.66102657627054, reference: 'Del' },
   { latitude: 33.10881877723489, longitude: -96.66108197915065, reference: 'G117' },
   { latitude: 33.10881877723489, longitude: -96.66108197915065, reference: 'G118' },
+  { latitude: 33.10880126526586, longitude: -96.66110845475237, reference: 'Midcutg1' },
+  { latitude: 33.10863730352468, longitude: -96.66095707771076, reference: 'Gmidcut2' },
   { latitude: 33.10880126526586, longitude: -96.66110845475237, reference: 'Midcutg1' },
   { latitude: 33.10875511428154, longitude: -96.66117822846417, reference: 'G121' },
   { latitude: 33.10872212289219, longitude: -96.66122810674361, reference: 'G122' },
@@ -242,6 +258,8 @@ const secondFloorCoordinates = [
 { latitude: 33.1093251244839, longitude: -96.6614173448425, reference: 'f215' },
 { latitude: 33.10930855790873, longitude: -96.66144259164321, reference: 'S2_7' },
 { latitude: 33.10925549614271, longitude: -96.66152345566115, reference: 'midcut1' },
+{ latitude: 33.10909147837973, longitude: -96.66136975085195, reference: 'midcut2' },
+{ latitude: 33.10925549614271, longitude: -96.66152345566115, reference: 'midcut1' },
 { latitude: 33.109224250296336, longitude: -96.66157107308649, reference: 'f222' },
 { latitude: 33.1092031527484, longitude: -96.66160322490923, reference: 'f224' },
 { latitude: 33.10914850258018, longitude: -96.66168650958885, reference: 'f223' },
@@ -262,6 +280,8 @@ const secondFloorCoordinates = [
 { latitude: 33.10904438696183, longitude: -96.66144136972915, reference: 'f242' },
 { latitude: 33.10905619398012, longitude: -96.66142341305189, reference: 'f243' },
 { latitude: 33.10909147837973, longitude: -96.66136975085195, reference: 'midcut2' },
+{ latitude: 33.10910835955181, longitude: -96.66134407715927, reference: 'fly1' },
+{ latitude: 33.10881966352259, longitude: -96.66108047573326, reference: "flycut2" },
 { latitude: 33.10910835955181, longitude: -96.66134407715927, reference: 'fly1' },
 { latitude: 33.10914197576989, longitude: -96.66129295200946, reference: 'S2_10' },
 { latitude: 33.10915944477946, longitude: -96.66126638430546, reference: 'f248' },
@@ -289,6 +309,8 @@ const secondFloorCoordinates = [
 { latitude: 33.10888563793986, longitude: -96.66097988888274, reference: "g214" },
 { latitude: 33.10886781305446, longitude: -96.66100706531199, reference: "g215" },
 { latitude: 33.10881966352259, longitude: -96.66108047573326, reference: "flycut2" },
+{ latitude: 33.10879927752077, longitude: -96.6611115569281, reference: "g218" },
+{ latitude: 33.10863610550598, longitude: -96.66095224283366, reference: "g247" },
 { latitude: 33.10879927752077, longitude: -96.6611115569281, reference: "g218" },
 { latitude: 33.10875741909612, longitude: -96.66117537571238, reference: "g220" },
 { latitude: 33.10872401243574, longitude: -96.66122630864811, reference: "g221" },
@@ -986,59 +1008,97 @@ function getCombinedDirections(route) {
   return directions;
 }
 
-function getSegmentDirections(segment, isLastSegment, destination) {
-  const start = segment[0];
-  const end = segment[segment.length - 1];
-  const distance = calculateTotalDistance(segment);
-  const distanceInFeet = Math.round(distance * 3.28084 / 5) * 5;
+function getSegmentDirections(currentSegment, nextSegment, previousSegment, isLast, destination) {
+  const isCurrentStaircase = currentSegment.length === 2 && 
+                            isValidStaircasePair(currentSegment[0], currentSegment[1]);
+  const isNextStaircase = nextSegment && 
+                         nextSegment.length === 2 && 
+                         isValidStaircasePair(nextSegment[0], nextSegment[1]);
+  const wasPreviousStaircase = previousSegment && 
+                              previousSegment.length === 2 && 
+                              isValidStaircasePair(previousSegment[0], previousSegment[1]);
 
-  let text = `Go straight for ${distanceInFeet} feet`;
+  let text = '';
   let turn = 'straight';
 
-  // Check if the segment involves stairs
-  const isStaircaseStart = start.reference.startsWith('S');
-  const isStaircaseEnd = end.reference.startsWith('S');
-  const isGoingUp = start.reference.startsWith('S1') && end.reference.startsWith('S2');
-  const isGoingDown = start.reference.startsWith('S2') && end.reference.startsWith('S1');
-
-  if (!isStaircaseStart && isStaircaseEnd) {
-    // First prompt to proceed to the stairs
+  // Staircase approach
+  if (isNextStaircase) {
     text = `Proceed to the stairs`;
     turn = 'stairs-start';
-  } else if (isStaircaseStart && isStaircaseEnd) {
-    // Climbing stairs segment
-    text = `Climb the stairs to the ${isGoingUp ? 'second' : 'first'} floor`;
+  }
+  // Staircase climb
+  else if (isCurrentStaircase) {
+    const isGoingUp = currentSegment[0].reference.startsWith('S1');
+    text = `Climb the stairs to ${isGoingUp ? 'second' : 'first'} floor`;
     turn = 'stairs-climb';
-  } else if (isStaircaseStart && !isStaircaseEnd) {
-    // Exiting the stairs on the destination floor
+  }
+  // Staircase exit
+  else if (wasPreviousStaircase) {
+    const distance = calculateTotalDistance(currentSegment);
+    const distanceInFeet = Math.round(distance * 3.28084 / 5) * 5;
     text = `From stairs, walk forward ${distanceInFeet} feet`;
-    turn = 'walk-forward';
-    
-  } else {
-    // Handle turns and destination arrival
-    const currentBearing = calculateBearing(start, segment[1]);
-    const nextBearing = calculateBearing(segment[segment.length - 2], end);
-    let bearingDifference = nextBearing - currentBearing;
 
-    if (bearingDifference > 180) bearingDifference -= 360;
-    if (bearingDifference < -180) bearingDifference += 360;
+    // Detect turn after stairs
+    if (currentSegment.length >= 2) {
+      const start = currentSegment[0];
+      const end = currentSegment[currentSegment.length - 1];
+      const bearingStart = calculateBearing(start, currentSegment[1]);
+      const bearingEnd = calculateBearing(currentSegment[currentSegment.length - 2], end);
+      let bearingDifference = bearingEnd - bearingStart;
 
-    if (Math.abs(bearingDifference) >= 80 && Math.abs(bearingDifference) <= 100) {
-      turn = bearingDifference > 0 ? 'right' : 'left';
-      text += `, then turn ${turn}`;
-    }
+      if (bearingDifference > 180) bearingDifference -= 360;
+      if (bearingDifference < -180) bearingDifference += 360;
 
-    if (isLastSegment) {
-      const destCoords = findRoomCoordinates(destination);
-      if (destCoords) {
-        const finalBearing = calculateBearing(segment[segment.length - 2], end);
-        const roomBearing = calculateBearing(end, destCoords);
-        let relativeAngle = roomBearing - finalBearing;
-        if (relativeAngle < -180) relativeAngle += 360;
-        if (relativeAngle > 180) relativeAngle -= 360;
-        const side = relativeAngle > 0 ? 'right' : 'left';
-        text += `. Your destination will be on the ${side}`;
+      if (Math.abs(bearingDifference) >= 30) {
+        const turnDirection = bearingDifference > 0 ? 'right' : 'left';
+        text += `, then turn ${turnDirection}`;
+        turn = turnDirection;
       }
+    }
+  }
+  // Regular segment
+  else {
+    // Existing turn detection logic
+    const distance = calculateTotalDistance(currentSegment);
+    const distanceInFeet = Math.round(distance * 3.28084 / 5) * 5;
+    text = `Go straight for ${distanceInFeet} feet`;
+
+    if (currentSegment.length >= 3) {
+      const start = currentSegment[0];
+      const mid = currentSegment[Math.floor(currentSegment.length/2)];
+      const end = currentSegment[currentSegment.length - 1];
+      
+      const initialBearing = calculateBearing(start, mid);
+      const finalBearing = calculateBearing(mid, end);
+      let bearingDifference = finalBearing - initialBearing;
+
+      if (bearingDifference > 180) bearingDifference -= 360;
+      if (bearingDifference < -180) bearingDifference += 360;
+
+      if (Math.abs(bearingDifference) >= 30) {
+        turn = bearingDifference > 0 ? 'right' : 'left';
+        text += `, then turn ${turn}`;
+      }
+    }
+  }
+
+  // Final destination handling
+  if (isLast) {
+    const destCoords = findRoomCoordinates(destination);
+    if (destCoords) {
+      const finalBearing = calculateBearing(
+        currentSegment[currentSegment.length - 2],
+        currentSegment[currentSegment.length - 1]
+      );
+      const roomBearing = calculateBearing(
+        currentSegment[currentSegment.length - 1],
+        destCoords
+      );
+      let relativeAngle = roomBearing - finalBearing;
+      if (relativeAngle < -180) relativeAngle += 360;
+      if (relativeAngle > 180) relativeAngle -= 360;
+      const side = relativeAngle > 0 ? 'right' : 'left';
+      text += `. Destination will be on your ${side}`;
     }
   }
 
@@ -1170,7 +1230,7 @@ const [hasArrived, setHasArrived] = useState(false);
 const [isMapDisabled, setIsMapDisabled] = useState(false);
 const [currentDirection, setCurrentDirection] = useState({ text: '', icon: null });
 const [remainingDistance, setRemainingDistance] = useState(0);
-const [searchHistory, setSearchHistory] = useState([]);
+// const [searchHistory, setSearchHistory] = useState([]);
 const [showHistory, setShowHistory] = useState(false);
 const routeFromHome = useRoute();
 const [currentSegment, setCurrentSegment] = useState(0);
@@ -1183,6 +1243,8 @@ const [showFirstFloor, setShowFirstFloor] = useState(true);
 const [currentFloor, setCurrentFloor] = useState(1);
 const [heading, setHeading] = useState(0);
 const [showSearch, setShowSearch] = useState(true);
+// Add to your state variables
+const [directionsList, setDirectionsList] = useState([]);
 
 
 const handleEndSegment = useCallback(() => {
@@ -1196,10 +1258,8 @@ const handleEndSegment = useCallback(() => {
 
     animateCamera(nextSegment[0], newBearing);
 
-    // Update directions
-    const isLastSegment = nextIndex === routeSegments.length - 1;
-    const segmentDirections = getSegmentDirections(nextSegment, isLastSegment, searchQuery);
-    setDirections(segmentDirections);
+    // Use precomputed directions
+    setDirections(directionsList[nextIndex]);
 
     // Update estimated time
     const remainingRoute = routeSegments.slice(nextIndex).flat();
@@ -1215,7 +1275,7 @@ const handleEndSegment = useCallback(() => {
       setShowFirstFloor(nextFloor === 1);
     }
   } else {
-    // Route is complete
+    // Route completion logic
     setHasArrived(true);
     setShowArrivedMessage(true);
     setShowSearch(true);
@@ -1228,7 +1288,7 @@ const handleEndSegment = useCallback(() => {
     setDirections({ text: '', turn: null });
     setTimeout(() => setShowArrivedMessage(false), 3000);
   }
-}, [currentSegmentIndex, routeSegments, calculateBearing, animateCamera, searchQuery, calculateTotalDistance, currentFloor]);
+}, [currentSegmentIndex, routeSegments, directionsList, currentFloor, calculateBearing, animateCamera, calculateTotalDistance]);
 const routeBetweenFloors = (start, end, startFloorCoordinates, endFloorCoordinates, startFloorStaircases, endFloorStaircases) => {
   // Find nearest staircase on start floor
   const nearestStartStaircase = findNearestPoint(start, startFloorStaircases);
@@ -1613,17 +1673,17 @@ const handleExitRoute = useCallback(() => {
   }
 }, [startingPoint, animateCamera]);
 
-useEffect(() => {
-  const fetchHistory = async () => {
-    try {
-      const history = await loadSearchHistory(userId);
-      setSearchHistory(history);
-    } catch (error) {
-      console.error('Error fetching search history:', error);
-    }
-  };
-  fetchHistory();
-}, [userId]);
+// useEffect(() => {
+//   const fetchHistory = async () => {
+//     try {
+//       const history = await loadSearchHistory(userId);
+//       setSearchHistory(history);
+//     } catch (error) {
+//       console.error('Error fetching search history:', error);
+//     }
+//   };
+//   fetchHistory();
+// }, [userId]);
 
 
 
@@ -1632,14 +1692,14 @@ useEffect(() => {
 
 
 
-const saveSearchHistory = async (uid, history) => {
-  try {
-    const jsonValue = JSON.stringify(history);
-    await AsyncStorage.setItem(`@search_history_${uid}`, jsonValue);
-  } catch (e) {
-    console.error('Failed to save search history.', e);
-  }
-};
+// const saveSearchHistory = async (uid, history) => {
+//   try {
+//     const jsonValue = JSON.stringify(history);
+//     await AsyncStorage.setItem(`@search_history_${uid}`, jsonValue);
+//   } catch (e) {
+//     console.error('Failed to save search history.', e);
+//   }
+// };
 
 
 
@@ -1648,15 +1708,15 @@ const saveSearchHistory = async (uid, history) => {
 
 
 
-const loadSearchHistory = async (uid) => {
-  try {
-    const jsonValue = await AsyncStorage.getItem(`@search_history_${uid}`);
-    return jsonValue != null ? JSON.parse(jsonValue) : [];
-  } catch (e) {
-    console.error('Failed to load search history.', e);
-    return [];
-  }
-};
+// const loadSearchHistory = async (uid) => {
+//   try {
+//     const jsonValue = await AsyncStorage.getItem(`@search_history_${uid}`);
+//     return jsonValue != null ? JSON.parse(jsonValue) : [];
+//   } catch (e) {
+//     console.error('Failed to load search history.', e);
+//     return [];
+//   }
+// };
 
 
 
@@ -1670,35 +1730,46 @@ const handleSearch = useCallback(async () => {
     Keyboard.dismiss();
     setShowSearch(false);
 
-
-    const newSearch = { query: searchQuery, timestamp: new Date().toISOString() };
-    const updatedHistory = [...searchHistory, newSearch];
-    setSearchHistory(updatedHistory);
-    await saveSearchHistory(userId, updatedHistory);
-    setShowHistory(false);
+    // const newSearch = { query: searchQuery, timestamp: new Date().toISOString() };
+    // const updatedHistory = [...searchHistory, newSearch];
+    // setSearchHistory(updatedHistory);
+    // await saveSearchHistory(userId, updatedHistory);
+    // setShowHistory(false);
 
     setHasArrived(false);
     const newDestination = searchQuery.toUpperCase();
-    const startPoint = [...firstFloorCoordinates, ...secondFloorCoordinates].find(point => point.reference.toUpperCase() === startingPointQuery.toUpperCase());
-    const destinationPoint = [...firstFloorCoordinates, ...secondFloorCoordinates].find(point => point.reference.toUpperCase() === newDestination);
+    const startPoint = [...firstFloorCoordinates, ...secondFloorCoordinates].find(point => 
+      point.reference.toUpperCase() === startingPointQuery.toUpperCase()
+    );
+    const destinationPoint = [...firstFloorCoordinates, ...secondFloorCoordinates].find(point => 
+      point.reference.toUpperCase() === newDestination
+    );
 
     if (startPoint && destinationPoint) {
       setStartingPoint(startPoint);
       setDestination(destinationPoint);
       setIsRouteActive(true);
-  
+
       const startFloor = firstFloorCoordinates.includes(startPoint) ? 1 : 2;
       setCurrentFloor(startFloor);
       setShowFirstFloor(startFloor === 1);
-  
-      const endFloor = firstFloorCoordinates.includes(destinationPoint) ? 1 : 2;
 
       const newRoute = calculateRoute(startPoint, destinationPoint);
 
       if (newRoute.length > 0) {
         const routeSegments = determineRealTurns(newRoute);
+        
+        // Precompute all directions
+        const directionsList = routeSegments.map((segment, index) => {
+          const nextSegment = routeSegments[index + 1];
+          const previousSegment = routeSegments[index - 1];
+          const isLast = index === routeSegments.length - 1;
+          return getSegmentDirections(segment, nextSegment, previousSegment, isLast, newDestination);
+        });
+
         setRoute(newRoute);
         setRouteSegments(routeSegments);
+        setDirectionsList(directionsList); // Store precomputed directions
         setCurrentSegmentIndex(0);
 
         const estimatedTimeInMinutes = Math.ceil(calculateTotalDistance(newRoute) * 3.28084 / 250);
@@ -1708,10 +1779,7 @@ const handleSearch = useCallback(async () => {
           const firstSegment = routeSegments[0];
           const newBearing = calculateBearing(firstSegment[0], firstSegment[firstSegment.length - 1]);
           setBearing(newBearing);
-
-          const segmentDirections = getSegmentDirections(firstSegment, routeSegments.length === 1, newDestination);
-          setDirections(segmentDirections);
-
+          setDirections(directionsList[0]); // Use precomputed first direction
           animateCamera(startPoint, newBearing);
         }
       } else {
@@ -1728,7 +1796,7 @@ const handleSearch = useCallback(async () => {
 }, [
   startingPointQuery,
   searchQuery,
-  searchHistory,
+  // searchHistory,
   userId,
   firstFloorCoordinates,
   secondFloorCoordinates,
@@ -1736,7 +1804,7 @@ const handleSearch = useCallback(async () => {
   calculateBearing,
   animateCamera,
   calculateTotalDistance,
-  saveSearchHistory,
+  // saveSearchHistory,
   setShowSearch
 ]);
  // Add this useEffect hook to handle route updates
@@ -1798,12 +1866,11 @@ return (
   <View style={styles.container}>
     <MapView
       ref={mapRef}
-      
       style={styles.map}
       initialCamera={{
         center: {
-          latitude: nearestPolylinePoint?.latitude || location?.coords.latitude || 0,
-          longitude: nearestPolylinePoint?.longitude || location?.coords.longitude || 0,
+          latitude: 33.1096996205575,
+          longitude: -96.66076983204718,
         },
         pitch: 0,
         heading: 0,
@@ -1898,7 +1965,7 @@ return (
         </TouchableOpacity>
       </View>
     )}
-      {showHistory && (
+      {/* {showHistory && (
         <View style={styles.historyContainer}>
           {searchHistory.map((item, index) => (
             <TouchableOpacity key={index} onPress={() => handleSearch(item.query)}>
@@ -1906,7 +1973,7 @@ return (
             </TouchableOpacity>
           ))}
         </View>
-      )}
+      )} */}
       {isRouteActive && (
         <View style={styles.routeInfoContainer}>
           <Text style={styles.routeInfoText}>

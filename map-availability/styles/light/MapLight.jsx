@@ -178,23 +178,23 @@ export  const styles = StyleSheet.create({
     },
     historyContainer: {
       position: 'absolute',
-      top: 250,
+      top: 100, // Adjust based on your layout
       left: 20,
       right: 20,
-      backgroundColor: '#FFF',
-      borderColor: '#CCC',
-      borderWidth: 1,
-      zIndex: 1,
-      maxHeight: 200,
-      overflow: 'scroll',
+      backgroundColor: 'white',
+      borderRadius: 8,
+      padding: 10,
+      zIndex: 999,
+    },
+    historyItemContainer: {
+      flexDirection: 'row',
       alignItems: 'center',
-      borderRadius: 30
+      justifyContent: 'space-between',
+      padding: 10,
     },
     historyItem: {
-      padding: 10,
-      fontSize: 28,
-      color: '#000',
-      alignItems: 'center',
+      fontSize: 16,
+      color: '#333',
     },
     customMarker: {
       width: 20,

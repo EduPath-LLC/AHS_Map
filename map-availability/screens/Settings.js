@@ -10,8 +10,6 @@ import { auth } from '../firebase';
 import Loader from '../components/Loader';
 
 import AccountIcon from '../assets/images/Account_Icon.png';
-import NotificationIcon from '../assets/images/Notification_Icon.png';
-import AppearanceIcon from '../assets/images/Appearance_Icon.png';
 import HelpAndSupportIcon from '../assets/images/Help_And_Support_Icon.png';
 import AboutIcon from '../assets/images/About_Icon.png';
 import ArrowForward from '../assets/images/ArrowForward.png';
@@ -57,8 +55,6 @@ export default function Settings({ userId, navigation }) {
         )
     }
 
-    
-
     return (
         <View style={styles.fullScreen}>
             <WavyHeader 
@@ -77,30 +73,6 @@ export default function Settings({ userId, navigation }) {
                             style={styles.imageStyle}
                         />
                             <Text style={styles.buttonNewText}>Account</Text>
-                        <Image
-                            source={ArrowForward}
-                            style={styles.imageArrowStyle}
-                        />
-                    </Pressable>
-
-                    <Pressable style={styles.buttonNew} onPress={() => navigation.navigate("Notifications", {userId: userId})}>
-                        <Image
-                            source={NotificationIcon}
-                            style={styles.imageStyle}
-                        />
-                            <Text style={styles.buttonNewText}>Notifications</Text>
-                        <Image
-                            source={ArrowForward}
-                            style={styles.imageArrowStyle}
-                        />
-                    </Pressable>
-
-                    <Pressable style={styles.buttonNew} onPress={() => navigation.navigate("Appearance", {userId: userId})}>
-                        <Image
-                            source={AppearanceIcon}
-                            style={styles.imageStyle}
-                        />
-                            <Text style={styles.buttonNewText}>Appearance</Text>
                         <Image
                             source={ArrowForward}
                             style={styles.imageArrowStyle}
