@@ -8,6 +8,7 @@ import { styles } from '../styles/light/MapLight'
 import { useRoute } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Magnetometer } from 'expo-sensors';
+
 function isValidStaircasePair(point1, point2) {
   const isStaircase1 = point1.reference.startsWith('S');
   const isStaircase2 = point2.reference.startsWith('S');
@@ -20,7 +21,6 @@ function isValidStaircasePair(point1, point2) {
   return false;
 }
 
-
 function determineRealTurns(route) {
   const segments = [];
   let currentSegment = [route[0]];
@@ -31,36 +31,46 @@ function determineRealTurns(route) {
     const nextPoint = route[i];
     const nextFloor = getFloor(nextPoint);
 
-    // Only treat the staircase as a transition point if there's a valid staircase pair
+    // Handle staircase transitions
     if (isFloorChange(route[i - 1], nextPoint) && isValidStaircasePair(route[i - 1], nextPoint)) {
-      segments.push(currentSegment); // End the current segment
-
-      // Create a special staircase segment
+      segments.push(currentSegment);
       segments.push([route[i - 1], nextPoint]);
-
-      currentSegment = [nextPoint]; // Start a new segment on the new floor
+      currentSegment = [nextPoint];
       currentFloor = nextFloor;
 
-      // Update the bearing
+      // Reset bearing after floor change using next valid point on new floor
       if (i < route.length - 1) {
-        lastSignificantBearing = calculateBearing(nextPoint, route[i + 1]);
+        let lookAhead = i + 1;
+        // Find next non-staircase point to calculate bearing
+        while (lookAhead < route.length && route[lookAhead].reference.startsWith('S')) {
+          lookAhead++;
+        }
+        if (lookAhead < route.length) {
+          lastSignificantBearing = calculateBearing(nextPoint, route[lookAhead]);
+        }
       }
-    } else {
-      currentSegment.push(nextPoint); // Regular node behavior
+      continue;
+    }
 
-      if (i < route.length - 1) {
-        const newBearing = calculateBearing(nextPoint, route[i + 1]);
-        let bearingDifference = Math.abs(newBearing - lastSignificantBearing);
+    currentSegment.push(nextPoint);
 
-        if (bearingDifference > 180) {
-          bearingDifference = 360 - bearingDifference;
-        }
+    if (i < route.length - 1) {
+      const newBearing = calculateBearing(nextPoint, route[i + 1]);
+      let bearingDifference = Math.abs(newBearing - lastSignificantBearing);
 
-        if (bearingDifference >= 55 && bearingDifference <= 100) {
-          segments.push(currentSegment);
-          currentSegment = [nextPoint];
-          lastSignificantBearing = newBearing;
-        }
+      // Skip bearing difference check for staircase segments
+      if (route[i].reference.startsWith('S') || route[i+1].reference.startsWith('S')) {
+        continue;
+      }
+
+      if (bearingDifference > 180) {
+        bearingDifference = 360 - bearingDifference;
+      }
+
+      if (bearingDifference >= 55 && bearingDifference <= 120) {
+        segments.push(currentSegment);
+        currentSegment = [nextPoint];
+        lastSignificantBearing = newBearing;
       }
     }
   }
@@ -1979,7 +1989,7 @@ return (
         );
       }, [location]);
 
-      if (distance > 7050) {
+      if (distance > 7500) {
         return (
           <View style={styles.distanceOverlay}>
             <Text style={styles.distanceOverlayText}>
@@ -2054,3 +2064,441 @@ return (
   </View>
 );
 }
+
+// import React, { useState, useEffect } from 'react';
+// import { View, StyleSheet, TouchableOpacity, Text, TextInput } from 'react-native';
+// import Svg, { Line, Circle, Text as SvgText, G } from 'react-native-svg';
+
+// const MAP_WIDTH = 320;
+// const MAP_HEIGHT = 640;
+
+// // Floor configuration
+// const floors = {
+//   1: {
+//     points: [
+//       { id: 'A', x: -100, y: 200 },
+//       { id: 'B', x: 100, y: 200 },
+//       { id: 'C', x: 100, y: -200 },
+//       { id: 'D', x: -100, y: -200 },
+//       { id: 'E', x: 0, y: 0 }
+//     ],
+//     lines: [
+//       { from: 'A', to: 'B' },
+//       { from: 'B', to: 'C' },
+//       { from: 'C', to: 'D' },
+//       { from: 'D', to: 'A' },
+//       { from: 'E', to: 'A' },
+//       { from: 'E', to: 'B' },
+//       { from: 'E', to: 'C' },
+//       { from: 'E', to: 'D' }
+//     ]
+//   },
+//   2: {
+//     points: [
+//       { id: 'F', x: 0, y: 150 },
+//       { id: 'G', x: 100, y: -150 },
+//       { id: 'H', x: -100, y: -150 },
+//     ],
+//     lines: [
+//       { from: 'F', to: 'G' },
+//       { from: 'G', to: 'H' },
+//       { from: 'H', to: 'F' },
+//     ]
+//   }
+// };
+
+// // Pathfinding functions
+// function buildWeightedGraph(lines, points) {
+//   const graph = {};
+//   const pointMap = Object.fromEntries(points.map(p => [p.id, p]));
+
+//   lines.forEach(line => {
+//     const fromPoint = pointMap[line.from];
+//     const toPoint = pointMap[line.to];
+    
+//     const dx = fromPoint.x - toPoint.x;
+//     const dy = fromPoint.y - toPoint.y;
+//     const distance = Math.sqrt(dx * dx + dy * dy);
+
+//     if (!graph[line.from]) graph[line.from] = [];
+//     if (!graph[line.to]) graph[line.to] = [];
+    
+//     graph[line.from].push({ id: line.to, distance });
+//     graph[line.to].push({ id: line.from, distance });
+//   });
+  
+//   return graph;
+// }
+
+// function findShortestPath(graph, start, end) {
+//   const distances = {};
+//   const previous = {};
+//   const unvisited = new Set();
+
+//   Object.keys(graph).forEach(node => {
+//     distances[node] = Infinity;
+//     unvisited.add(node);
+//   });
+//   distances[start] = 0;
+
+//   while (unvisited.size > 0) {
+//     const current = Array.from(unvisited).reduce((minNode, node) => 
+//       distances[node] < distances[minNode] ? node : minNode
+//     );
+
+//     if (current === end) break;
+//     unvisited.delete(current);
+
+//     graph[current].forEach(neighbor => {
+//       const alt = distances[current] + neighbor.distance;
+//       if (alt < distances[neighbor.id]) {
+//         distances[neighbor.id] = alt;
+//         previous[neighbor.id] = current;
+//       }
+//     });
+//   }
+
+//   const path = [];
+//   let current = end;
+//   while (current !== undefined) {
+//     path.unshift(current);
+//     current = previous[current];
+//   }
+
+//   return path.length > 1 ? path : null;
+// }
+
+// // Navigation functions
+// function getRouteSegments(route, points) {
+//   const segments = [];
+//   if (route.length < 2) return segments;
+
+//   let currentSegment = [route[0]];
+  
+//   for (let i = 1; i < route.length; i++) {
+//     currentSegment.push(route[i]);
+//     if (i === route.length - 1) {
+//       segments.push(currentSegment);
+//     }
+//   }
+  
+//   return segments;
+// }
+
+// export default function MapScreen() {
+//   const [currentFloor, setCurrentFloor] = useState(1);
+//   const [startInput, setStartInput] = useState('');
+//   const [endInput, setEndInput] = useState('');
+//   const [route, setRoute] = useState([]);
+//   const [error, setError] = useState('');
+//   const [currentSegmentIndex, setCurrentSegmentIndex] = useState(0);
+//   const [rotationAngle, setRotationAngle] = useState(0);
+//   const [userPosition, setUserPosition] = useState(null);
+
+//   const { points, lines } = floors[currentFloor];
+//   const floorOnePoints = floors[1].points;
+//   const routeSegments = getRouteSegments(route, floorOnePoints);
+
+//   useEffect(() => {
+//     if (route.length > 0) {
+//       setCurrentSegmentIndex(0);
+//       updateRotationAndPosition(0);
+//     }
+//   }, [route]);
+
+//   const validatePoint = (input) => {
+//     return floorOnePoints.some(p => p.id === input.toUpperCase());
+//   };
+
+//   const calculateRoute = () => {
+//     setError('');
+//     const start = startInput.toUpperCase();
+//     const end = endInput.toUpperCase();
+    
+//     if (!validatePoint(start) || !validatePoint(end)) {
+//       setError('Invalid point ID');
+//       return;
+//     }
+  
+//     if (start === end) {
+//       setError('Start and end points are the same');
+//       setRoute([]);
+//       return;
+//     }
+  
+//     const graph = buildWeightedGraph(floors[1].lines, floors[1].points);
+//     const path = findShortestPath(graph, start, end);
+    
+//     if (!path) {
+//       setError('No path found');
+//       setRoute([]);
+//       return;
+//     }
+    
+//     setRoute(path);
+//   };
+
+//   const updateRotationAndPosition = (segmentIndex) => {
+//     if (routeSegments[segmentIndex]) {
+//       const segment = routeSegments[segmentIndex];
+//       const startPoint = floors[1].points.find(p => p.id === segment[0]);
+//       const endPoint = floors[1].points.find(p => p.id === segment[segment.length - 1]);
+      
+//       const dx = endPoint.x - startPoint.x;
+//       const dy = endPoint.y - startPoint.y;
+//       const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+//       setRotationAngle(-angle + 90);
+      
+//       setUserPosition(startPoint);
+//     }
+//   };
+
+//   const handleEndSegment = () => {
+//     if (currentSegmentIndex < routeSegments.length - 1) {
+//       const newIndex = currentSegmentIndex + 1;
+//       setCurrentSegmentIndex(newIndex);
+//       updateRotationAndPosition(newIndex);
+//     }
+//   };
+
+//   return (
+//     <View style={styles.container}>
+//       <TouchableOpacity 
+//         style={styles.floorButton} 
+//         onPress={() => setCurrentFloor(p => p === 1 ? 2 : 1)}
+//       >
+//         <Text style={styles.buttonText}>Switch to Floor {currentFloor === 1 ? 2 : 1}</Text>
+//       </TouchableOpacity>
+
+//       <View style={styles.mapContainer}>
+//         <View style={styles.mapBackground}>
+//           <Svg height="100%" width="100%" style={StyleSheet.absoluteFill}>
+//             <G
+//               rotation={rotationAngle}
+//               origin={`${MAP_WIDTH/2}, ${MAP_HEIGHT/2}`}
+//             >
+//               {/* Base lines */}
+//               {lines.map((line, i) => {
+//                 const from = points.find(p => p.id === line.from);
+//                 const to = points.find(p => p.id === line.to);
+//                 const start = convertCoordinate(from.x, from.y, MAP_WIDTH, MAP_HEIGHT);
+//                 const end = convertCoordinate(to.x, to.y, MAP_WIDTH, MAP_HEIGHT);
+                
+//                 return (
+//                   <Line
+//                     key={`line-${i}`}
+//                     stroke="#fff"
+//                     strokeWidth="2"
+//                     x1={start.x}
+//                     y1={start.y}
+//                     x2={end.x}
+//                     y2={end.y}
+//                   />
+//                 );
+//               })}
+
+//               {/* Full route */}
+//               {routeSegments.map((segment, i) => (
+//                 segment.slice(1).map((pointId, j) => {
+//                   const prevPoint = floorOnePoints.find(p => p.id === segment[j]);
+//                   const currentPoint = floorOnePoints.find(p => p.id === pointId);
+//                   const start = convertCoordinate(prevPoint.x, prevPoint.y, MAP_WIDTH, MAP_HEIGHT);
+//                   const end = convertCoordinate(currentPoint.x, currentPoint.y, MAP_WIDTH, MAP_HEIGHT);
+
+//                   return (
+//                     <Line
+//                       key={`route-${i}-${j}`}
+//                       stroke="#666"
+//                       strokeWidth="4"
+//                       x1={start.x}
+//                       y1={start.y}
+//                       x2={end.x}
+//                       y2={end.y}
+//                     />
+//                   );
+//                 })
+//               ))}
+
+//               {/* Active segment */}
+//               {routeSegments[currentSegmentIndex]?.slice(1).map((pointId, j) => {
+//                 const prevPoint = floorOnePoints.find(p => p.id === routeSegments[currentSegmentIndex][j]);
+//                 const currentPoint = floorOnePoints.find(p => p.id === pointId);
+//                 const start = convertCoordinate(prevPoint.x, prevPoint.y, MAP_WIDTH, MAP_HEIGHT);
+//                 const end = convertCoordinate(currentPoint.x, currentPoint.y, MAP_WIDTH, MAP_HEIGHT);
+
+//                 return (
+//                   <Line
+//                     key={`active-${j}`}
+//                     stroke="#00f"
+//                     strokeWidth="4"
+//                     x1={start.x}
+//                     y1={start.y}
+//                     x2={end.x}
+//                     y2={end.y}
+//                   />
+//                 );
+//               })}
+
+//               {/* User position */}
+//               {userPosition && (
+//                 <Circle
+//                   cx={convertCoordinate(userPosition.x, userPosition.y, MAP_WIDTH, MAP_HEIGHT).x}
+//                   cy={convertCoordinate(userPosition.x, userPosition.y, MAP_WIDTH, MAP_HEIGHT).y}
+//                   r="8"
+//                   fill="#00f"
+//                   stroke="#fff"
+//                   strokeWidth="2"
+//                 />
+//               )}
+
+//               {/* Points and labels */}
+//               {points.map((point, i) => {
+//                 const coord = convertCoordinate(point.x, point.y, MAP_WIDTH, MAP_HEIGHT);
+//                 return (
+//                   <React.Fragment key={`point-${i}`}>
+//                     <Circle cx={coord.x} cy={coord.y} r="5" fill="#fff" />
+//                     <SvgText
+//                       x={coord.x + 8}
+//                       y={coord.y - 8}
+//                       fill="#fff"
+//                       fontSize="12"
+//                       fontWeight="bold"
+//                     >
+//                       {point.id}
+//                     </SvgText>
+//                   </React.Fragment>
+//                 );
+//               })}
+//             </G>
+//           </Svg>
+//         </View>
+//       </View>
+
+//       {/* Controls */}
+//       <View style={styles.controls}>
+//         <Text style={styles.label}>Start Point:</Text>
+//         <TextInput
+//           style={styles.searchInput}
+//           placeholder="Enter start (A-E)"
+//           value={startInput}
+//           onChangeText={text => setStartInput(text.toUpperCase())}
+//           maxLength={1}
+//           autoCapitalize="characters"
+//         />
+
+//         <Text style={styles.label}>End Point:</Text>
+//         <TextInput
+//           style={styles.searchInput}
+//           placeholder="Enter end (A-E)"
+//           value={endInput}
+//           onChangeText={text => setEndInput(text.toUpperCase())}
+//           maxLength={1}
+//           autoCapitalize="characters"
+//         />
+
+//         {error ? <Text style={styles.errorText}>{error}</Text> : null}
+
+//         <TouchableOpacity
+//           style={[styles.searchButton, (!startInput || !endInput) && styles.disabledButton]}
+//           onPress={calculateRoute}
+//           disabled={!startInput || !endInput}
+//         >
+//           <Text style={styles.buttonText}>Find Route</Text>
+//         </TouchableOpacity>
+
+//         <TouchableOpacity
+//           style={[styles.segmentButton, !route.length && styles.disabledButton]}
+//           onPress={handleEndSegment}
+//           disabled={!route.length}
+//         >
+//           <Text style={styles.buttonText}>Next Segment</Text>
+//         </TouchableOpacity>
+//       </View>
+//     </View>
+//   );
+// }
+
+// // utils.js
+// export const convertCoordinate = (x, y, containerWidth, containerHeight) => {
+//   return {
+//     x: (x + containerWidth/2),
+//     y: (containerHeight/2 - y)
+//   };
+// };
+
+// const styles = StyleSheet.create({
+//   container: {
+//     flex: 1,
+//     backgroundColor: '#fff',
+//     paddingTop: 50
+//   },
+//   mapContainer: {
+//     width: 320,
+//     height: 640,
+//     alignSelf: 'center',
+//     marginTop: 20
+//   },
+//   mapBackground: {
+//     flex: 1,
+//     backgroundColor: 'black',
+//     borderRadius: 8
+//   },
+//   floorButton: {
+//     position: 'absolute',
+//     top: 10,
+//     alignSelf: 'center',
+//     backgroundColor: '#2196F3',
+//     paddingVertical: 10,
+//     paddingHorizontal: 20,
+//     borderRadius: 20,
+//     zIndex: 1
+//   },
+//   controls: {
+//     position: 'absolute',
+//     bottom: 20,
+//     left: 20,
+//     right: 20,
+//     backgroundColor: 'rgba(51, 51, 51, 0.9)',
+//     borderRadius: 10,
+//     padding: 15
+//   },
+//   searchInput: {
+//     backgroundColor: '#fff',
+//     padding: 12,
+//     borderRadius: 8,
+//     marginBottom: 15,
+//     fontSize: 16
+//   },
+//   searchButton: {
+//     backgroundColor: '#4CAF50',
+//     padding: 15,
+//     borderRadius: 8,
+//     alignItems: 'center'
+//   },
+//   segmentButton: {
+//     backgroundColor: '#FF5722',
+//     padding: 15,
+//     borderRadius: 8,
+//     alignItems: 'center',
+//     marginTop: 10
+//   },
+//   disabledButton: {
+//     opacity: 0.5
+//   },
+//   buttonText: {
+//     color: 'white',
+//     fontWeight: 'bold',
+//     fontSize: 16
+//   },
+//   label: {
+//     color: '#fff',
+//     marginBottom: 5,
+//     fontWeight: 'bold'
+//   },
+//   errorText: {
+//     color: '#ff4444',
+//     textAlign: 'center',
+//     marginBottom: 10
+//   }
+// });
+
