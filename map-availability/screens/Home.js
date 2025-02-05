@@ -10,7 +10,6 @@ import HomeCarousel from '../components/cards/HomeCarousel';
 
 export default function Home({userId, navigation}) {
   const [firstName, setFirstName] = useState('');
-  const [darkMode, setDarkMode] = useState(false);
   let styles = stylesLight;
 
   useEffect(() => {
@@ -23,13 +22,6 @@ export default function Home({userId, navigation}) {
           if (userDocSnap.exists()) {
             const userData = userDocSnap.data();
             setFirstName(userData.firstName);
-
-            if(userData.dark) {
-              setDarkMode(true)
-            } else {
-              setDarkMode(false)
-            }
-
           } else {
             console.log('No such document!');
           }

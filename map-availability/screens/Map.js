@@ -5,7 +5,7 @@ import { LocationContext } from '../components/providers/LocationContext';
 import {FontAwesome6, FontAwesome} from '@expo/vector-icons';
 import { debounce } from 'lodash';
 import { styles } from '../styles/light/MapLight'
-import { useRoute } from '@react-navigation/native';
+import { useRoute, useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Magnetometer } from 'expo-sensors';
 function isValidStaircasePair(point1, point2) {
@@ -1251,6 +1251,26 @@ const [showSearch, setShowSearch] = useState(true);
 // Add to your state variables
 const [directionsList, setDirectionsList] = useState([]);
 
+const route_navigation = useRoute();
+const { targetRoom, prevRoom } = route_navigation.params || {}; 
+console.log(targetRoom, prevRoom)
+
+useEffect(() => {
+  if (targetRoom && prevRoom) {
+    setStartingPointQuery(targetRoom);
+    setSearchQuery(prevRoom);
+  }
+}, [targetRoom, prevRoom]);
+
+useEffect(() => {
+  if (startingPointQuery && searchQuery) {
+    handleSearch();
+  }
+}, [startingPointQuery, searchQuery]);
+
+
+
+
 
 const handleEndSegment = useCallback(() => {
   if (currentSegmentIndex < routeSegments.length - 1) {
@@ -1430,6 +1450,7 @@ const getFirstHeadingDirection = useCallback(() => {
 
 
 const getDirectionGuidance = useCallback(() => {
+  console.log(directions.text);
   const nextSegmentIndex = currentSegmentIndex + 1;
   const nextSegment = routeSegments[nextSegmentIndex];
   const currentSegment = routeSegments[currentSegmentIndex];
