@@ -13,6 +13,7 @@ import AccountIcon from '../assets/images/Account_Icon.png';
 import HelpAndSupportIcon from '../assets/images/Help_And_Support_Icon.png';
 import AboutIcon from '../assets/images/About_Icon.png';
 import ArrowForward from '../assets/images/ArrowForward.png';
+import PrivacyPolicyIcon from '../assets/images/Privacy_Policy_Icon.png';
 
 export default function Settings({ userId, navigation }) {
     const [darkMode, setDarkMode] = useState(false);
@@ -85,6 +86,18 @@ export default function Settings({ userId, navigation }) {
                             style={styles.imageStyle}
                         />
                             <Text style={styles.buttonNewText}>Help and Support</Text>
+                        <Image
+                            source={ArrowForward}
+                            style={styles.imageArrowStyle}
+                        />
+                    </Pressable>
+
+                    <Pressable style={styles.buttonNew} onPress={() => navigation.navigate("PrivacyPolicy", {userId: userId})}>
+                        <Image
+                            source={PrivacyPolicyIcon}
+                            style={styles.imageStyle}
+                        />
+                            <Text style={styles.buttonNewText}>Privacy Policy</Text>
                         <Image
                             source={ArrowForward}
                             style={styles.imageArrowStyle}

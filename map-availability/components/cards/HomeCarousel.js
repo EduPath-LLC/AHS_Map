@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import { View, Text, Pressable, Image, Alert } from 'react-native';
 import { getDocs, collection } from 'firebase/firestore';
 import { db } from '../../firebase';
-import { PanGestureHandler, State } from 'react-native-gesture-handler';
+import { PanGestureHandler, State, TextInput } from 'react-native-gesture-handler';
+import dayData from '../../assets/schedule/day.json';
 
 import { stylesLight } from '../../styles/light/HomeCarouselLight';
 // import { stylesDark } from '../../styles/dark/HomeCarouselDark';
@@ -32,11 +33,18 @@ export default class HomeCarousel extends Component {
             arrowBack: this.props.dark ? ArrowBackDark : ArrowBack,
             arrowForward: this.props.dark ? ArrowForwardDark : ArrowForward,
             styles: stylesLight,
+            goToClass: false,
+            ab: "",
+            school: false,
+            previousRoom: "",
         };
     }
 
     componentDidMount() {
         this.fetchSchedule(this.props.userId);
+        const today = new Date().toISOString().split('T')[0];
+        const todayEntry = dayData[today];
+        this.setState({ab: todayEntry, school: true})
     }
 
     fetchSchedule = async (userId) => {
@@ -166,17 +174,27 @@ export default class HomeCarousel extends Component {
     }
 
     renderCarousel = (current) => {
-        const scheduleMap = {
-            1: this.state.first,
-            2: this.state.second,
-            3: this.state.third,
-            4: this.state.fourth,
-            5: this.state.fifth,
-            6: this.state.sixth,
-            7: this.state.seventh,
-            8: this.state.eighth,
-            9: this.state.lunch,
-        };
+        var scheduleMap;
+
+        if(this.state.ab == "A"){
+            scheduleMap = {
+                1: this.state.first,
+                2: this.state.second,
+                3: this.state.third,
+                4: this.state.fourth,
+                5: this.state.eighth,
+                6: this.state.lunch,
+            }
+        } else {
+            scheduleMap = {
+                1: this.state.first,
+                2: this.state.fifth,
+                3: this.state.sixth,
+                4: this.state.seventh,
+                5: this.state.eighth,
+                6: this.state.lunch,
+            }
+        }
 
         const scheduleItem = scheduleMap[current];
 
@@ -191,7 +209,7 @@ export default class HomeCarousel extends Component {
 
     increase = () => {
         this.setState(prevState => ({
-            current: prevState.current < 9 ? prevState.current + 1 : prevState.current
+            current: prevState.current < 6 ? prevState.current + 1 : prevState.current
         }));
     }
 
@@ -202,21 +220,36 @@ export default class HomeCarousel extends Component {
     }
 
     handleSubmit = () => {
-        const scheduleMap = {
-            1: this.state.first,
-            2: this.state.second,
-            3: this.state.third,
-            4: this.state.fourth,
-            5: this.state.fifth,
-            6: this.state.sixth,
-            7: this.state.seventh,
-            8: this.state.eighth,
-            9: this.state.lunch,
-        };
+        var scheduleMap;
+
+        if(this.state.ab == "A"){
+            scheduleMap = {
+                1: this.state.first,
+                2: this.state.second,
+                3: this.state.third,
+                4: this.state.fourth,
+                5: this.state.eighth,
+                6: this.state.lunch,
+            }
+        } else {
+            scheduleMap = {
+                1: this.state.first,
+                2: this.state.fifth,
+                3: this.state.sixth,
+                4: this.state.seventh,
+                5: this.state.eighth,
+                6: this.state.lunch,
+            }
+        }
 
         const roomNumber = scheduleMap[this.state.current].roomNumber;
-        Alert.alert('Navigating to room', `Room number: ${roomNumber}`);
-        this.props.navigation.navigate('Map', { roomNumber: roomNumber });
+        // console.log(roomNumber);
+        const prevRoom = this.state.previousRoom;
+        // console.log(prevRoom);
+
+        this.setState({goToClass: false})
+
+        this.props.navigation.navigate("Map", { targetRoom: roomNumber, prevRoom: prevRoom });
     }
 
     handleSwipe = ({ nativeEvent }) => {
@@ -229,7 +262,45 @@ export default class HomeCarousel extends Component {
         }
     };
 
+    handleGoToClass = () => {
+        this.setState({goToClass: true})
+        var scheduleMap;
+
+        if(this.state.ab == "A"){
+            scheduleMap = {
+                1: this.state.first,
+                2: this.state.second,
+                3: this.state.third,
+                4: this.state.fourth,
+                5: this.state.eighth,
+                6: this.state.lunch,
+            }
+        } else {
+            scheduleMap = {
+                1: this.state.first,
+                2: this.state.fifth,
+                3: this.state.sixth,
+                4: this.state.seventh,
+                5: this.state.eighth,
+                6: this.state.lunch,
+            }
+        }
+
+        if(this.state.current != 1){
+            const prevRoom = scheduleMap[this.state.current-1].roomNumber;
+            this.setState({previousRoom: prevRoom});
+        }
+    }
+
     render() {
+        if (!this.state.school) {
+            return (
+                <View>
+                    <Text style={this.state.styles.noSchool}> Yay, Looks like there is not school today! </Text>
+                </View>
+            );
+        }
+    
         return (
             <View>
                 <View style={this.state.styles.viewer}>
@@ -242,13 +313,13 @@ export default class HomeCarousel extends Component {
                             source={this.state.arrowBack}
                         />
                     </Pressable>
-
+    
                     <PanGestureHandler onHandlerStateChange={this.handleSwipe}>
                         <View>
                             {this.renderCarousel(this.state.current)}
                         </View>
                     </PanGestureHandler>
-
+    
                     <Pressable 
                         onPress={this.increase}
                         style={this.state.styles.arrows}
@@ -259,14 +330,40 @@ export default class HomeCarousel extends Component {
                         />
                     </Pressable>
                 </View>
-
+    
                 <Pressable 
                     style={this.state.styles.button}
-                    onPress={this.handleSubmit}
+                    onPress={this.handleGoToClass}
                 >
                     <Text style={this.state.styles.buttonText}> Go To Class </Text>
                 </Pressable>
+    
+                {this.state.goToClass ? 
+                    <View style={this.state.styles.modalBackground}>
+                        <Text style={this.state.styles.classHeading}> Go To Class </Text>
+                        <View style={this.state.styles.inputClass}>
+                            <Text style={this.state.styles.from}> From: </Text>
+                            <TextInput style={this.state.styles.classInput}> {this.state.previousRoom} </TextInput>
+                        </View>
+                        <Pressable 
+                            style={this.state.styles.button}
+                            onPress={this.handleSubmit}
+                        >
+                            <Text style={this.state.styles.buttonText}> Go </Text>
+                        </Pressable>
+                        <Pressable 
+                            style={this.state.styles.buttonCancel}
+                            onPress={() => {this.setState({goToClass: false})}}
+                        >
+                            <Text style={this.state.styles.buttonText}> Cancel </Text>
+                        </Pressable>
+                    </View> 
+                    : 
+                    <View>
+                    </View>
+                }
             </View>
         );
     }
+    
 }
