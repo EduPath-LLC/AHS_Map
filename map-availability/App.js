@@ -13,6 +13,7 @@ import Notifications from './screens/Notifications.js'
 import Appearance from './screens/Appearance.js';
 import HelpAndSupport from './screens/HelpAndSupport.js'
 import About from './screens/About.js'
+import PrivacyPolicy from './screens/PrivacyPolicy.js'
 
 const Stack = createStackNavigator();
 
@@ -31,6 +32,7 @@ const MainNavigator = () => (
     <Stack.Screen name="Appearance" component={Appearance} />
     <Stack.Screen name="HelpAndSupport" component={HelpAndSupport} />
     <Stack.Screen name="About" component={About} />
+    <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicy} />
   </Stack.Navigator>
 );
 
