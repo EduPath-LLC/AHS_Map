@@ -1253,7 +1253,6 @@ const [directionsList, setDirectionsList] = useState([]);
 
 const route_navigation = useRoute();
 const { targetRoom, prevRoom } = route_navigation.params || {}; 
-console.log(targetRoom, prevRoom)
 
 useEffect(() => {
   if (targetRoom && prevRoom) {
