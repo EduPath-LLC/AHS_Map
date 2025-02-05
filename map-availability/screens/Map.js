@@ -8,7 +8,6 @@ import { styles } from '../styles/light/MapLight'
 import { useRoute } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Magnetometer } from 'expo-sensors';
-
 function isValidStaircasePair(point1, point2) {
   const isStaircase1 = point1.reference.startsWith('S');
   const isStaircase2 = point2.reference.startsWith('S');
@@ -16,7 +15,7 @@ function isValidStaircasePair(point1, point2) {
   if (isStaircase1 && isStaircase2) {
     const pair1 = point1.reference.split('_')[1];
     const pair2 = point2.reference.split('_')[1];
-    return pair1 === pair2; // Valid pair if numbers after "_" are the same
+    return pair1 === pair2;
   }
   return false;
 }
@@ -27,46 +26,63 @@ function determineRealTurns(route) {
   let lastSignificantBearing = calculateBearing(route[0], route[1]);
   let currentFloor = getFloor(route[0]);
 
+  const isActiveStaircasePair = (i) => {
+    if (i < 0 || i >= route.length - 1) return false;
+    const curr = route[i];
+    const next = route[i + 1];
+    return isValidStaircasePair(curr, next) && isFloorChange(curr, next);
+  };
+
   for (let i = 1; i < route.length; i++) {
+    const currentPoint = route[i - 1];
     const nextPoint = route[i];
-    const nextFloor = getFloor(nextPoint);
 
-    // Handle staircase transitions
-    if (isFloorChange(route[i - 1], nextPoint) && isValidStaircasePair(route[i - 1], nextPoint)) {
-      segments.push(currentSegment);
-      segments.push([route[i - 1], nextPoint]);
-      currentSegment = [nextPoint];
-      currentFloor = nextFloor;
+    // Handle active staircase pairs
+    if (isActiveStaircasePair(i - 1)) {
+      // Split the current segment before the stairs
+      if (currentSegment.length > 0) {
+        segments.push(currentSegment);
+        currentSegment = [];
+      }
 
-      // Reset bearing after floor change using next valid point on new floor
-      if (i < route.length - 1) {
-        let lookAhead = i + 1;
-        // Find next non-staircase point to calculate bearing
-        while (lookAhead < route.length && route[lookAhead].reference.startsWith('S')) {
-          lookAhead++;
-        }
-        if (lookAhead < route.length) {
-          lastSignificantBearing = calculateBearing(nextPoint, route[lookAhead]);
-        }
+      // Create staircase segment
+      const staircaseSegment = [currentPoint, nextPoint];
+      segments.push(staircaseSegment);
+
+      // Find next non-staircase point
+      let lookAhead = i + 1;
+      while (lookAhead < route.length && route[lookAhead].reference.startsWith('S')) {
+        lookAhead++;
+      }
+
+      // Update index to skip processed staircase points
+      i = lookAhead - 1; // -1 because loop will increment
+
+      // Start new segment with next point after stairs
+      if (lookAhead < route.length) {
+        currentSegment = [route[lookAhead - 1]];
+        currentFloor = getFloor(route[lookAhead - 1]);
+        lastSignificantBearing = calculateBearing(
+          route[lookAhead - 1], 
+          route[lookAhead] || route[lookAhead - 1]
+        );
       }
       continue;
     }
 
+    // Regular point processing
     currentSegment.push(nextPoint);
 
-    if (i < route.length - 1) {
+    // Calculate bearing difference for non-staircase points
+    if (i < route.length - 1 && !nextPoint.reference.startsWith('S')) {
       const newBearing = calculateBearing(nextPoint, route[i + 1]);
       let bearingDifference = Math.abs(newBearing - lastSignificantBearing);
-
-      // Skip bearing difference check for staircase segments
-      if (route[i].reference.startsWith('S') || route[i+1].reference.startsWith('S')) {
-        continue;
-      }
-
+      
       if (bearingDifference > 180) {
         bearingDifference = 360 - bearingDifference;
       }
 
+      // Split segment on significant turn
       if (bearingDifference >= 55 && bearingDifference <= 120) {
         segments.push(currentSegment);
         currentSegment = [nextPoint];
@@ -81,7 +97,6 @@ function determineRealTurns(route) {
 
   return segments;
 }
-
 // Helper function to determine the floor of a point
 function getFloor(point) {
   return point.reference.startsWith('S1') || point.reference.startsWith('1') ? 1 : 2;
@@ -89,9 +104,8 @@ function getFloor(point) {
 
 // Helper function to determine if there's a floor change
 function isFloorChange(point1, point2) {
-  const isS1 = point1.reference.startsWith('S1') || point2.reference.startsWith('S1');
-  const isS2 = point1.reference.startsWith('S2') || point2.reference.startsWith('S2');
-  return isS1 && isS2;
+  return (point1.reference.startsWith('S1') && point2.reference.startsWith('S2')) ||
+         (point1.reference.startsWith('S2') && point2.reference.startsWith('S1'));
 }
 
 
