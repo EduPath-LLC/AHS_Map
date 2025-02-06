@@ -351,7 +351,13 @@ export default class HomeCarousel extends Component {
                         <Text style={this.state.styles.classHeading}> Go To Class </Text>
                         <View style={this.state.styles.inputClass}>
                             <Text style={this.state.styles.from}> From: </Text>
-                            <TextInput style={this.state.styles.classInput}> {this.state.previousRoom} </TextInput>
+                            <TextInput
+                                style={this.state.styles.classInput}
+                                placeholder="Class"
+                                value={this.state.previousRoom}
+                                onChangeText={(text) => this.setState({ previousRoom: text })}
+                                />
+
                         </View>
                         <Pressable 
                             style={this.state.styles.button}

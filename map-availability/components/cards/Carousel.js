@@ -3,7 +3,7 @@ import { View, Text, Alert, Image, Pressable, KeyboardAvoidingView, Platform } f
 import { doc, getDocs, collection, setDoc, docRef, updateDoc } from 'firebase/firestore';
 import { db } from '../../firebase'
 
-import { styles } from '../../styles/light/CarouselLight'
+import { stylesLight } from '../../styles/light/CarouselLight'
 
 import Loader from '../Loader';
 import CardInputs from './CardInputs';
@@ -274,18 +274,18 @@ export default class Carousel extends Component {
 
     render() {
         return (
-            <View style={styles.container}>
+            <View style={stylesLight.container}>
                 {this.state.loading? 
                 ( <Loader /> ) :
                 (
                     <View>
-                        <View style={styles.viewer}>
+                        <View style={stylesLight.viewer}>
                             <Pressable 
                                 onPress={this.decrease}
-                                style={styles.arrows}
+                                style={stylesLight.arrows}
                             >
                                 <Image 
-                                    style={styles.image}
+                                    style={stylesLight.image}
                                     source={this.state.arrowBack}
                                 />
                             </Pressable>
@@ -294,20 +294,20 @@ export default class Carousel extends Component {
 
                             <Pressable 
                                 onPress={this.increase}
-                                style={styles.arrows}
+                                style={stylesLight.arrows}
                             >
                                 <Image 
-                                    style={styles.image}
+                                    style={stylesLight.image}
                                     source={this.state.arrowForward}
                                 />
                             </Pressable>
                         </View>
 
                         <Pressable 
-                            style={styles.button}
+                            style={stylesLight.button}
                             onPress={this.handleSubmit}
                         >
-                            <Text style={styles.buttonText}> Finish </Text>
+                            <Text style={stylesLight.buttonText}> Finish </Text>
                         </Pressable>
                     </View>
             )}

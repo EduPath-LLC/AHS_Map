@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { View, Text, TextInput, KeyboardAvoidingView, Platform } from 'react-native'
-import { styles } from '../../styles/light/CardInputsLight'
+import { stylesLight } from '../../styles/light/CardInputsLight'
 import { Dropdown } from 'react-native-element-dropdown';
 import { validateBBox } from '@turf/turf';
 
@@ -78,15 +78,15 @@ export default class CardInputs extends Component {
         if(this.state.arr.id != 'Lunch'){
             return (
 
-                <View style={styles.card}>
-                    <Text style={styles.period}> {this.state.arr.id} Period </Text>
+                <View style={stylesLight.card}>
+                    <Text style={stylesLight.period}> {this.state.arr.id} Period </Text>
 
 
 
                     <Dropdown
-                        style={styles.dropdown}
-                        placeholderStyle={styles.placeholderStyle}
-                        selectedTextStyle={styles.selectedTextStyle}
+                        style={stylesLight.dropdown}
+                        placeholderStyle={stylesLight.placeholderStyle}
+                        selectedTextStyle={stylesLight.selectedTextStyle}
                         data={this.state.classOptions}
                         labelField="label"
                         valueField="value"
@@ -97,9 +97,9 @@ export default class CardInputs extends Component {
                     />
 
                     <Dropdown
-                        style={styles.dropdown}
-                        placeholderStyle={styles.placeholderStyle}
-                        selectedTextStyle={styles.selectedTextStyle}
+                        style={stylesLight.dropdown}
+                        placeholderStyle={stylesLight.placeholderStyle}
+                        selectedTextStyle={stylesLight.selectedTextStyle}
                         data={this.state.teacherOptions}
                         labelField="label"
                         valueField="value"
@@ -110,9 +110,9 @@ export default class CardInputs extends Component {
                     />
 
                     <Dropdown
-                        style={styles.dropdown}
-                        placeholderStyle={styles.placeholderStyle}
-                        selectedTextStyle={styles.selectedTextStyle}
+                        style={stylesLight.dropdown}
+                        placeholderStyle={stylesLight.placeholderStyle}
+                        selectedTextStyle={stylesLight.selectedTextStyle}
                         data={this.state.buildingOptions}
                         labelField="label"
                         valueField="value"
@@ -122,9 +122,9 @@ export default class CardInputs extends Component {
                     />
 
                     <Dropdown
-                        style={styles.dropdown}
-                        placeholderStyle={styles.placeholderStyle}
-                        selectedTextStyle={styles.selectedTextStyle}
+                        style={stylesLight.dropdown}
+                        placeholderStyle={stylesLight.placeholderStyle}
+                        selectedTextStyle={stylesLight.selectedTextStyle}
                         data={this.state.roomOptions}
                         labelField="label"
                         valueField="value"
@@ -138,19 +138,19 @@ export default class CardInputs extends Component {
             );
         } else {
             return(
-                <View style={styles.card}>
-                    <Text style={styles.period}> {this.state.arr.id} </Text>
+                <View style={stylesLight.card}>
+                    <Text style={stylesLight.period}> {this.state.arr.id} </Text>
 
                     {/* <TextInput
-                        style={styles.input}
+                        style={stylesLight.input}
                         placeholder="A Day Lunch"
                         value={this.state.arr.a_day}
                         onChangeText={(value) => this.handleInputChange('a_day', value)}
                     /> */}
                     <Dropdown
-                        style={styles.dropdown}
-                        placeholderStyle={styles.placeholderStyle}
-                        selectedTextStyle={styles.selectedTextStyle}
+                        style={stylesLight.dropdown}
+                        placeholderStyle={stylesLight.placeholderStyle}
+                        selectedTextStyle={stylesLight.selectedTextStyle}
                         data={this.state.lunchOptions}
                         labelField="label"
                         valueField="value"
@@ -160,9 +160,9 @@ export default class CardInputs extends Component {
                     />
 
                     <Dropdown
-                        style={styles.dropdown}
-                        placeholderStyle={styles.placeholderStyle}
-                        selectedTextStyle={styles.selectedTextStyle}
+                        style={stylesLight.dropdown}
+                        placeholderStyle={stylesLight.placeholderStyle}
+                        selectedTextStyle={stylesLight.selectedTextStyle}
                         data={this.state.lunchOptions}
                         labelField="label"
                         valueField="value"

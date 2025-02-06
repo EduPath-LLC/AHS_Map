@@ -8,6 +8,7 @@ const height = Dimensions.get('window').height * 0.01;
 
 export const stylesLight = StyleSheet.create({
     container: {
+        display: 'flex'
     },
     viewer: {
         flexDirection: 'row'
