@@ -117,7 +117,7 @@ const firstFloorCoordinates = [
     { latitude: 33.109768672191244, longitude: -96.66105221607514, reference: 'CAFE' },
     { latitude: 33.11002453134270951, longitude: -96.66066677016860353, reference: 'ENTRANCE' },
     { latitude: 33.109768672191244, longitude: -96.66105221607516, reference: 'MID' },
-    { latitude: 33.109549184264225, longitude: -96.6608491206446, reference: 'F135' },
+    { latitude: 33.109549184264225, longitude: -96.6608491206446, reference: 'S1_1' },
     { latitude: 33.10945194354582, longitude: -96.66100404668036, reference: 'F MID' },
     { latitude: 33.109483345573686, longitude: -96.66103270225616, reference: 'F105' },
     { latitude: 33.10954345131491, longitude: -96.66108818354715, reference: 'CORNER' },
@@ -167,7 +167,7 @@ const firstFloorCoordinates = [
     { latitude: 33.10937929679408, longitude: -96.66093665884165, reference: 'F164' },
     { latitude: 33.10941692859606, longitude: -96.66097139530632, reference: 'F165' },
     { latitude: 33.10945194354582, longitude: -96.66100404668036, reference: 'F MID' },
-    { latitude: 33.10954918426422, longitude: -96.66084912064460, reference: 'F135' },
+    { latitude: 33.10954918426422, longitude: -96.66084912064460, reference: 'S1_1' },
     { latitude: 33.10934693614330, longitude: -96.66066226859509, reference: 'S1_14' },
     { latitude: 33.10944234865774, longitude: -96.66051814553069, reference: 'A MID' },
     { latitude: 33.10949115105158, longitude: -96.66056318284635, reference: 'A134' },
@@ -217,7 +217,7 @@ const firstFloorCoordinates = [
     { latitude: 33.10861239099607, longitude: -96.66139400573383, reference: 'G127' },
     { latitude: 33.10853146243038, longitude: -96.66151635819290, reference: 'G128' },
     { latitude: 33.10851678364739, longitude: -96.66153855042106, reference: 'S1_5' },
-    { latitude: 33.10835308826282, longitude: -96.66138774313453, reference: 'F135' },
+    { latitude: 33.10835308826282, longitude: -96.66138774313453, reference: 'S1_1' },
     { latitude: 33.10836926588401, longitude: -96.66136322952454, reference: 'G138' },
     { latitude: 33.10841888660577, longitude: -96.66128804028583, reference: 'G139' },
     { latitude: 33.10844886016316, longitude: -96.66124262198313, reference: 'G140' },
@@ -268,7 +268,7 @@ const secondFloorCoordinates = [
 
   { latitude: 33.109971381724904, longitude: -96.66130147923262, reference: '2MAINHALL' },
   { latitude: 33.10952242109021, longitude: -96.66088922805024, reference: '2FENTRANCE' },
-  { latitude: 33.109545215126175, longitude: -96.66085454284246, reference: 'F235' },
+  { latitude: 33.109545215126175, longitude: -96.66085454284246, reference: 'S2_1' },
   { latitude: 33.10956921622493, longitude: -96.66081717996883, reference: '2ENTRANCE' },
   { latitude: 33.10945468699747, longitude: -96.66099546935033, reference: '2F MID FRONT' },
   { latitude: 33.10954500167219, longitude: -96.66108226076537, reference: 'F207' },
@@ -294,7 +294,7 @@ const secondFloorCoordinates = [
   { latitude: 33.10896764835255, longitude: -96.66196212422827, reference: 'S2_20' },
   { latitude: 33.10880219053123, longitude: -96.661809713627, reference: 'S2_30' },
   { latitude: 33.10885407349071, longitude: -96.66173080754453, reference: 'F234' },
-  { latitude: 33.1088667511467, longitude: -96.66171152675986, reference: 'F235' },
+  { latitude: 33.1088667511467, longitude: -96.66171152675986, reference: 'S2_1' },
   { latitude: 33.10887335684002, longitude: -96.661701480506, reference: 'F236' },
   { latitude: 33.108949273233236, longitude: -96.66158602322979, reference: 'F238' },
   { latitude: 33.10896128996865, longitude: -96.66156774760472, reference: 'F239' },
@@ -343,7 +343,7 @@ const secondFloorCoordinates = [
   { latitude: 33.108581705223514, longitude: -96.66144327508565, reference: "G227" },
   { latitude: 33.10853124877592, longitude: -96.66152020270945, reference: "G228" },
   { latitude: 33.10851308693722, longitude: -96.66154789286921, reference: "S2_5" },
-  { latitude: 33.10834535768775, longitude: -96.6613946199867, reference: "F235" },
+  { latitude: 33.10834535768775, longitude: -96.6613946199867, reference: "S2_1" },
   { latitude: 33.1083641486784, longitude: -96.66136620875649, reference: "G236" },
   { latitude: 33.10841559016205, longitude: -96.66128790580876, reference: "G237" },
   { latitude: 33.10844641688495, longitude: -96.66124098213743, reference: "G238" },
@@ -1244,7 +1244,7 @@ return { currentSegment, progress, currentBearing, nextBearing };
 
 
 
-export default function Map({userId}) {
+export default function Map({userId, navigation}) {
 const { location, errorMsg } = useContext(LocationContext);
 const [estimatedTime, setEstimatedTime] = useState(0);
 const mapRef = useRef(null);
@@ -1276,7 +1276,8 @@ const [showSearch, setShowSearch] = useState(true);
 const [directionsList, setDirectionsList] = useState([]);
 
 const route_navigation = useRoute();
-const { targetRoom, prevRoom } = route_navigation.params || {}; 
+const { targetRoom, prevRoom } = route_navigation.params || {};
+
 
 useEffect(() => {
   if (targetRoom && prevRoom) {
@@ -1286,8 +1287,9 @@ useEffect(() => {
 }, [targetRoom, prevRoom]);
 
 useEffect(() => {
-  if (startingPointQuery && searchQuery) {
+  if (startingPointQuery && searchQuery && targetRoom) {
     handleSearch();
+    navigation.setParams({ targetRoom: undefined, prevRoom: undefined });
   }
 }, [startingPointQuery, searchQuery]);
 

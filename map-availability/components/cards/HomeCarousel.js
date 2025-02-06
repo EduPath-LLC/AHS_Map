@@ -42,9 +42,17 @@ export default class HomeCarousel extends Component {
 
     componentDidMount() {
         this.fetchSchedule(this.props.userId);
-        const today = new Date().toISOString().split('T')[0];
-        const todayEntry = dayData[today];
+        const options = { timeZone: "America/Chicago", year: "numeric", month: "2-digit", day: "2-digit" };
+        const centralTime = new Date().toLocaleDateString("en-US", options);
+        
+        const [month, day, year] = centralTime.split("/");
+        const formattedDate = `${year}-${month}-${day}`;
+        const todayEntry = dayData[formattedDate];
+        console.log(todayEntry)
         this.setState({ab: todayEntry, school: true})
+
+        
+
     }
 
     fetchSchedule = async (userId) => {
