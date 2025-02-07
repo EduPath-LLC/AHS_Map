@@ -18,85 +18,85 @@ function isValidStaircasePair(point1, point2) {
     return pair1 === pair2;
   }
   return false;
-}
-
-function determineRealTurns(route) {
+}function determineRealTurns(route) {
   const segments = [];
   let currentSegment = [route[0]];
   let lastSignificantBearing = calculateBearing(route[0], route[1]);
   let currentFloor = getFloor(route[0]);
 
   const isActiveStaircasePair = (i) => {
-    if (i < 0 || i >= route.length - 1) return false;
-    const curr = route[i];
-    const next = route[i + 1];
-    return isValidStaircasePair(curr, next) && isFloorChange(curr, next);
+      if (i < 0 || i >= route.length - 1) return false;
+      const curr = route[i];
+      const next = route[i + 1];
+      // Check for both upward and downward floor changes
+      return isValidStaircasePair(curr, next) && isFloorChange(curr, next);
   };
 
   for (let i = 1; i < route.length; i++) {
-    const currentPoint = route[i - 1];
-    const nextPoint = route[i];
+      const currentPoint = route[i - 1];
+      const nextPoint = route[i];
 
-    // Handle active staircase pairs
-    if (isActiveStaircasePair(i - 1)) {
-      // Split the current segment before the stairs
-      if (currentSegment.length > 0) {
-        segments.push(currentSegment);
-        currentSegment = [];
+      // Handle active staircase pairs for both up and down floor changes
+      if (isActiveStaircasePair(i - 1)) {
+          // Split the current segment before the stairs
+          if (currentSegment.length > 0) {
+              segments.push(currentSegment);
+              currentSegment = [];
+          }
+
+          // Create staircase segment
+          const staircaseSegment = [currentPoint, nextPoint];
+          segments.push(staircaseSegment);
+
+          // Find next non-staircase point
+          let lookAhead = i + 1;
+          while (lookAhead < route.length && isFloorChange(route[lookAhead - 1], route[lookAhead])) {
+              lookAhead++;
+          }
+
+          // Update index to skip processed staircase points
+          i = lookAhead - 1; // -1 because loop will increment
+
+          // Start new segment with next point after stairs
+          if (lookAhead < route.length) {
+              currentSegment = [route[lookAhead - 1]];
+              currentFloor = getFloor(route[lookAhead - 1]);
+              lastSignificantBearing = calculateBearing(
+                  route[lookAhead - 1],
+                  route[lookAhead] || route[lookAhead - 1]
+              );
+          }
+          continue;
       }
 
-      // Create staircase segment
-      const staircaseSegment = [currentPoint, nextPoint];
-      segments.push(staircaseSegment);
+      // Regular point processing (including staircases if they don't change floors)
+      currentSegment.push(nextPoint);
 
-      // Find next non-staircase point
-      let lookAhead = i + 1;
-      while (lookAhead < route.length && route[lookAhead].reference.startsWith('S')) {
-        lookAhead++;
+      // Calculate bearing difference for non-staircase points
+      if (i < route.length - 1) {
+          const newBearing = calculateBearing(nextPoint, route[i + 1]);
+          let bearingDifference = Math.abs(newBearing - lastSignificantBearing);
+          if (bearingDifference > 180) {
+              bearingDifference = 360 - bearingDifference;
+          }
+          console.log(`Bearing difference: ${bearingDifference}`);
+
+          // Split segment on significant turn
+          if (bearingDifference >= 55 && bearingDifference <= 120) {
+              segments.push(currentSegment);
+              currentSegment = [nextPoint];
+              lastSignificantBearing = newBearing;
+          }
       }
-
-      // Update index to skip processed staircase points
-      i = lookAhead - 1; // -1 because loop will increment
-
-      // Start new segment with next point after stairs
-      if (lookAhead < route.length) {
-        currentSegment = [route[lookAhead - 1]];
-        currentFloor = getFloor(route[lookAhead - 1]);
-        lastSignificantBearing = calculateBearing(
-          route[lookAhead - 1], 
-          route[lookAhead] || route[lookAhead - 1]
-        );
-      }
-      continue;
-    }
-
-    // Regular point processing
-    currentSegment.push(nextPoint);
-
-    // Calculate bearing difference for non-staircase points
-    if (i < route.length - 1 && !nextPoint.reference.startsWith('S')) {
-      const newBearing = calculateBearing(nextPoint, route[i + 1]);
-      let bearingDifference = Math.abs(newBearing - lastSignificantBearing);
-      
-      if (bearingDifference > 180) {
-        bearingDifference = 360 - bearingDifference;
-      }
-
-      // Split segment on significant turn
-      if (bearingDifference >= 55 && bearingDifference <= 120) {
-        segments.push(currentSegment);
-        currentSegment = [nextPoint];
-        lastSignificantBearing = newBearing;
-      }
-    }
   }
 
   if (currentSegment.length > 0) {
-    segments.push(currentSegment);
+      segments.push(currentSegment);
   }
 
   return segments;
 }
+
 // Helper function to determine the floor of a point
 function getFloor(point) {
   return point.reference.startsWith('S1') || point.reference.startsWith('1') ? 1 : 2;
@@ -1281,8 +1281,8 @@ const { targetRoom, prevRoom } = route_navigation.params || {};
 
 useEffect(() => {
   if (targetRoom && prevRoom) {
-    setStartingPointQuery(targetRoom);
-    setSearchQuery(prevRoom);
+    setStartingPointQuery(prevRoom);
+    setSearchQuery(targetRoom);
   }
 }, [targetRoom, prevRoom]);
 
@@ -1475,7 +1475,7 @@ const getFirstHeadingDirection = useCallback(() => {
 
 
 const getDirectionGuidance = useCallback(() => {
-  console.log(directions.text);
+
   const nextSegmentIndex = currentSegmentIndex + 1;
   const nextSegment = routeSegments[nextSegmentIndex];
   const currentSegment = routeSegments[currentSegmentIndex];
@@ -1934,8 +1934,8 @@ return (
   <>
     {routeSegments.slice(currentSegmentIndex).map((segment, index) => {
       const isSegmentOnCurrentFloor = segment.every(point => 
-        (currentFloor === 1 && firstFloorCoordinates.some(c => c.reference === point.reference)) ||
-        (currentFloor === 2 && secondFloorCoordinates.some(c => c.reference === point.reference))
+        (currentFloor === 1 && firstFloorCoordinates.includes(point)) ||
+        (currentFloor === 2 && secondFloorCoordinates.includes(point))
       );
       
       if (isSegmentOnCurrentFloor) {
