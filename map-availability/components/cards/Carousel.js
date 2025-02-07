@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { View, Text, Alert, Image, Pressable, KeyboardAvoidingView, Platform } from 'react-native'
+import { View, Text, Alert, Image, Pressable, KeyboardAvoidingView, Platform, PanResponder } from 'react-native'
 import { doc, getDocs, collection, setDoc, docRef, updateDoc } from 'firebase/firestore';
 import { db } from '../../firebase'
 
@@ -32,6 +32,17 @@ export default class Carousel extends Component {
             arrowBack: null,
             arrowForward: null,
         };
+
+        this.panResponder = PanResponder.create({
+            onStartShouldSetPanResponder: () => true,
+            onPanResponderRelease: (evt, gestureState) => {
+                if (gestureState.dx > 50) {
+                    this.decrease();
+                } else if (gestureState.dx < -50) {
+                    this.increase();
+                }
+            }
+        });
     }
 
     componentDidMount() {
@@ -274,7 +285,7 @@ export default class Carousel extends Component {
 
     render() {
         return (
-            <View style={stylesLight.container}>
+            <View style={stylesLight.container} {...this.panResponder.panHandlers}>
                 {this.state.loading? 
                 ( <Loader /> ) :
                 (
