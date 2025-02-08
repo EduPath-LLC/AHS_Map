@@ -217,7 +217,7 @@ const firstFloorCoordinates = [
     { latitude: 33.10861239099607, longitude: -96.66139400573383, reference: 'G127' },
     { latitude: 33.10853146243038, longitude: -96.66151635819290, reference: 'G128' },
     { latitude: 33.10851678364739, longitude: -96.66153855042106, reference: 'S1_5' },
-    { latitude: 33.10835308826282, longitude: -96.66138774313453, reference: 'S1_1' },
+    { latitude: 33.10835308826282, longitude: -96.66138774313453, reference: 'S1_19' },
     { latitude: 33.10836926588401, longitude: -96.66136322952454, reference: 'G138' },
     { latitude: 33.10841888660577, longitude: -96.66128804028583, reference: 'G139' },
     { latitude: 33.10844886016316, longitude: -96.66124262198313, reference: 'G140' },
@@ -343,7 +343,7 @@ const secondFloorCoordinates = [
   { latitude: 33.108581705223514, longitude: -96.66144327508565, reference: "G227" },
   { latitude: 33.10853124877592, longitude: -96.66152020270945, reference: "G228" },
   { latitude: 33.10851308693722, longitude: -96.66154789286921, reference: "S2_5" },
-  { latitude: 33.10834535768775, longitude: -96.6613946199867, reference: "S2_1" },
+  { latitude: 33.10834535768775, longitude: -96.6613946199867, reference: "S2_19" },
   { latitude: 33.1083641486784, longitude: -96.66136620875649, reference: "G236" },
   { latitude: 33.10841559016205, longitude: -96.66128790580876, reference: "G237" },
   { latitude: 33.10844641688495, longitude: -96.66124098213743, reference: "G238" },
@@ -1699,7 +1699,7 @@ useEffect(() => {
       heading: bearing,
       pitch: 0,
       zoom: 18,
-      altitude: 2000,
+      altitude: 1500,
     }, { duration: 1000 });
   }
 }, 3000);
@@ -1907,7 +1907,7 @@ const animateCamera = useCallback((targetLocation, targetBearing) => {
     heading: targetBearing,
     pitch: 0,
     zoom: 18,
-    altitude: 2000,
+    altitude: 1500,
   }, { duration: 1000 });
 }, []);
 return (
@@ -1922,7 +1922,7 @@ return (
         },
         pitch: 0,
         heading: 0,
-        altitude: 2000,
+        altitude: 1500,
         zoom: 18,
       }}
       showsCompass={!isRouteActive}
