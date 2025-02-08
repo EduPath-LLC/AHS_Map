@@ -286,7 +286,7 @@ export default class Carousel extends Component {
         this.setState({loading: false})
 
         if(empty){
-            Alert.alert('Warning', 'One or More Fields are Empty')
+            Alert.alert('Message', 'Restart the app for the changes to take place')
             return true
         }
 
