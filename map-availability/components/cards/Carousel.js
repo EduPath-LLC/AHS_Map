@@ -89,23 +89,34 @@ export default class Carousel extends Component {
     handleClassChange = (newArr) => {
         switch(this.state.current){
             case 1:
-                this.setState({first: newArr})
+                this.setState({first: newArr});
+                break;
             case 2:
-                this.setState({second: newArr})
+                this.setState({second: newArr});
+                break;
             case 3:
-                this.setState({third: newArr})
+                this.setState({third: newArr});
+                break;
             case 4:
-                this.setState({fourth: newArr})
+                this.setState({fourth: newArr});
+                break;
             case 5:
-                this.setState({fifth: newArr})
+                this.setState({fifth: newArr});
+                break;
             case 6:
-                this.setState({sixth: newArr})
+                this.setState({sixth: newArr});
+                break;
             case 7:
-                this.setState({seventh: newArr})
+                this.setState({seventh: newArr});
+                break;
             case 8:
-                this.setState({eighth: newArr})
+                this.setState({eighth: newArr});
+                break;
             case 9:
-                this.setState({lunch: newArr})
+                this.setState({lunch: newArr});
+                break;
+            default:
+                break;
         }
     }
 

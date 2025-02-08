@@ -1,27 +1,12 @@
 import React, { Component } from 'react'
 import { View, Text, TextInput, KeyboardAvoidingView, Platform } from 'react-native'
 import { stylesLight } from '../../styles/light/CardInputsLight'
-import { Dropdown } from 'react-native-element-dropdown';
-import { validateBBox } from '@turf/turf';
-
 
 export default class CardInputs extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            arr: {},
-            lunchOptions: [
-                { label: 'A Lunch', value: 'A Lunch' },
-                { label: 'B Lunch', value: 'B Lunch' },
-                { label: 'C Lunch', value: 'C Lunch' },
-                { label: 'D Lunch', value: 'D Lunch' },
-                { label: 'STEAM Lunch', value: 'STEAM Lunch'},
-            ],
-            buildingOptions: [
-                { label: 'Allen High School', value: 'Allen High School' },
-                { label: 'STEAM Center', value: 'STEAM Center' },
-                { label: 'Lowery Freshman Center', value: 'Lowery Freshman Center' },
-            ],
+            arr: {}
         };
     }
 
@@ -50,68 +35,52 @@ export default class CardInputs extends Component {
 
 
                     <TextInput
-                        style={stylesLight.dropdown}
+                        style={stylesLight.input}
                         placeholder="Class Name"
                         value={this.state.arr.className}
-                        onChange={(item) => this.handleInputChange('className', item.value)}
+                        onChangeText={(value) => this.handleInputChange('className', value)}
                     />
 
                     <TextInput
-                        style={stylesLight.dropdown}
-                        placeholder="Teacher Name"
+                        style={stylesLight.input}
+                        placeholder="Teacher Last Name"
                         value={this.state.arr.teacher}
-                        onChange={(item) => this.handleInputChange('teacher', item.value)}
+                        onChangeText={(value) => this.handleInputChange('teacher', value)}
                     />
 
                     <TextInput
-                        style={stylesLight.dropdown}
-                        placeholder="Room Number"
-                        value={this.state.arr.roomNumber}
-                        onChange={(item) => this.handleInputChange('roomNumber', item.value)}
-                    />
-
-                    <Dropdown
-                        style={stylesLight.dropdown}
-                        placeholderStyle={stylesLight.placeholderStyle}
-                        selectedTextStyle={stylesLight.selectedTextStyle}
-                        data={this.state.buildingOptions}
-                        labelField="label"
-                        valueField="value"
+                        style={stylesLight.input}
                         placeholder="Building"
                         value={this.state.arr.building}
-                        onChange={(item) => this.handleInputChange('building', item.value)}
+                        onChangeText={(value) => this.handleInputChange('building', value)}
                     />
 
-
+                    <TextInput
+                        style={stylesLight.input}
+                        placeholder="Room Number"
+                        value={this.state.arr.roomNumber}
+                        onChangeText={(value) => this.handleInputChange('roomNumber', value)}
+                    />
 
                 </View>
             );
         } else {
             return(
                 <View style={stylesLight.card}>
-                    <Text style={stylesLight.period}> {this.state.arr.id} </Text>
-                    <Dropdown
-                        style={stylesLight.dropdown}
-                        placeholderStyle={stylesLight.placeholderStyle}
-                        selectedTextStyle={stylesLight.selectedTextStyle}
-                        data={this.state.lunchOptions}
-                        labelField="label"
-                        valueField="value"
-                        placeholder="Select A Day Lunch"
+                    <Text style={stylesLight.period}> {this.state.arr.id} Period </Text>
+
+                    <TextInput
+                        style={stylesLight.input}
+                        placeholder="A Day Lunch"
                         value={this.state.arr.a_day}
-                        onChange={(item) => this.handleInputChange('a_day', item.value)}
+                        onChangeText={(value) => this.handleInputChange('a_day', value)}
                     />
 
-                    <Dropdown
-                        style={stylesLight.dropdown}
-                        placeholderStyle={stylesLight.placeholderStyle}
-                        selectedTextStyle={stylesLight.selectedTextStyle}
-                        data={this.state.lunchOptions}
-                        labelField="label"
-                        valueField="value"
-                        placeholder="Select B Day Lunch"
+                    <TextInput
+                        style={stylesLight.input}
+                        placeholder="B Day Lunch"
                         value={this.state.arr.b_day}
-                        onChange={(item) => this.handleInputChange('b_day', item.value)}
+                        onChangeText={(value) => this.handleInputChange('b_day', value)}
                     />
 
                 </View>
