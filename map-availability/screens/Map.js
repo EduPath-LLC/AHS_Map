@@ -79,7 +79,7 @@ function isValidStaircasePair(point1, point2) {
           if (bearingDifference > 180) {
               bearingDifference = 360 - bearingDifference;
           }
-          console.log(`Bearing difference: ${bearingDifference}`);
+          // console.log(`Bearing difference: ${bearingDifference}`);
 
           // Split segment on significant turn
           if (bearingDifference >= 55 && bearingDifference <= 120) {
@@ -384,7 +384,7 @@ const secondFloorCoordinates = [
   { latitude: 33.109282569888094, longitude: -96.659738137832, reference: "K214" },
   { latitude: 33.10929611809012, longitude: -96.65971756799658, reference: "S2_29" },
   { latitude: 33.10912819010214, longitude: -96.6595629196543, reference: "S2_25" },
-  { latitude: 33.10904976079582, longitude: -96.65968562007973, reference: "K211" },
+  { latitude: 33.10904976079582, longitude: -96.6596856200793, reference: "K211" },
   { latitude: 33.10904976079582, longitude: -96.65968562007973, reference: "K212" },
 { latitude: 33.10903424268949, longitude: -96.65970897630184, reference: "K210" },
 { latitude: 33.10900433751869, longitude: -96.6597539864208, reference: "K205" },
@@ -1397,14 +1397,13 @@ const routeBetweenFloors = (start, end, startFloorCoordinates, endFloorCoordinat
     current.distance < shortest.distance ? current : shortest
   );
 
-  console.log(`Chosen route uses staircases: ${shortestRoute.startStaircase.reference} to ${shortestRoute.endStaircase.reference}`);
+  // console.log(`Chosen route uses staircases: ${shortestRoute.startStaircase.reference} to ${shortestRoute.endStaircase.reference}`);
   return shortestRoute.route;
 };
-
 useEffect(() => {
   let subscription;
   let lastUpdateTime = 0;
-  const updateInterval = 500; // 2 seconds in milliseconds
+  const updateInterval = 500; 
 
   const startMagnetometer = async () => {
     try {
@@ -1438,14 +1437,7 @@ const getHeadingDifference = useCallback(() => {
   const currentSegment = routeSegments[currentSegmentIndex];
   if (!currentSegment || currentSegment.length < 2) return null;
 
-  // Check if the current segment is for stairs (assuming stair segments have references starting with 'S')
-  const isStairSegment = currentSegment[0].reference.startsWith('S') || currentSegment[currentSegment.length - 1].reference.startsWith('S');
-
-  if (isStairSegment) {
-    // For stair segments, we don't provide directional guidance
-    return null;
-  }
-
+  // Get segment start and end points regardless of segment type
   const segmentStart = currentSegment[0];
   const segmentEnd = currentSegment[currentSegment.length - 1];
   const segmentBearing = calculateBearing(segmentStart, segmentEnd);
@@ -1457,11 +1449,12 @@ const getHeadingDifference = useCallback(() => {
   return difference;
 }, [isRouteActive, routeSegments, currentSegmentIndex, heading, calculateBearing]);
 
-  
-// Initial orientation guidance
 const getFirstHeadingDirection = useCallback(() => {
   const difference = getHeadingDifference(currentSegmentIndex);
 
+  if (difference === null) {
+    return 'Calculating direction...';
+  }
 
   if (Math.abs(difference) <= 45) {
     return 'You are facing the right way';

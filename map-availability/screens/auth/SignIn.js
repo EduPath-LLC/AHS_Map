@@ -4,6 +4,7 @@ import { signInWithEmailAndPassword, sendEmailVerification } from 'firebase/auth
 import { doc, getDoc } from 'firebase/firestore';
 import * as SplashScreen from 'expo-splash-screen';
 import * as Font from 'expo-font';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { auth, db } from '../../firebase';
 
@@ -30,6 +31,22 @@ export default function SignIn({ navigation }) {
     setFontsLoaded(true);
   };
 
+  // Load saved email on component mount
+  useEffect(() => {
+    const loadSavedEmail = async () => {
+      try {
+        const savedEmail = await AsyncStorage.getItem('userEmail');
+        if (savedEmail) {
+          setEmail(savedEmail);
+        }
+      } catch (error) {
+        console.error('Error loading saved email:', error);
+      }
+    };
+
+    loadSavedEmail();
+  }, []);
+
   useEffect(() => {
     async function prepare() {
       try {
@@ -42,8 +59,6 @@ export default function SignIn({ navigation }) {
       }
     }
     prepare();
-
-
   }, []);
 
   const isFirstTime = async (userId) => {
@@ -90,6 +105,13 @@ export default function SignIn({ navigation }) {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
+      // Save email after successful login
+      try {
+        await AsyncStorage.setItem('userEmail', email);
+      } catch (error) {
+        console.error('Error saving email:', error);
+      }
+
       // Check if the user's email is verified
       if (!user.emailVerified) {
         Alert.alert(
@@ -103,7 +125,6 @@ export default function SignIn({ navigation }) {
 
       const firstTime = await isFirstTime(user.uid);
 
-      setEmail("");
       setPassword("");
       setLoading(false);
 
