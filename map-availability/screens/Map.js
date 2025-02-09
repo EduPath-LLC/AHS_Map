@@ -114,7 +114,7 @@ const firstFloorCoordinates = [
     { latitude: 33.11000677620671, longitude: -96.66127237288006, reference: 'LIBRARY' },
     { latitude: 33.109768672191244, longitude: -96.66105221607516, reference: 'S1_9' },
     { latitude: 33.109768672191244, longitude: -96.66105221607515, reference: 'CAFETERIA' },
-    { latitude: 33.109768672191244, longitude: -96.66105221607514, reference: 'CAFE' },
+    
     { latitude: 33.11002453134270951, longitude: -96.66066677016860353, reference: 'ENTRANCE' },
     { latitude: 33.109768672191244, longitude: -96.66105221607516, reference: 'MID' },
     { latitude: 33.109549184264225, longitude: -96.6608491206446, reference: 'S1_1' },
@@ -517,6 +517,7 @@ const secondFloorStaircases = secondFloorCoordinates.filter(coord => coord.refer
 // };
 
 const roomCoordinates = {
+  CAFETERIA:{latitude: 33.1098803,longitude: -96.6613386},
   F207: { latitude: 33.10958534, longitude: -96.66109439 },
   F208: { latitude: 33.10956719, longitude: -96.66110143 },
   F210: { latitude: 33.10950093, longitude: -96.66123634 },
