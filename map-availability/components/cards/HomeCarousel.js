@@ -48,11 +48,9 @@ export default class HomeCarousel extends Component {
         const [month, day, year] = centralTime.split("/");
         const formattedDate = `${year}-${month}-${day}`;
         const todayEntry = dayData[formattedDate];
-        console.log(todayEntry)
+        if(todayEntry){
         this.setState({ab: todayEntry, school: true})
-
-        
-
+        }
     }
 
     fetchSchedule = async (userId) => {

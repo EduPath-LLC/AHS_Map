@@ -9,6 +9,7 @@ import { stylesLight } from '../styles/light/AccountLight';
 import { auth } from '../firebase';
 import Loader from '../components/Loader';
 import { useRoute } from '@react-navigation/native';
+import * as FileSystem from 'expo-file-system'
 
 import AccountIcon from '../assets/images/Account_Icon.png';
 import NotificationIcon from '../assets/images/Notification_Icon.png';
@@ -25,9 +26,20 @@ export default function Account({navigation}) {
   const route = useRoute();
   const userId = route.params.userId;
 
+  async function wipeUserInfo() {
+    try {
+        const fileUri = FileSystem.documentDirectory + 'userInfo.txt';
+        await FileSystem.writeAsStringAsync(fileUri, '', { encoding: FileSystem.EncodingType.UTF8 });
+        navigation.navigate("SignIn")
+    } catch (error) {
+        console.error('Error wiping userInfo.txt:', error);
+    }
+  }
+
   const logOut = async () => {
     signOut(auth)
         .then(() => {
+            wipeUserInfo();
             navigation.navigate("SignIn");
         }).catch((e) => {
             Alert.alert("Error", e);

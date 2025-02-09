@@ -4,7 +4,7 @@ import { signInWithEmailAndPassword, sendEmailVerification } from 'firebase/auth
 import { doc, getDoc } from 'firebase/firestore';
 import * as SplashScreen from 'expo-splash-screen';
 import * as Font from 'expo-font';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as FileSystem from 'expo-file-system';
 
 import { auth, db } from '../../firebase';
 
@@ -31,26 +31,33 @@ export default function SignIn({ navigation }) {
     setFontsLoaded(true);
   };
 
-  // Load saved email on component mount
   useEffect(() => {
-    const loadSavedEmail = async () => {
+    async function checkUserFile() {
       try {
-        const savedEmail = await AsyncStorage.getItem('userEmail');
-        if (savedEmail) {
-          setEmail(savedEmail);
+        const fileUri = FileSystem.documentDirectory + 'userInfo.txt';
+        const fileInfo = await FileSystem.getInfoAsync(fileUri);
+  
+        if (fileInfo.exists) {
+          // Read the file
+          const content = await FileSystem.readAsStringAsync(fileUri, { encoding: FileSystem.EncodingType.UTF8 });
+          const lines = content.split('\n');
+          
+          if (lines.length > 1) {
+            const savedEmail = lines[0];
+            setEmail(savedEmail);
+  
+            navigation.replace('Back');
+          }
         }
       } catch (error) {
-        console.error('Error loading saved email:', error);
+        console.error('Error reading user info file:', error);
       }
-    };
-
-    loadSavedEmail();
-  }, []);
-
-  useEffect(() => {
+    }
+  
     async function prepare() {
       try {
         await loadFonts();
+        await checkUserFile();
       } catch (e) {
         console.warn(e);
       } finally {
@@ -60,6 +67,19 @@ export default function SignIn({ navigation }) {
     }
     prepare();
   }, []);
+  
+  const saveUserInfo = async (email) => {
+    const path = FileSystem.documentDirectory + 'userInfo.txt';
+    const FirstName = email.slice(0,1).toUpperCase() + email.slice(1, email.indexOf("."))
+    const content = `${email}\n${FirstName}`;
+  
+    try {
+      await FileSystem.writeAsStringAsync(path, content, { encoding: FileSystem.EncodingType.UTF8 });
+      console.log('File saved successfully');
+    } catch (error) {
+      console.error('Error saving file:', error);
+    }
+  };
 
   const isFirstTime = async (userId) => {
     try {
@@ -105,13 +125,6 @@ export default function SignIn({ navigation }) {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      // Save email after successful login
-      try {
-        await AsyncStorage.setItem('userEmail', email);
-      } catch (error) {
-        console.error('Error saving email:', error);
-      }
-
       // Check if the user's email is verified
       if (!user.emailVerified) {
         Alert.alert(
@@ -125,6 +138,9 @@ export default function SignIn({ navigation }) {
 
       const firstTime = await isFirstTime(user.uid);
 
+      saveUserInfo(email);
+
+      setEmail("");
       setPassword("");
       setLoading(false);
 

@@ -14,6 +14,7 @@ import Appearance from './screens/Appearance.js';
 import HelpAndSupport from './screens/HelpAndSupport.js'
 import About from './screens/About.js'
 import PrivacyPolicy from './screens/PrivacyPolicy.js'
+import Back from './screens/auth/Back.js';
 
 const Stack = createStackNavigator();
 
@@ -22,17 +23,18 @@ const MainNavigator = () => (
     initialRouteName="SignIn" 
     screenOptions={{ headerShown: false }}
   >
-    <Stack.Screen name="SignIn" component={SignIn} />
-    <Stack.Screen name="SignUp" component={SignUp} />
-    <Stack.Screen name="ResetPassword" component={ResetPassword} />
-    <Stack.Screen name="SetSchedule" component={SetSchedule} />
-    <Stack.Screen name="BottomTab" component={BottomTab} />
-    <Stack.Screen name="Account" component={Account} />
-    <Stack.Screen name="Notifications" component={Notifications} />
-    <Stack.Screen name="Appearance" component={Appearance} />
-    <Stack.Screen name="HelpAndSupport" component={HelpAndSupport} />
-    <Stack.Screen name="About" component={About} />
-    <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicy} />
+    <Stack.Screen name="SignIn" component={SignIn} options={{gestureEnabled: false}} />
+    <Stack.Screen name="SignUp" component={SignUp} options={{gestureEnabled: false}} />
+    <Stack.Screen name="Back" component={Back} options={{gestureEnabled: false}} />
+    <Stack.Screen name="ResetPassword" component={ResetPassword} options={{gestureEnabled: false}} />
+    <Stack.Screen name="SetSchedule" component={SetSchedule} options={{gestureEnabled: false}} />
+    <Stack.Screen name="BottomTab" component={BottomTab} options={{gestureEnabled: false}} />
+    <Stack.Screen name="Account" component={Account} options={{gestureEnabled: false}} />
+    <Stack.Screen name="Notifications" component={Notifications} options={{gestureEnabled: false}} />
+    <Stack.Screen name="Appearance" component={Appearance} options={{gestureEnabled: false}} />
+    <Stack.Screen name="HelpAndSupport" component={HelpAndSupport} options={{gestureEnabled: false}} />
+    <Stack.Screen name="About" component={About} options={{gestureEnabled: false}} />
+    <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicy} options={{gestureEnabled: false}} />
   </Stack.Navigator>
 );
 
