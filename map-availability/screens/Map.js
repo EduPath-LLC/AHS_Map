@@ -59,13 +59,14 @@ function isValidStaircasePair(point1, point2) {
 
           // Start new segment with next point after stairs
           if (lookAhead < route.length) {
-              currentSegment = [route[lookAhead - 1]];
-              currentFloor = getFloor(route[lookAhead - 1]);
-              lastSignificantBearing = calculateBearing(
-                  route[lookAhead - 1],
-                  route[lookAhead] || route[lookAhead - 1]
-              );
-          }
+            currentSegment = [route[lookAhead - 1]];
+            currentFloor = getFloor(route[lookAhead - 1]);
+        
+            // Ensure a reliable post-staircase bearing
+            let nextValidPoint = route[lookAhead + 1] || route[lookAhead];
+            lastSignificantBearing = calculateBearing(route[lookAhead - 1], nextValidPoint);
+        }
+        
           continue;
       }
 
@@ -79,7 +80,7 @@ function isValidStaircasePair(point1, point2) {
           if (bearingDifference > 180) {
               bearingDifference = 360 - bearingDifference;
           }
-          // console.log(`Bearing difference: ${bearingDifference}`);
+          console.log(`Bearing difference: ${bearingDifference}`);
 
           // Split segment on significant turn
           if (bearingDifference >= 55 && bearingDifference <= 120) {
@@ -111,13 +112,13 @@ function isFloorChange(point1, point2) {
 
 const firstFloorCoordinates = [
   
-    { latitude: 33.11000677620671, longitude: -96.66127237288006, reference: 'LIBRARY' },
-    { latitude: 33.109768672191244, longitude: -96.66105221607516, reference: 'S1_9' },
-    { latitude: 33.109768672191244, longitude: -96.66105221607515, reference: 'CAFETERIA' },
+  { latitude: 33.11000677620671000000, longitude: -96.66127234430397000000, reference: 'LIBRARY' },
+  { latitude: 33.10976867219124400000, longitude: -96.66105219132257000000, reference: 'S1_9' },
+  { latitude: 33.10976867219124400000, longitude: -96.66105219132257000000, reference: 'CAFETERIA' },
     
     { latitude: 33.11002453134270951, longitude: -96.66066677016860353, reference: 'ENTRANCE' },
     { latitude: 33.109768672191244, longitude: -96.66105221607516, reference: 'MID' },
-    { latitude: 33.109549184264225, longitude: -96.6608491206446, reference: 'S1_1' },
+    { latitude: 33.10954918426422500000, longitude: -96.66084925093358000000, reference: 'S1_1' },
     { latitude: 33.10945194354582, longitude: -96.66100404668036, reference: 'F MID' },
     { latitude: 33.109483345573686, longitude: -96.66103270225616, reference: 'F105' },
     { latitude: 33.10954345131491, longitude: -96.66108818354715, reference: 'CORNER' },
@@ -167,8 +168,10 @@ const firstFloorCoordinates = [
     { latitude: 33.10937929679408, longitude: -96.66093665884165, reference: 'F164' },
     { latitude: 33.10941692859606, longitude: -96.66097139530632, reference: 'F165' },
     { latitude: 33.10945194354582, longitude: -96.66100404668036, reference: 'F MID' },
-    { latitude: 33.10954918426422, longitude: -96.66084912064460, reference: 'S1_1' },
-    { latitude: 33.10934693614330, longitude: -96.66066226859509, reference: 'S1_14' },
+    { latitude: 33.10954918426422500000, longitude: -96.66084925093358000000, reference: 'S1_1' },
+
+    { latitude: 33.10934693614330000000, longitude: -96.66066225061475000000, reference: 'S1_14' },
+
     { latitude: 33.10944234865774, longitude: -96.66051814553069, reference: 'A MID' },
     { latitude: 33.10949115105158, longitude: -96.66056318284635, reference: 'A134' },
     { latitude: 33.10951177786585, longitude: -96.66058215076715, reference: 'CORNERA' },
@@ -191,8 +194,9 @@ const firstFloorCoordinates = [
     { latitude: 33.10934872496921, longitude: -96.66043174485885, reference: 'A106' },
     { latitude: 33.10938202253659, longitude: -96.66046247353700, reference: 'A104' },
     { latitude: 33.10944234865774, longitude: -96.66051814553069, reference: 'A MID' },
-    { latitude: 33.10934693614330, longitude: -96.66066226859509, reference: 'S1_14' },
-    { latitude: 33.10909604500765, longitude: -96.66043028850565, reference: 'S1_13' },
+    { latitude: 33.10934693614330000000, longitude: -96.66066225061475000000, reference: 'S1_14' },
+
+    { latitude: 33.10909604500765000000, longitude: -96.66043027455417000000, reference: 'S1_13' },
     { latitude: 33.10899494581290, longitude: -96.66058915467005, reference: 'GMID' },
     { latitude: 33.10905716275518, longitude: -96.66064685173170, reference: 'G104' },
     { latitude: 33.10908779885913, longitude: -96.66067426235244, reference: 'CORNERL' },
@@ -237,9 +241,9 @@ const firstFloorCoordinates = [
     { latitude: 33.10889413114312, longitude: -96.66056791220850, reference: 'G164' },
     { latitude: 33.10892365295320, longitude: -96.66052380872497, reference: 'G165' },
     { latitude: 33.10899494581290, longitude: -96.66058915467005, reference: 'GMID' },
-    { latitude: 33.10909604500765, longitude: -96.66043028850565, reference: 'S1_13' },
-    { latitude: 33.10888318346311, longitude: -96.66023347150767, reference: 'S1_16' },
-    { latitude: 33.10883392503870, longitude: -96.66018792596192, reference: 'K ENTRANCE' },
+    { latitude: 33.10909604500765000000, longitude: -96.66043027455417000000, reference: 'S1_13' },
+    { latitude: 33.10888318346311000000, longitude: -96.66023346097434000000, reference: 'S1_16' },
+    { latitude: 33.10883392503870000000, longitude: -96.66018791621958000000, reference: 'K ENTRANCE' },
   { latitude: 33.10893343998354, longitude: -96.66004332519219, reference: 'K MID' },
   { latitude: 33.10899853172984, longitude: -96.66010402494138, reference: 'K130' },
   { latitude: 33.10903282294311, longitude: -96.66013597078240, reference: 'K126' },
@@ -259,7 +263,7 @@ const firstFloorCoordinates = [
   { latitude: 33.10894857742131, longitude: -96.65984730723488, reference: 'K106' },
   { latitude: 33.10886276303221, longitude: -96.65997743957256, reference: 'K100' },
   { latitude: 33.10893343998354, longitude: -96.66004332519219, reference: 'K MID' },
-  { latitude: 33.10883392503870, longitude: -96.66018792596192, reference: 'K ENTRANCE' },
+  { latitude: 33.10883392503870000000, longitude: -96.66018791621958000000, reference: 'K ENTRANCE' },
   // { latitude: 33.10856133683780, longitude: -96.65993588423450, reference: 'S1_21' },
 ];
 
@@ -2019,7 +2023,7 @@ return (
         );
       }, [location]);
 
-      if (distance > 7500) {
+      if (distance > 750000000000) {
         return (
           <View style={styles.distanceOverlay}>
             <Text style={styles.distanceOverlayText}>
