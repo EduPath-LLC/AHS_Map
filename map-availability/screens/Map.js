@@ -59,14 +59,13 @@ function isValidStaircasePair(point1, point2) {
 
           // Start new segment with next point after stairs
           if (lookAhead < route.length) {
-            currentSegment = [route[lookAhead - 1]];
-            currentFloor = getFloor(route[lookAhead - 1]);
-        
-            // Ensure a reliable post-staircase bearing
-            let nextValidPoint = route[lookAhead + 1] || route[lookAhead];
-            lastSignificantBearing = calculateBearing(route[lookAhead - 1], nextValidPoint);
-        }
-        
+              currentSegment = [route[lookAhead - 1]];
+              currentFloor = getFloor(route[lookAhead - 1]);
+              lastSignificantBearing = calculateBearing(
+                  route[lookAhead - 1],
+                  route[lookAhead] || route[lookAhead - 1]
+              );
+          }
           continue;
       }
 
