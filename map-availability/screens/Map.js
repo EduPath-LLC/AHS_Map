@@ -19,79 +19,98 @@ function isValidStaircasePair(point1, point2) {
   }
   return false;
 }function determineRealTurns(route) {
+  console.log('DETERMINERIEALJSKJLJDL:KJDS:FJDLS:FJDL:SFJ');
   const segments = [];
   let currentSegment = [route[0]];
   let lastSignificantBearing = calculateBearing(route[0], route[1]);
   let currentFloor = getFloor(route[0]);
+  let specialStaircaseHandled = false;
+
+  // Enhanced staircase detection using both ID and reference
+  const isTargetStaircase = (point) => {
+    const identifiers = [point?.id, point?.nodeId, point?.reference];
+    return identifiers.some(id => id?.includes('S1_14') || id?.includes('S2_14'));
+  };
 
   const isActiveStaircasePair = (i) => {
-      if (i < 0 || i >= route.length - 1) return false;
-      const curr = route[i];
-      const next = route[i + 1];
-      // Check for both upward and downward floor changes
-      return isValidStaircasePair(curr, next) && isFloorChange(curr, next);
+    if (i < 0 || i >= route.length - 1) return false;
+    const curr = route[i];
+    const next = route[i + 1];
+    return isValidStaircasePair(curr, next) && isFloorChange(curr, next);
   };
 
   for (let i = 1; i < route.length; i++) {
-      const currentPoint = route[i - 1];
-      const nextPoint = route[i];
+    const currentPoint = route[i - 1];
+    const nextPoint = route[i];
 
-      // Handle active staircase pairs for both up and down floor changes
-      if (isActiveStaircasePair(i - 1)) {
-          // Split the current segment before the stairs
-          if (currentSegment.length > 0) {
-              segments.push(currentSegment);
-              currentSegment = [];
-          }
-
-          // Create staircase segment
-          const staircaseSegment = [currentPoint, nextPoint];
-          segments.push(staircaseSegment);
-
-          // Find next non-staircase point
-          let lookAhead = i + 1;
-          while (lookAhead < route.length && isFloorChange(route[lookAhead - 1], route[lookAhead])) {
-              lookAhead++;
-          }
-
-          // Update index to skip processed staircase points
-          i = lookAhead - 1; // -1 because loop will increment
-
-          // Start new segment with next point after stairs
-          if (lookAhead < route.length) {
-              currentSegment = [route[lookAhead - 1]];
-              currentFloor = getFloor(route[lookAhead - 1]);
-              lastSignificantBearing = calculateBearing(
-                  route[lookAhead - 1],
-                  route[lookAhead] || route[lookAhead - 1]
-              );
-          }
-          continue;
+    if (isActiveStaircasePair(i - 1)) {
+      if (currentSegment.length > 0) {
+        segments.push(currentSegment);
+        currentSegment = [];
       }
 
-      // Regular point processing (including staircases if they don't change floors)
-      currentSegment.push(nextPoint);
+      // Handle staircase segment
+      segments.push([currentPoint, nextPoint]);
+      
+      // Check if this is our target staircase
+      const isSpecialCase = isTargetStaircase(currentPoint) || isTargetStaircase(nextPoint);
 
-      // Calculate bearing difference for non-staircase points
-      if (i < route.length - 1) {
-          const newBearing = calculateBearing(nextPoint, route[i + 1]);
-          let bearingDifference = Math.abs(newBearing - lastSignificantBearing);
-          if (bearingDifference > 180) {
-              bearingDifference = 360 - bearingDifference;
-          }
-          console.log(`Bearing difference: ${bearingDifference}`);
+      let lookAhead = i + 1;
+      if (isSpecialCase) {
+        // Special handling for S1_14/S2_14
+        while (lookAhead < route.length && 
+              (isFloorChange(route[lookAhead - 1], route[lookAhead]) ||
+              isTargetStaircase(route[lookAhead]))) {
+          lookAhead++;
+        }
 
-          // Split segment on significant turn
-          if (bearingDifference >= 55 && bearingDifference <= 120) {
-              segments.push(currentSegment);
-              currentSegment = [nextPoint];
-              lastSignificantBearing = newBearing;
-          }
+        // Create extended segment for special case
+        currentSegment = [route[lookAhead - 1]];
+        if (lookAhead < route.length) {
+          currentSegment.push(route[lookAhead]);
+          i = lookAhead; // Skip ahead
+          specialStaircaseHandled = true;
+        }
+      } else {
+        // Regular staircase handling
+        while (lookAhead < route.length && 
+              isFloorChange(route[lookAhead - 1], route[lookAhead])) {
+          lookAhead++;
+        }
+        i = lookAhead - 1;
+        currentSegment = [route[i]];
       }
+      continue;
+    }
+
+    // Reset bearing after special staircase
+    if (specialStaircaseHandled) {
+      lastSignificantBearing = calculateBearing(
+        currentSegment[currentSegment.length - 2],
+        currentSegment[currentSegment.length - 1]
+      );
+      specialStaircaseHandled = false;
+    }
+
+    currentSegment.push(nextPoint);
+
+    // Bearing calculations for regular points
+    if (i < route.length - 1 && !specialStaircaseHandled) {
+      const newBearing = calculateBearing(nextPoint, route[i + 1]);
+      let bearingDifference = Math.abs(newBearing - lastSignificantBearing);
+      
+      bearingDifference = bearingDifference > 180 ? 360 - bearingDifference : bearingDifference;
+
+      if (bearingDifference >= 55 && bearingDifference <= 120) {
+        segments.push(currentSegment);
+        currentSegment = [nextPoint];
+        lastSignificantBearing = newBearing;
+      }
+    }
   }
 
   if (currentSegment.length > 0) {
-      segments.push(currentSegment);
+    segments.push(currentSegment);
   }
 
   return segments;
@@ -167,9 +186,9 @@ const firstFloorCoordinates = [
     { latitude: 33.10937929679408, longitude: -96.66093665884165, reference: 'F164' },
     { latitude: 33.10941692859606, longitude: -96.66097139530632, reference: 'F165' },
     { latitude: 33.10945194354582, longitude: -96.66100404668036, reference: 'F MID' },
-    { latitude: 33.10954918426422500000, longitude: -96.66084925093358000000, reference: 'S1_1' },
+    { latitude: 33.109549184260000, longitude: -96.66084925000000, reference: 'F201' },
 
-    { latitude: 33.10934693614330000000, longitude: -96.66066225061475000000, reference: 'S1_14' },
+    { latitude: 33.109349413, longitude: -96.660664880, reference: 'S1_14' },
 
     { latitude: 33.10944234865774, longitude: -96.66051814553069, reference: 'A MID' },
     { latitude: 33.10949115105158, longitude: -96.66056318284635, reference: 'A134' },
@@ -192,8 +211,8 @@ const firstFloorCoordinates = [
     { latitude: 33.10937330106562, longitude: -96.66039410326786, reference: 'A108' },
     { latitude: 33.10934872496921, longitude: -96.66043174485885, reference: 'A106' },
     { latitude: 33.10938202253659, longitude: -96.66046247353700, reference: 'A104' },
-    { latitude: 33.10944234865774, longitude: -96.66051814553069, reference: 'A MID' },
-    { latitude: 33.10934693614330000000, longitude: -96.66066225061475000000, reference: 'S1_14' },
+    { latitude: 33.10944234865774, longitude: -96.6605181455, reference: 'A MID' },
+    { latitude: 33.109349413, longitude: -96.660664880, reference: 'S1_14' },
 
     { latitude: 33.10909604500765000000, longitude: -96.66043027455417000000, reference: 'S1_13' },
     { latitude: 33.10899494581290, longitude: -96.66058915467005, reference: 'GMID' },
@@ -1040,7 +1059,6 @@ function getCombinedDirections(route) {
   
   return directions;
 }
-
 function getSegmentDirections(currentSegment, nextSegment, previousSegment, isLast, destination) {
   const isCurrentStaircase = currentSegment.length === 2 && 
                             isValidStaircasePair(currentSegment[0], currentSegment[1]);
@@ -1069,10 +1087,19 @@ function getSegmentDirections(currentSegment, nextSegment, previousSegment, isLa
   else if (wasPreviousStaircase) {
     const distance = calculateTotalDistance(currentSegment);
     const distanceInFeet = Math.round(distance * 3.28084 / 5) * 5;
-    text = `From stairs, walk forward ${distanceInFeet} feet`;
+    
+    // Handle zero-distance staircase transitions
+    let distanceText = '';
+    if (distanceInFeet > 0) {
+      distanceText = `walk forward ${distanceInFeet} feet`;
+    } else {
+      distanceText = `proceed forward`; // Generic instruction for S1_14/S2_14 case
+    }
+    
+    text = `From stairs, ${distanceText}`;
 
-    // Detect turn after stairs
-    if (currentSegment.length >= 2) {
+    // Only detect turns if there's actual movement
+    if (distanceInFeet > 0 && currentSegment.length >= 2) {
       const start = currentSegment[0];
       const end = currentSegment[currentSegment.length - 1];
       const bearingStart = calculateBearing(start, currentSegment[1]);
@@ -1091,7 +1118,6 @@ function getSegmentDirections(currentSegment, nextSegment, previousSegment, isLa
   }
   // Regular segment
   else {
-    // Existing turn detection logic
     const distance = calculateTotalDistance(currentSegment);
     const distanceInFeet = Math.round(distance * 3.28084 / 5) * 5;
     text = `Go straight for ${distanceInFeet} feet`;
