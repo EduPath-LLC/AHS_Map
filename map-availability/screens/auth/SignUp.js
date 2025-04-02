@@ -21,7 +21,7 @@ export default function SignUp({ navigation }) {
 
   const validateInputs = (email, password, confirm) => {
     if (email === '' || password === '' || confirm === '') {
-      Alert.alert("Warning", "One or More Fields is empty");
+      Alert.alert("Warning", "Please fill in all required fields");
       return false;
     }
 
@@ -79,66 +79,21 @@ export default function SignUp({ navigation }) {
       let docRefEight = doc(collection(db, `users/${user.uid}/schedule`), 'Eight');
       let docRefLunch = doc(collection(db, `users/${user.uid}/schedule`), 'Lunch');
 
-      await setDoc(docRefFirst, {
-        className: '',
-        teacher: '',
-        building: '',
-        roomNumber: ''
-      });
+      const scheduleDocs = [
+        { ref: docRefFirst, data: { className: '', teacher: '', building: '', roomNumber: '' } },
+        { ref: docRefSecond, data: { className: '', teacher: '', building: '', roomNumber: '' } },
+        { ref: docRefThird, data: { className: '', teacher: '', building: '', roomNumber: '' } },
+        { ref: docRefFourth, data: { className: '', teacher: '', building: '', roomNumber: '' } },
+        { ref: docRefFifth, data: { className: '', teacher: '', building: '', roomNumber: '' } },
+        { ref: docRefSixth, data: { className: '', teacher: '', building: '', roomNumber: '' } },
+        { ref: docRefSeventh, data: { className: '', teacher: '', building: '', roomNumber: '' } },
+        { ref: docRefEight, data: { className: '', teacher: '', building: '', roomNumber: '' } },
+        { ref: docRefLunch, data: { a_day: '', b_day: '' } }
+      ];
 
-      await setDoc(docRefSecond, {
-        className: '',
-        teacher: '',
-        building: '',
-        roomNumber: ''
-      });
-
-      await setDoc(docRefThird, {
-        className: '',
-        teacher: '',
-        building: '',
-        roomNumber: ''
-      });
-
-      await setDoc(docRefFourth, {
-        className: '',
-        teacher: '',
-        building: '',
-        roomNumber: ''
-      });
-
-      await setDoc(docRefFifth, {
-        className: '',
-        teacher: '',
-        building: '',
-        roomNumber: ''
-      });
-
-      await setDoc(docRefSixth, {
-        className: '',
-        teacher: '',
-        building: '',
-        roomNumber: ''
-      });
-
-      await setDoc(docRefSeventh, {
-        className: '',
-        teacher: '',
-        building: '',
-        roomNumber: ''
-      });
-
-      await setDoc(docRefEight, {
-        className: '',
-        teacher: '',
-        building: '',
-        roomNumber: ''
-      });
-
-      await setDoc(docRefLunch, {
-        a_day: '',
-        b_day: ''
-      });
+      for (const { ref, data } of scheduleDocs) {
+        await setDoc(ref, data);
+      }
 
       // Send email verification
       await sendEmailVerification(user);
@@ -220,7 +175,7 @@ export default function SignUp({ navigation }) {
             <Text style={styles.scrollText}>9. Updates to This Policy</Text>
             <Text style={styles.scrollText2}>We may update this Privacy Policy from time to time. We will notify you of any changes by updating the effective date at the top of this Privacy Policy. Continued use of the app after such changes will constitute your consent to the updated policy.</Text>
             <Text style={styles.scrollText}>10. Contact Us</Text>
-            <Text style={styles.scrollText2}>If you have any questions or concerns about this Privacy Policy or our data practices, please jayadeep.velagapudi@student.allenisd.org, rishi.nigam@student.allenisd.org, or anish.choudhury@student.allenisd.org.</Text>
+            <Text style={styles.scrollText2}>If you have any questions or concerns about this Privacy Policy or our data practices, please contact team@edupathllc.onmicrosoft.com</Text>
             
             <View style={styles.checkboxContainer}>
               <TouchableOpacity

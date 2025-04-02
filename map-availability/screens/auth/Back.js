@@ -51,8 +51,25 @@ export default function Back({ navigation }) {
       setLoading(false);
       navigation.navigate("BottomTab", { userId: user.uid });
     } catch (error) {
-      Alert.alert("Error", "Invalid Credentials");
       setLoading(false);
+
+      switch (error.code) {
+        case 'auth/invalid-email':
+          Alert.alert("Error", "The email address is not valid.");
+          break;
+        case 'auth/user-disabled':
+          Alert.alert("Error", "This user account has been disabled.");
+          break;
+        case 'auth/user-not-found':
+          Alert.alert("Error", "No user found with this email.");
+          break;
+        case 'auth/wrong-password':
+          Alert.alert("Error", "Incorrect password. Please try again.");
+          break;
+        default:
+          Alert.alert("Error", "An unexpected error occurred. Please try again later.");
+          console.error("Sign-in error:", error);
+      }
     }
   };
 

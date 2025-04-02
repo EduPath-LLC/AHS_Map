@@ -110,10 +110,10 @@ export default function SignIn({ navigation }) {
       return;
     }
 
-    const checkEmailStudent = email.slice(-21);
-    const checkEmailTeacher = email.slice(-13);
+    const studentEmailRegex = /^[a-zA-Z0-9._%+-]+@student\.allenisd\.org$/;
+    const teacherEmailRegex = /^[a-zA-Z0-9._%+-]+@allenisd\.org$/;
 
-    if (checkEmailStudent !== "@student.allenisd.org" && checkEmailTeacher !== "@allenisd.org") {
+    if (!studentEmailRegex.test(email) && !teacherEmailRegex.test(email)) {
       Alert.alert("Warning", "You must use an Allen ISD email");
       return;
     }
@@ -138,7 +138,7 @@ export default function SignIn({ navigation }) {
 
       const firstTime = await isFirstTime(user.uid);
 
-      saveUserInfo(email);
+      setTimeout(() => saveUserInfo(email), 0);
 
       setEmail("");
       setPassword("");
@@ -151,10 +151,19 @@ export default function SignIn({ navigation }) {
       }
 
     } catch (error) {
-      if (error.message === "Firebase: Error (auth/invalid-credential).") {
-        Alert.alert("Error", "Invalid Credentials");
-      } else {
-        Alert.alert('Error', error.message);
+      switch (error.code) {
+        case 'auth/user-not-found':
+          Alert.alert("Error", "No user found with this email.");
+          break;
+        case 'auth/wrong-password':
+          Alert.alert("Error", "Incorrect password. Please try again.");
+          break;
+        case 'auth/invalid-email':
+          Alert.alert("Error", "The email address is badly formatted.");
+          break;
+        default:
+          Alert.alert('Error', error.message);
+          break;
       }
       setLoading(false);
     }

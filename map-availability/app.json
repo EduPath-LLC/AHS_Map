@@ -4,10 +4,10 @@
     "slug": "map-availability",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/images/logo.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/images/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff",
       "plugins": [
@@ -30,19 +30,17 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/images/logo.png",
         "backgroundColor": "#FFFFFF"
       },
       "permissions": [
-        "ACCESS_COARSE_LOCATION",
-        "ACCESS_FINE_LOCATION",
-        "ACCESS_COARSE_LOCATION",
-        "ACCESS_FINE_LOCATION"
+          "ACCESS_COARSE_LOCATION",
+          "ACCESS_FINE_LOCATION"
       ],
       "package": "com.rishinigam.mapavailability"
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/images/Logo.png"
     },
     "extra": {
       "eas": {

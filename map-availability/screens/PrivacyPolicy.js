@@ -83,7 +83,7 @@ export default function About({ navigation }) {
             <Text style={styles.scrollText}>9. Updates to This Policy</Text>
             <Text style={styles.scrollText2}>We may update this Privacy Policy from time to time. We will notify you of any changes by updating the effective date at the top of this Privacy Policy. Continued use of the app after such changes will constitute your consent to the updated policy.</Text>
             <Text style={styles.scrollText}>10. Contact Us</Text>
-            <Text style={styles.scrollText2}>If you have any questions or concerns about this Privacy Policy or our data practices, please jayadeep.velagapudi@student.allenisd.org, rishi.nigam@student.allenisd.org, or anish.choudhury@student.allenisd.org.</Text>
+            <Text style={styles.scrollText2}>If you have any questions or concerns about this Privacy Policy or our data practices, please contact team@edupathllc-onmicrosoft.com.</Text>
         </ScrollView>
       </View>
     </View>
