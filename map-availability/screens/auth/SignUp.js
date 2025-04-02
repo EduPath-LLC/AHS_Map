@@ -232,15 +232,15 @@ export default function SignUp({ navigation }) {
               <Text style={styles.checkboxLabel}>I agree to the Privacy Policy</Text>
             </View>
             
-            <View style={styles.buttonContainer}>
+            
               <Pressable 
-                style={styles.buttonCancel} 
+                style={[styles.button, { backgroundColor: '#F66060' }]}
                 onPress={() => {
                   setModalVisible(false);
                   setPPAccept(false);
                 }}
               >
-                <Text style={styles.buttonCancelText}>Cancel</Text>
+                <Text style={styles.buttonText}>Cancel</Text>
               </Pressable>
               
               <Pressable 
@@ -250,7 +250,7 @@ export default function SignUp({ navigation }) {
               >
                 <Text style={styles.buttonText}>Sign Up</Text>
               </Pressable>
-            </View>
+            
           </ScrollView>
         </View>
       </Modal>
