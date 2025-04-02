@@ -42,5 +42,53 @@ export const styles = StyleSheet.create({
     fontFamily: 'Kanit-Bold',
     fontSize: 10 * width,
     alignSelf: 'center'
+  },
+  
+  bigText: {
+    fontSize: 10 * width,
+    alignItems: 'center',
+    textAlign: 'left',
+    fontFamily: 'Kanit-Bold',
+  },
+
+  modalContainer: {
+    flex: 1,
+    flexDirection: 'column',
+    alignItems: 'center',
+    
+    backgroundColor: "#E0EDFC",
+    marginTop: 31 * height,
+  },
+
+  scrollStyle: {
+    paddingLeft: 10
+  },
+  scrollText: {
+    color: '#000000',
+    width: 90 * width,
+    alignSelf: 'flex-end',
+    fontSize: 5 * width,
+    fontWeight: 'bold',
+    alignContent: 'flex-start',
+    textAlign: 'flex-start',
+    marginBottom: 1 * width,
+  },
+  scrollText2: {
+    color: '#000000',
+    width: 85 * width,
+    alignSelf: 'flex-end',
+    fontSize: 5 * width,
+    alignContent: 'flex-start',
+    textAlign: 'flex-start',
+    marginBottom: 1 * width,
+  },
+  scrollText3: {
+    color: '#000000',
+    width: 80 * width,
+    alignSelf: 'flex-end',
+    fontSize: 5 * width,
+    alignContent: 'flex-start',
+    textAlign: 'flex-start',
+    marginBottom: 1 * width,
   }
 });
