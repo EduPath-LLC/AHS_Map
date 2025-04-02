@@ -55,7 +55,6 @@ export const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'column',
     alignItems: 'center',
-    
     backgroundColor: "#E0EDFC",
     marginTop: 31 * height,
   },
@@ -90,5 +89,66 @@ export const styles = StyleSheet.create({
     alignContent: 'flex-start',
     textAlign: 'flex-start',
     marginBottom: 1 * width,
-  }
+  },
+  
+  // New styles for checkbox and buttons
+  checkboxContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 2 * height,
+    paddingHorizontal: 2 * width,
+    width: 85 * width,
+    alignSelf: 'flex-end',
+  },
+  checkbox: {
+    width: 6 * width,
+    height: 6 * width,
+    borderWidth: 2,
+    borderColor: '#574BE5',
+    borderRadius: width,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 2 * width,
+  },
+  checkboxChecked: {
+    backgroundColor: '#574BE5',
+    borderColor: '#574BE5',
+  },
+  checkmark: {
+    color: 'white',
+    fontSize: 4 * width,
+  },
+  checkboxLabel: {
+    fontSize: 4.5 * width,
+    flex: 1,
+    color: '#000000',
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginVertical: 3 * height,
+    paddingHorizontal: 2 * width,
+    width: 85 * width,
+    alignSelf: 'flex-end',
+  },
+  buttonCancel: {
+    backgroundColor: '#E5E5E5',
+    paddingVertical: 1.5 * height,
+    paddingHorizontal: 5 * width,
+    borderRadius: 2 * width,
+    flex: 1,
+    marginRight: 3 * width,
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 7 * height,
+  },
+  buttonCancelText: {
+    fontSize: 4 * width,
+    fontWeight: 'bold',
+    color: '#555555',
+  },
+  buttonDisabled: {
+    backgroundColor: '#A8A8A8',
+    opacity: 0.7,
+  },
 });
