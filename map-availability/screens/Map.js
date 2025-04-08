@@ -8,6 +8,9 @@ import { styles } from '../styles/light/MapLight'
 import { useRoute, useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Magnetometer } from 'expo-sensors';
+import { Linking } from 'react-native';
+
+
 function isValidStaircasePair(point1, point2) {
   const isStaircase1 = point1.reference.startsWith('S');
   const isStaircase2 = point2.reference.startsWith('S');
@@ -1275,7 +1278,7 @@ return { currentSegment, progress, currentBearing, nextBearing };
 
 
 export default function Map({userId, navigation}) {
-const { location, errorMsg, hasPermission, updateLocation } = useContext(LocationContext);
+const { location, errorMsg, hasPermission, requestPermissions, updateLocation } = useContext(LocationContext);
 const [estimatedTime, setEstimatedTime] = useState(0);
 const mapRef = useRef(null);
 const [searchQuery, setSearchQuery] = useState('');
@@ -1430,6 +1433,19 @@ const routeBetweenFloors = (start, end, startFloorCoordinates, endFloorCoordinat
   // console.log(`Chosen route uses staircases: ${shortestRoute.startStaircase.reference} to ${shortestRoute.endStaircase.reference}`);
   return shortestRoute.route;
 };
+
+useEffect(() => {
+  if (hasPermission === false) {
+    // Handle case when permissions are denied
+    setIsMapDisabled(true);
+  } else if (hasPermission === true) {
+    // Handle case when permissions are granted
+    setIsMapDisabled(false);
+    updateLocation();
+  }
+}, [hasPermission]);
+
+
 useEffect(() => {
   let subscription;
   let lastUpdateTime = 0;
@@ -2083,7 +2099,7 @@ return (
         </View>
       )}
     </View>
-    {!hasPermission && (
+    {hasPermission === false && (
   <View style={styles.permissionOverlay}>
     <View style={styles.permissionMessageContainer}>
       <Text style={styles.permissionMessageText}>
@@ -2091,12 +2107,24 @@ return (
       </Text>
       <TouchableOpacity 
         style={styles.permissionButton} 
-        onPress={() => {
-          // Try to request permission again
-          updateLocation();
+        onPress={async () => {
+          const granted = await requestPermissions();
+          if (granted) {
+            // Permission granted, update location
+            await updateLocation();
+          }
         }}
       >
         <Text style={styles.permissionButtonText}>Allow Location Access</Text>
+      </TouchableOpacity>
+      <TouchableOpacity 
+        style={[styles.permissionButton, { marginTop: 10, backgroundColor: '#FF3B30' }]}
+        onPress={() => {
+          // Open app settings so user can enable permissions
+          Linking.openSettings();
+        }}
+      >
+        <Text style={styles.permissionButtonText}>Open Settings</Text>
       </TouchableOpacity>
     </View>
   </View>
