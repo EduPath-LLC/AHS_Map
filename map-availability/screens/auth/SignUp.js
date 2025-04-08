@@ -144,7 +144,7 @@ export default function SignUp({ navigation }) {
             <Text style={styles.scrollText}>Privacy Policy for Edupath</Text>
             <Text style={styles.scrollText2}>Effective Date: 7/31/2024</Text>
             <Text style={styles.scrollText}>1. Introduction</Text>
-            <Text style={styles.scrollText2}>Eagle Maps is committed to protecting the privacy of our users. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our mobile application designed for school students below 18 years old. Please read this privacy policy carefully. If you do not agree with the terms of this privacy policy, please do not access the application.</Text>
+            <Text style={styles.scrollText2}>Eagle Maps is committed to protecting the privacy of our users. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our mobile application designed for school students below 18 years old. Please read this privacy policy carefully. If you do not agree with the terms of this privacy policy, please do not access the application. Use the app at your own risk.</Text>
             <Text style={styles.scrollText}>2. Data Collection</Text>
             <Text style={styles.scrollText2}>We collect the following information:</Text>
             <Text style={styles.scrollText3}>→ First Name: To personalize your experience within the app.</Text>
