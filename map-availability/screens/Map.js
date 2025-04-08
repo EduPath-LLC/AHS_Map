@@ -2074,7 +2074,7 @@ return (
         );
       }
 
-      if (distance > 10000) {
+      if (distance > 1000) {
         return (
           <View style={styles.distanceOverlay}>
             <Text style={styles.distanceOverlayText}>
