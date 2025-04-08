@@ -41,7 +41,7 @@
       "package": "com.rishinigam.mapavailability"
     },
     "web": {
-      "favicon": "./assets/images/Logo.png"
+      "favicon": "./assets/images/logo.png"
     },
     "extra": {
       "eas": {
