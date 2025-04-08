@@ -1275,7 +1275,7 @@ return { currentSegment, progress, currentBearing, nextBearing };
 
 
 export default function Map({userId, navigation}) {
-const { location, errorMsg } = useContext(LocationContext);
+const { location, errorMsg, hasPermission, updateLocation } = useContext(LocationContext);
 const [estimatedTime, setEstimatedTime] = useState(0);
 const mapRef = useRef(null);
 const [searchQuery, setSearchQuery] = useState('');
@@ -2083,6 +2083,24 @@ return (
         </View>
       )}
     </View>
+    {!hasPermission && (
+  <View style={styles.permissionOverlay}>
+    <View style={styles.permissionMessageContainer}>
+      <Text style={styles.permissionMessageText}>
+        Location permission is required to use this feature
+      </Text>
+      <TouchableOpacity 
+        style={styles.permissionButton} 
+        onPress={() => {
+          // Try to request permission again
+          updateLocation();
+        }}
+      >
+        <Text style={styles.permissionButtonText}>Allow Location Access</Text>
+      </TouchableOpacity>
+    </View>
+  </View>
+)}
     {showArrivedMessage && (
       <View style={styles.arrivedMessageContainer}>
         <Text style={styles.arrivedMessageText}>Arrived</Text>

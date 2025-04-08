@@ -119,6 +119,34 @@ export  const styles = StyleSheet.create({
       shadowRadius: 3.84,
       elevation: 5,
     },
+    permissionOverlay: {
+      ...StyleSheet.absoluteFillObject,
+      backgroundColor: 'rgba(0,0,0,0.7)',
+      justifyContent: 'center',
+      alignItems: 'center',
+      zIndex: 100,
+    },
+    permissionMessageContainer: {
+      backgroundColor: 'white',
+      padding: 20,
+      borderRadius: 10,
+      width: '80%',
+      alignItems: 'center',
+    },
+    permissionMessageText: {
+      fontSize: 16,
+      textAlign: 'center',
+      marginBottom: 20,
+    },
+    permissionButton: {
+      backgroundColor: '#007AFF',
+      padding: 10,
+      borderRadius: 5,
+    },
+    permissionButtonText: {
+      color: 'white',
+      fontWeight: 'bold',
+    },
     routeInfoText: {
       fontSize: 18,
       fontWeight: 'bold',

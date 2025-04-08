@@ -23,7 +23,8 @@
       "supportsTablet": true,
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "This app needs access to location when open.",
-        "NSLocationAlwaysAndWhenInUseUsageDescription": "This app needs access to location when open and in the background."
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "This app needs access to location when open and in the background.",
+        "ITSAppUsesNonExemptEncryption": false
       },
       "newArchEnabled": true,
       "bundleIdentifier": "com.rishinigam.mapavailability"
@@ -34,8 +35,8 @@
         "backgroundColor": "#FFFFFF"
       },
       "permissions": [
-          "ACCESS_COARSE_LOCATION",
-          "ACCESS_FINE_LOCATION"
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION"
       ],
       "package": "com.rishinigam.mapavailability"
     },

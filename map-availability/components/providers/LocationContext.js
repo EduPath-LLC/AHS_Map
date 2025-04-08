@@ -6,15 +6,18 @@ export const LocationContext = createContext();
 export const LocationProvider = ({ children }) => {
   const [location, setLocation] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
+  const [hasPermission, setHasPermission] = useState(false);
 
   useEffect(() => {
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
         setErrorMsg('Permission to access location was denied');
+        setHasPermission(false);
         return;
       }
 
+      setHasPermission(true);
       await updateLocation();
 
       // Set up a location subscription
@@ -38,12 +41,16 @@ export const LocationProvider = ({ children }) => {
   }, []);
 
   const updateLocation = async () => {
-    let currentLocation = await Location.getCurrentPositionAsync({});
-    setLocation(currentLocation);
+    try {
+      let currentLocation = await Location.getCurrentPositionAsync({});
+      setLocation(currentLocation);
+    } catch (error) {
+      setErrorMsg('Error getting location');
+    }
   };
 
   return (
-    <LocationContext.Provider value={{ location, errorMsg, updateLocation }}>
+    <LocationContext.Provider value={{ location, errorMsg, hasPermission, updateLocation }}>
       {children}
     </LocationContext.Provider>
   );
