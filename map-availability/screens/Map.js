@@ -2055,7 +2055,7 @@ return (
     {(() => {
       const { location } = useContext(LocationContext);
       const distance = useMemo(() => {
-        if (!location?.coords) return Infinity;
+        if (!location?.coords) return null;
         return calculateDistance(
           location.coords.latitude,
           location.coords.longitude,
@@ -2064,7 +2064,17 @@ return (
         );
       }, [location]);
 
-      if (distance > 750000000000) {
+      if (distance === null || distance > 10000000) {
+        return (
+          <View style={styles.distanceOverlay}>
+            <Text style={styles.distanceOverlayText}>
+              Please enable location services in settings and reopen the app.
+            </Text>
+          </View>
+        );
+      }
+
+      if (distance > 1000) {
         return (
           <View style={styles.distanceOverlay}>
             <Text style={styles.distanceOverlayText}>
@@ -2074,8 +2084,10 @@ return (
           </View>
         );
       }
+
       return null;
     })()}
+
       {/* {showHistory && (
         <View style={styles.historyContainer}>
           {searchHistory.map((item, index) => (
