@@ -2054,7 +2054,7 @@ return (
           style={styles.searchInput}
           value={startingPointQuery}
           onChangeText={setStartingPointQuery}
-          placeholder="Enter starting point (e.g., F108)"
+          placeholder="Enter starting point (e.g., F108, G245)"
           placeholderTextColor="#999"
         />
         <TextInput
@@ -2062,7 +2062,7 @@ return (
           value={searchQuery}
           onChangeText={setSearchQuery}
           onFocus={() => setShowHistory(true)}
-          placeholder="Enter destination (e.g., F108)"
+          placeholder="Enter destination (e.g., A116, K106)"
           placeholderTextColor="#999"
         />
         <TouchableOpacity 
