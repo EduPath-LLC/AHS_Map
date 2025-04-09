@@ -9,7 +9,9 @@ import { useRoute, useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Magnetometer } from 'expo-sensors';
 import { Linking } from 'react-native';
+import { doc, getDoc } from 'firebase/firestore';
 
+import { db } from '../firebase'
 
 function isValidStaircasePair(point1, point2) {
   const isStaircase1 = point1.reference.startsWith('S');
@@ -1305,12 +1307,39 @@ const [showFirstFloor, setShowFirstFloor] = useState(true);
 const [currentFloor, setCurrentFloor] = useState(1);
 const [heading, setHeading] = useState(0);
 const [showSearch, setShowSearch] = useState(true);
+const [email, setEmail] = useState('');
 // Add to your state variables
 const [directionsList, setDirectionsList] = useState([]);
 
 const route_navigation = useRoute();
 const { targetRoom, prevRoom } = route_navigation.params || {};
 
+useEffect(() => {
+  const fetchEmail = async () => {
+    try {
+      if (userId) {
+        const userDocRef = doc(db, 'users', userId);
+        const userDocSnap = await getDoc(userDocRef);
+
+        if (userDocSnap.exists()) {
+          const userData = userDocSnap.data();
+          setEmail(userData.email);
+        } else {
+          console.log('No such document!');
+        }
+      } else {
+        console.error('User ID is undefined');
+      }
+    } catch (error) {
+      console.error('Error fetching document: ', error);
+    }
+  };
+
+  fetchEmail();
+  
+}, [userId]);
+
+console.log(email)
 
 useEffect(() => {
   if (targetRoom && prevRoom) {

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Switch, Pressable, Alert, Image } from 'react-native';
-import { signOut } from 'firebase/auth';
+import { signOut, deleteUser } from 'firebase/auth';
 import WavyHeader from '../components/headers/WavyHeader';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../firebase';
@@ -46,6 +46,22 @@ export default function Account({navigation}) {
         });
 };
 
+  const handleDeleteUser = async () => {
+    const user = auth.currentUser;
+    if (user) {
+      deleteUser(user)
+        .then(() => {
+          wipeUserInfo();
+          navigation.navigate("SignIn");
+        })
+        .catch((e) => {
+          Alert.alert("Error", e.message);
+        });
+    } else {
+      Alert.alert("Error", "No user is currently signed in.");
+    }
+  };
+
   return (
     <View style={styles.fullScreen}>
         <WavyHeader 
@@ -70,6 +86,11 @@ export default function Account({navigation}) {
         <Pressable style={[styles.button, {backgroundColor: "#F66060"}]} onPress={logOut}>
           <Text style={styles.buttonText}>Log Out</Text>
         </Pressable>
+
+        <Pressable style={[styles.button, { backgroundColor: "#ad0603" }]} onPress={handleDeleteUser}>
+          <Text style={styles.buttonText}> Delete User </Text>
+        </Pressable>
+
     </View>
     </View>
   )
