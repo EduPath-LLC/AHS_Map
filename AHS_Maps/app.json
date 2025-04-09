@@ -22,8 +22,8 @@
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
-        "NSLocationWhenInUseUsageDescription": "$(PRODUCT_NAME) needs your location to enable safety features and restrict map access to Allen High School users only.",
-        "NSLocationAlwaysAndWhenInUseUsageDescription": "$(PRODUCT_NAME) needs your location to enable safety features and restrict map access to Allen High School users only.",
+        "NSLocationWhenInUseUsageDescription": "$(PRODUCT_NAME) needs your location to enable safety features and restrict map access to Allen High School users only. Also, it is used for directional guidance.",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "$(PRODUCT_NAME) needs your location to enable safety features and restrict map access to Allen High School users only. Also, it is used for directional guidance.",
         "ITSAppUsesNonExemptEncryption": false
       },
       "newArchEnabled": true,

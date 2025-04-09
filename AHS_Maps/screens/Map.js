@@ -1903,7 +1903,7 @@ const handleSearch = useCallback(async () => {
         alert('Unable to calculate route. Please try again.');
       }
     } else {
-      alert("Invalid starting point or destination. Please enter valid hall numbers (e.g., F108, S18).");
+      alert("Invalid starting point or destination. Please enter valid hall numbers (e.g., F108, G245).");
       setShowSearch(true);
     }
   } else {
