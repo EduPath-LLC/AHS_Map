@@ -21,7 +21,7 @@ extensions.configure(com.facebook.react.ReactSettingsExtension) { ex ->
   }
 }
 
-rootProject.name = 'map-availability'
+rootProject.name = 'AHS Maps'
 
 dependencyResolutionManagement {
   versionCatalogs {

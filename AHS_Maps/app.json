@@ -22,8 +22,8 @@
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
-        "NSLocationWhenInUseUsageDescription": "This app needs access to location when open.",
-        "NSLocationAlwaysAndWhenInUseUsageDescription": "This app needs access to location when open and in the background.",
+        "NSLocationWhenInUseUsageDescription": "$(PRODUCT_NAME) needs your location to enable safety features and restrict map access to Allen High School users only.",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "$(PRODUCT_NAME) needs your location to enable safety features and restrict map access to Allen High School users only.",
         "ITSAppUsesNonExemptEncryption": false
       },
       "newArchEnabled": true,
