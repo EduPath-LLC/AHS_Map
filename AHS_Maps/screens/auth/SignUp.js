@@ -54,6 +54,7 @@ export default function SignUp({ navigation }) {
     }
 
     try {
+      setModalVisible(false);
       setLoading(true);
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
@@ -107,8 +108,20 @@ export default function SignUp({ navigation }) {
       );
     } catch (error) {
       setLoading(false);
-      // Handle sign-up errors
-      Alert.alert('Error', error.message);
+      switch (error.code) {
+              case 'auth/email-already-in-use':
+                Alert.alert("Error", "This email already has an account.");
+                break;
+              case 'auth/weak-password':
+                Alert.alert("Error", "Weak password. Please have at least 6 characters.");
+                break;
+              case 'auth/invalid-email':
+                Alert.alert("Error", "The email address is badly formatted.");
+                break;
+              default:
+                Alert.alert('Error', error.message);
+                break;
+            }
     }
   };
 

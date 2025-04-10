@@ -26,65 +26,44 @@ export default class CardInputs extends Component {
     
 
     render() {
-        if(this.state.arr.id != 'Lunch'){
-            return (
+        
+        return (
 
-                <View style={stylesLight.card}>
-                    <Text style={stylesLight.period}> {this.state.arr.id} Period </Text>
+            <View style={stylesLight.card}>
+                <Text style={stylesLight.period}> {this.state.arr.id} Period </Text>
 
 
 
-                    <TextInput
-                        style={stylesLight.input}
-                        placeholder="Class Name"
-                        value={this.state.arr.className}
-                        onChangeText={(value) => this.handleInputChange('className', value)}
-                    />
+                <TextInput
+                    style={stylesLight.input}
+                    placeholder="Class Name"
+                    value={this.state.arr.className}
+                    onChangeText={(value) => this.handleInputChange('className', value)}
+                />
 
-                    <TextInput
-                        style={stylesLight.input}
-                        placeholder="Teacher Last Name"
-                        value={this.state.arr.teacher}
-                        onChangeText={(value) => this.handleInputChange('teacher', value)}
-                    />
+                <TextInput
+                    style={stylesLight.input}
+                    placeholder="Teacher Last Name"
+                    value={this.state.arr.teacher}
+                    onChangeText={(value) => this.handleInputChange('teacher', value)}
+                />
 
-                    <TextInput
-                        style={stylesLight.input}
-                        placeholder="Building"
-                        value={this.state.arr.building}
-                        onChangeText={(value) => this.handleInputChange('building', value)}
-                    />
+                <TextInput
+                    style={stylesLight.input}
+                    placeholder="Building"
+                    value={this.state.arr.building}
+                    onChangeText={(value) => this.handleInputChange('building', value)}
+                />
 
-                    <TextInput
-                        style={stylesLight.input}
-                        placeholder="Room Number"
-                        value={this.state.arr.roomNumber}
-                        onChangeText={(value) => this.handleInputChange('roomNumber', value)}
-                    />
+                <TextInput
+                    style={stylesLight.input}
+                    placeholder="Room Number"
+                    value={this.state.arr.roomNumber}
+                    onChangeText={(value) => this.handleInputChange('roomNumber', value)}
+                />
 
-                </View>
-            );
-        } else {
-            return(
-                <View style={stylesLight.card}>
-                    <Text style={stylesLight.period}> {this.state.arr.id} Period </Text>
-
-                    <TextInput
-                        style={stylesLight.input}
-                        placeholder="A Day Lunch"
-                        value={this.state.arr.a_day}
-                        onChangeText={(value) => this.handleInputChange('a_day', value)}
-                    />
-
-                    <TextInput
-                        style={stylesLight.input}
-                        placeholder="B Day Lunch"
-                        value={this.state.arr.b_day}
-                        onChangeText={(value) => this.handleInputChange('b_day', value)}
-                    />
-
-                </View>
-            )
-        }
+            </View>
+        );
+        
     }
 }

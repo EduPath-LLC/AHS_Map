@@ -27,7 +27,6 @@ export default class Carousel extends Component {
             sixth: {},
             seventh: {},
             eighth: {},
-            lunch: {},
             loading: false,
             arrowBack: null,
             arrowForward: null,
@@ -68,7 +67,6 @@ export default class Carousel extends Component {
                         fifth: scheduleData[1],
                         first: scheduleData[2],
                         fourth: scheduleData[3],
-                        lunch: scheduleData[4],
                         second: scheduleData[5],
                         seventh: scheduleData[6],
                         sixth: scheduleData[7],
@@ -112,9 +110,6 @@ export default class Carousel extends Component {
             case 8:
                 this.setState({eighth: newArr});
                 break;
-            case 9:
-                this.setState({lunch: newArr});
-                break;
             default:
                 break;
         }
@@ -130,7 +125,6 @@ export default class Carousel extends Component {
             6: this.state.sixth,
             7: this.state.seventh,
             8: this.state.eighth,
-            9: this.state.lunch,
         };
 
         const scheduleItem = scheduleMap[current];
@@ -146,7 +140,7 @@ export default class Carousel extends Component {
 
     increase = () => {
         this.setState(prevState => ({
-            current: prevState.current < 9 ? prevState.current + 1 : prevState.current
+            current: prevState.current < 8 ? prevState.current + 1 : prevState.current
         }));
     }
 
@@ -167,7 +161,7 @@ export default class Carousel extends Component {
 
         try {
             this.setState({loading: true})
-            const data = [this.state.first, this.state.second, this.state.third, this.state.fourth, this.state.fifth, this.state.sixth, this.state.seventh, this.state.eighth, this.state.lunch]
+            const data = [this.state.first, this.state.second, this.state.third, this.state.fourth, this.state.fifth, this.state.sixth, this.state.seventh, this.state.eighth]
 
             data.map(async (data) => {
                 let docRef = doc(db, `users/${this.props.userId}/schedule`, data.id);
@@ -266,16 +260,6 @@ export default class Carousel extends Component {
         if(!empty) {
             for (let key in this.state.eighth) {
                 let value = this.state.eighth[key];
-                if (value === "") {
-                    empty = true;
-                    break;
-                }
-            }
-        }
-
-        if(!empty) {
-            for (let key in this.state.lunch) {
-                let value = this.state.lunch[key];
                 if (value === "") {
                     empty = true;
                     break;

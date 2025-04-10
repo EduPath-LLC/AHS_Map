@@ -28,7 +28,6 @@ export default class HomeCarousel extends Component {
             sixth: {},
             seventh: {},
             eighth: {},
-            lunch: {},
             loading: false,
             arrowBack: this.props.dark ? ArrowBackDark : ArrowBack,
             arrowForward: this.props.dark ? ArrowForwardDark : ArrowForward,
@@ -71,7 +70,6 @@ export default class HomeCarousel extends Component {
                         fifth: scheduleData[1],
                         first: scheduleData[2],
                         fourth: scheduleData[3],
-                        lunch: scheduleData[4],
                         second: scheduleData[5],
                         seventh: scheduleData[6],
                         sixth: scheduleData[7],
@@ -171,9 +169,6 @@ export default class HomeCarousel extends Component {
             case 8:
                 this.setState({eighth: newArr});
                 break;
-            case 9:
-                this.setState({lunch: newArr});
-                break;
             default:
                 break;
         }
@@ -189,7 +184,6 @@ export default class HomeCarousel extends Component {
                 3: this.state.third,
                 4: this.state.fourth,
                 5: this.state.eighth,
-                6: this.state.lunch,
             }
         } else {
             scheduleMap = {
@@ -198,7 +192,6 @@ export default class HomeCarousel extends Component {
                 3: this.state.sixth,
                 4: this.state.seventh,
                 5: this.state.eighth,
-                6: this.state.lunch,
             }
         }
 
@@ -215,7 +208,7 @@ export default class HomeCarousel extends Component {
 
     increase = () => {
         this.setState(prevState => ({
-            current: prevState.current < 6 ? prevState.current + 1 : prevState.current
+            current: prevState.current < 5 ? prevState.current + 1 : prevState.current
         }));
     }
 
@@ -235,7 +228,6 @@ export default class HomeCarousel extends Component {
                 3: this.state.third,
                 4: this.state.fourth,
                 5: this.state.eighth,
-                6: this.state.lunch,
             }
         } else {
             scheduleMap = {
@@ -244,7 +236,6 @@ export default class HomeCarousel extends Component {
                 3: this.state.sixth,
                 4: this.state.seventh,
                 5: this.state.eighth,
-                6: this.state.lunch,
             }
         }
 
@@ -279,7 +270,6 @@ export default class HomeCarousel extends Component {
                 3: this.state.third,
                 4: this.state.fourth,
                 5: this.state.eighth,
-                6: this.state.lunch,
             }
         } else {
             scheduleMap = {
@@ -288,7 +278,6 @@ export default class HomeCarousel extends Component {
                 3: this.state.sixth,
                 4: this.state.seventh,
                 5: this.state.eighth,
-                6: this.state.lunch,
             }
         }
 
