@@ -74,12 +74,20 @@ export default function Account({navigation}) {
           navigation.navigate("SignIn");
         })
         .catch((e) => {
-          Alert.alert("Error", e.message);
+          if (e.code === "auth/requires-recent-login") {
+            Alert.alert(
+              "Session Expired",
+              "For security reasons, please log out and log back in before deleting your account."
+            );
+          } else {
+            Alert.alert("Error", e.message);
+          }
         });
     } else {
       Alert.alert("Error", "No user is currently signed in.");
     }
   };
+  
 
   return (
     <View style={styles.fullScreen}>
