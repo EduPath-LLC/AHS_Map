@@ -105,7 +105,7 @@ function isValidStaircasePair(point1, point2) {
       let bearingDifference = Math.abs(newBearing - lastSignificantBearing);
       
       bearingDifference = bearingDifference > 180 ? 360 - bearingDifference : bearingDifference;
-
+      console.log(bearingDifference)
       if (bearingDifference >= 55 && bearingDifference <= 120) {
         segments.push(currentSegment);
         currentSegment = [nextPoint];
@@ -288,6 +288,19 @@ const firstFloorCoordinates = [
   { latitude: 33.10893343998354, longitude: -96.66004332519219, reference: 'K MID' },
   { latitude: 33.10883392503870000000, longitude: -96.66018791621958000000, reference: 'K ENTRANCE' },
   // { latitude: 33.10856133683780, longitude: -96.65993588423450, reference: 'S1_21' },
+  { latitude: 33.1086619585, longitude: -96.6600289543, reference: 'H ENTRANCE' },
+  { latitude: 33.1085634645, longitude: -96.6601760848, reference: 'H101' },
+{ latitude: 33.1085160383, longitude: -96.6602469942, reference: 'H100' },
+{ latitude: 33.1084710293, longitude: -96.6603049346, reference: 'S1_123' },
+{ latitude: 33.1085160383, longitude: -96.6602469942, reference: 'H100' },
+{ latitude: 33.1083272249, longitude: -96.6605290615, reference: 'H104' },
+{ latitude: 33.1083145142, longitude: -96.6605489087, reference: 'H112' },
+{ latitude: 33.1082646275, longitude: -96.6606227137, reference: 'H113' }, 
+{ latitude: 33.1083413446, longitude: -96.6606974466, reference: 'END1H' },
+{ latitude: 33.1083097488, longitude: -96.6607437354, reference: 'CORNERH' },
+{ latitude: 33.1082902300, longitude: -96.6607719281, reference: 'H115' },
+{ latitude: 33.1082614589, longitude: -96.6608138064, reference: 'H117' },
+{ latitude: 33.1082614589, longitude: -96.6608138064, reference: 'SHOP' },
 ];
 
 const secondFloorCoordinates = [
@@ -369,7 +382,7 @@ const secondFloorCoordinates = [
   { latitude: 33.108613014886394, longitude: -96.66139553930395, reference: "G226" },
   { latitude: 33.108581705223514, longitude: -96.66144327508565, reference: "G227" },
   { latitude: 33.10853124877592, longitude: -96.66152020270945, reference: "G228" },
-  { latitude: 33.10851308693722, longitude: -96.66154789286921, reference: "S2_5" },
+  { latitude: 33.10851678364739, longitude: -96.66153855042106, reference: 'S2_5' },
   { latitude: 33.10834535768775, longitude: -96.6613946199867, reference: "S2_19" },
   { latitude: 33.1083641486784, longitude: -96.66136620875649, reference: "G236" },
   { latitude: 33.10841559016205, longitude: -96.66128790580876, reference: "G237" },
@@ -397,7 +410,18 @@ const secondFloorCoordinates = [
   { latitude: 33.10886097025895, longitude: -96.66028186102025, reference: 'S2_16' },
   { latitude: 33.10890844171046, longitude: -96.66020960345315, reference: "HALLPT2" },
   { latitude: 33.10886097025895, longitude: -96.66028186102025, reference: 'S2_16' },
-  { latitude: 33.108630171211225, longitude: -96.66006993335228, reference: '2HENTRANCE' },
+  { latitude: 33.1086301712, longitude: -96.6600676445, reference: 'H2ENTRANCE' },
+{ latitude: 33.1085978749, longitude: -96.6601157274, reference: 'H203' },
+{ latitude: 33.1085123138, longitude: -96.6602432465, reference: 'H204' },
+{ latitude: 33.1084773589, longitude: -96.6602954475, reference: 'H205' },
+{ latitude: 33.1084710292, longitude: -96.6603049345, reference: 'RND' },
+{ latitude: 33.1084710293, longitude: -96.6603049346, reference: 'S2_123' },
+{ latitude: 33.1084710292, longitude: -96.6603049345, reference: 'RND' },
+{ latitude: 33.1084635304, longitude: -96.6603159826, reference: 'H206' },
+{ latitude: 33.1084626441, longitude: -96.6603174987, reference: 'H208' },
+{ latitude: 33.1086301712, longitude: -96.6600676445, reference: 'H2ENTRANCE' },
+
+
   { latitude: 33.10867497158879, longitude: -96.65999863931151, reference: "K204" },
   { latitude: 33.10885838458248, longitude: -96.66016301902835, reference: "K ENTRANCE" },
   { latitude: 33.10896982964244, longitude: -96.65998494750866, reference: "K MID" },
@@ -1613,9 +1637,9 @@ const getDirectionGuidance = useCallback(() => {
 
   // Provide turn instructions based on the angle
   if (angle < 180) {
-    return `Turn left in ${distance}`;
+    return `Go straight for ${distance}`;
   } else {
-    return `Turn right in ${distance}`;
+    return `Go straight for ${distance}`;
   }
 }, [routeSegments, currentSegmentIndex, directions.text]);
 
