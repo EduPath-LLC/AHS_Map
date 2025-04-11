@@ -1,6 +1,7 @@
-import React, { Component } from 'react'
-import { View, Text, TextInput, KeyboardAvoidingView, Platform } from 'react-native'
-import { stylesLight } from '../../styles/light/CardInputsLight'
+import React, { Component } from 'react';
+import { View, Text, TextInput } from 'react-native';
+import { Dropdown } from 'react-native-element-dropdown'; // Import Dropdown
+import { stylesLight } from '../../styles/light/CardInputsLight';
 
 export default class CardInputs extends Component {
     constructor(props) {
@@ -16,23 +17,21 @@ export default class CardInputs extends Component {
 
     handleInputChange = (id, value) => {
         const newObject = { ...this.state.arr };
-    
         newObject[id] = value;
-    
         this.setState({ arr: newObject });
-    
         this.props.onInputChange(newObject);
     };
-    
 
     render() {
-        
-        return (
+        const buildingOptions = [
+            { label: 'Allen High School', value: 'Allen High School' },
+            { label: 'Lowery Freshman Center', value: 'Lowery Freshman Center' },
+            { label: 'STEAM Center', value: 'STEAM Center' },
+        ];
 
+        return (
             <View style={stylesLight.card}>
                 <Text style={stylesLight.period}> {this.state.arr.id} Period </Text>
-
-
 
                 <TextInput
                     style={stylesLight.input}
@@ -48,11 +47,15 @@ export default class CardInputs extends Component {
                     onChangeText={(value) => this.handleInputChange('teacher', value)}
                 />
 
-                <TextInput
+                {/* Replace Picker with Dropdown */}
+                <Dropdown
                     style={stylesLight.input}
-                    placeholder="Building"
+                    data={buildingOptions}
+                    labelField="label"
+                    valueField="value"
+                    placeholder="Select Building"
                     value={this.state.arr.building}
-                    onChangeText={(value) => this.handleInputChange('building', value)}
+                    onChange={(item) => this.handleInputChange('building', item.value)}
                 />
 
                 <TextInput
@@ -61,9 +64,7 @@ export default class CardInputs extends Component {
                     value={this.state.arr.roomNumber}
                     onChangeText={(value) => this.handleInputChange('roomNumber', value)}
                 />
-
             </View>
         );
-        
     }
 }
