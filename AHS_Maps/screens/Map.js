@@ -1499,36 +1499,37 @@ useEffect(() => {
 }, [hasPermission]);
 
 
-useEffect(() => {
-  let subscription;
-  let lastUpdateTime = 0;
-  const updateInterval = 500; 
+// useEffect(() => {
+//   let subscription;
+//   let lastUpdateTime = 0;
+//   const updateInterval = 500; 
 
-  const startMagnetometer = async () => {
-    try {
-      await Magnetometer.requestPermissionsAsync();
-      Magnetometer.setUpdateInterval(updateInterval);
-      subscription = Magnetometer.addListener((data) => {
-        const currentTime = Date.now();
-        if (currentTime - lastUpdateTime >= updateInterval) {
-          const newHeading = Math.round((Math.atan2(data.y, data.x) * 180) / Math.PI);
-          setHeading(newHeading);
-          lastUpdateTime = currentTime;
-        }
-      });
-    } catch (error) {
-      console.log('Error setting up magnetometer:', error);
-    }
-  };
+//   const startMagnetometer = async () => {
+//     try {
+//       await Magnetometer.requestPermissionsAsync();
+//       Magnetometer.setUpdateInterval(updateInterval);
+//       // Update the magnetometer listener
+//       subscription = Magnetometer.addListener((data) => {
+//         const currentTime = Date.now();
+//         if (currentTime - lastUpdateTime >= updateInterval) {
+//           const newHeading = Math.round((Math.atan2(data.y, data.x) * 180) / Math.PI);
+//           setHeading(newHeading);
+//           lastUpdateTime = currentTime;
+//         }
+//       });
+//     } catch (error) {
+//       console.log('Error setting up magnetometer:', error);
+//     }
+//   };
 
-  startMagnetometer();
+//   startMagnetometer();
 
-  return () => {
-    if (subscription) {
-      subscription.remove();
-    }
-  };
-}, []);
+//   return () => {
+//     if (subscription) {
+//       subscription.remove();
+//     }
+//   };
+// }, []);
 
 const getHeadingDifference = useCallback(() => {
   if (!isRouteActive || routeSegments.length === 0) return null;
@@ -1548,21 +1549,21 @@ const getHeadingDifference = useCallback(() => {
   return difference;
 }, [isRouteActive, routeSegments, currentSegmentIndex, heading, calculateBearing]);
 
-const getFirstHeadingDirection = useCallback(() => {
-  const difference = getHeadingDifference(currentSegmentIndex);
+// const getFirstHeadingDirection = useCallback(() => {
+//   const difference = getHeadingDifference(currentSegmentIndex);
 
-  if (difference === null) {
-    return 'Calculating direction...';
-  }
+//   if (difference === null) {
+//     return 'Calculating direction...';
+//   }
 
-  if (Math.abs(difference) <= 45) {
-    return 'You are facing the right way';
-  } else if (difference < 0) {
-    return `Rotate left ${Math.abs(Math.round(difference))}°`;
-  } else {
-    return `Rotate right ${Math.round(difference)}°`;
-  }
-}, [getHeadingDifference, routeSegments, currentSegmentIndex]);
+//   if (Math.abs(difference) <= 45) {
+//     return 'You are facing the right way';
+//   } else if (difference < 0) {
+//     return `Rotate left ${Math.abs(Math.round(difference))}°`;
+//   } else {
+//     return `Rotate right ${Math.round(difference)}°`;
+//   }
+// }, [getHeadingDifference, routeSegments, currentSegmentIndex]);
 
 
 
@@ -2218,15 +2219,15 @@ return (
 
     <View style={styles.rotationContainer}>
           <Text style={styles.directionsText}>
-            Rotation
+            Coming Soon
           </Text>
 
-          {getFirstHeadingDirection().startsWith("Rotate left") 
+          {/* {getFirstHeadingDirection().startsWith("Rotate left") 
             ? <FontAwesome6 name="arrow-rotate-left" size={24} color="black" />
             : getFirstHeadingDirection().startsWith("Rotate right")
               ? <FontAwesome6 name="arrow-rotate-right" size={24} color="black" />
               : <FontAwesome name="check" size={24} color="black" />
-            }
+            } */}
     </View>
 
     <View style={styles.guidanceContainer}>
