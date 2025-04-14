@@ -30,6 +30,7 @@ function isValidStaircasePair(point1, point2) {
   let lastSignificantBearing = calculateBearing(route[0], route[1]);
   let currentFloor = getFloor(route[0]);
   let specialStaircaseHandled = false;
+  let justExitedStaircase = false; // Flag to track if we just exited a staircase
 
   // Enhanced staircase detection using both ID and reference
   const isTargetStaircase = (point) => {
@@ -48,6 +49,7 @@ function isValidStaircasePair(point1, point2) {
     const currentPoint = route[i - 1];
     const nextPoint = route[i];
 
+    // Check if we're entering a staircase
     if (isActiveStaircasePair(i - 1)) {
       if (currentSegment.length > 0) {
         segments.push(currentSegment);
@@ -85,6 +87,8 @@ function isValidStaircasePair(point1, point2) {
         i = lookAhead - 1;
         currentSegment = [route[i]];
       }
+      
+      justExitedStaircase = true; // Set flag to indicate we just exited a staircase
       continue;
     }
 
@@ -95,6 +99,7 @@ function isValidStaircasePair(point1, point2) {
         currentSegment[currentSegment.length - 1]
       );
       specialStaircaseHandled = false;
+      justExitedStaircase = true; // We've just exited a staircase
     }
 
     currentSegment.push(nextPoint);
@@ -105,12 +110,24 @@ function isValidStaircasePair(point1, point2) {
       let bearingDifference = Math.abs(newBearing - lastSignificantBearing);
       
       bearingDifference = bearingDifference > 180 ? 360 - bearingDifference : bearingDifference;
-      console.log(bearingDifference)
-      if (bearingDifference >= 55 && bearingDifference <= 120) {
+      console.log(bearingDifference);
+      
+      // Only create a turn segment if we haven't just exited a staircase
+      if (bearingDifference >= 55 && bearingDifference <= 120 && !justExitedStaircase) {
         segments.push(currentSegment);
         currentSegment = [nextPoint];
         lastSignificantBearing = newBearing;
+      } else {
+        // Update the bearing even if we don't create a new segment
+        // This ensures we capture the new direction after staircase exit
+        if (justExitedStaircase) {
+          lastSignificantBearing = newBearing;
+          justExitedStaircase = false; // Reset the flag
+        }
       }
+    } else {
+      // Reset the flag if we've processed the next point after a staircase
+      justExitedStaircase = false;
     }
   }
 
@@ -140,8 +157,11 @@ const firstFloorCoordinates = [
   { latitude: 33.10976867219124400000, longitude: -96.66105219132257000000, reference: 'CAFETERIA' },
     
     { latitude: 33.11002453134270951, longitude: -96.66066677016860353, reference: 'ENTRANCE' },
+    { latitude: 33.10990558458200894, longitude: -96.6608457668722707, reference: 'BOBO' },
     { latitude: 33.109768672191244, longitude: -96.66105221607516, reference: 'MID' },
+    { latitude: 33.10963909069702282, longitude: -96.6609325858267141, reference: 'NAN' },
     { latitude: 33.10954918426422500000, longitude: -96.66084925093358000000, reference: 'S1_1' },
+    { latitude: 33.109490531505528571, longitude: -96.66094251757571953, reference: 'RANDOM' },
     { latitude: 33.10945194354582, longitude: -96.66100404668036, reference: 'F MID' },
     { latitude: 33.109483345573686, longitude: -96.66103270225616, reference: 'F105' },
     { latitude: 33.10954345131491, longitude: -96.66108818354715, reference: 'CORNER' },
@@ -156,6 +176,7 @@ const firstFloorCoordinates = [
     { latitude: 33.10930435051054, longitude: -96.66145051621429, reference: 'S1_7' },
     { latitude: 33.10926906150741, longitude: -96.66150394814619, reference: 'F120' },
     { latitude: 33.10925627852489, longitude: -96.66152330316875, reference: 'MIDCUT1' },
+{ latitude: 33.10917500057485796, longitude: -96.66144709120794687, reference: 'BS1' },
     { latitude: 33.10909240405331, longitude: -96.66136957400717, reference: 'MIDCUT2' },
     { latitude: 33.10925627852489, longitude: -96.66152330316875, reference: 'MIDCUT1' },
     { latitude: 33.10921164679766, longitude: -96.66159088114483, reference: 'F123' },
@@ -168,6 +189,7 @@ const firstFloorCoordinates = [
     { latitude: 33.10903118206320, longitude: -96.66186412715768, reference: 'F131' },
     { latitude: 33.10898396103786, longitude: -96.66193562565257, reference: 'F133' },
     { latitude: 33.10896996486976, longitude: -96.66195681758873, reference: 'S1_20' },
+    { latitude: 33.10889551968602973, longitude: -96.66188870894556828, reference: 'NAN1A' },
     { latitude: 33.10880449636794, longitude: -96.66180426005346, reference: 'S1_30' },
     { latitude: 33.10881853776829, longitude: -96.66178306019978, reference: 'F136' },
     { latitude: 33.10884543469507, longitude: -96.66174245093733, reference: 'F137' },
@@ -179,7 +201,7 @@ const firstFloorCoordinates = [
     { latitude: 33.10901217527204, longitude: -96.66149070426349, reference: 'F146' },
     { latitude: 33.10909240405331, longitude: -96.66136957400717, reference: 'MIDCUT2' },
     { latitude: 33.10909240405331, longitude: -96.66136957400717, reference: 'F148' },
-    { latitude: 33.10913821274078, longitude: -96.66130041156984, reference: 'S1_10' },
+    { latitude: 33.10914462005206, longitude: -96.66129074330831, reference: 'S1_10' },
     { latitude: 33.10915554044267, longitude: -96.66127425002360, reference: 'F153' },
     { latitude: 33.10920440903412, longitude: -96.66120046771113, reference: 'F155' },
     { latitude: 33.10923993344288, longitude: -96.66114683258577, reference: 'F156' },
@@ -191,10 +213,13 @@ const firstFloorCoordinates = [
     { latitude: 33.10937929679408, longitude: -96.66093665884165, reference: 'F164' },
     { latitude: 33.10941692859606, longitude: -96.66097139530632, reference: 'F165' },
     { latitude: 33.10945194354582, longitude: -96.66100404668036, reference: 'F MID' },
+    { latitude: 33.109490531505528571, longitude: -96.66094251757571953, reference: 'RANDOM' },
     { latitude: 33.109549184260000, longitude: -96.66084925000000, reference: 'F201' },
+{ latitude: 33.10944815518212891, longitude: -96.66075598255289947, reference: 'BK2' },
 
     { latitude: 33.109349413, longitude: -96.660664880, reference: 'S1_14' },
-
+    { latitude: 33.10941080843694806, longitude: -96.66056559753064903, reference: 'BK3' },
+    
     { latitude: 33.10944234865774, longitude: -96.66051814553069, reference: 'A MID' },
     { latitude: 33.10949115105158, longitude: -96.66056318284635, reference: 'A134' },
     { latitude: 33.10951177786585, longitude: -96.66058215076715, reference: 'CORNERA' },
@@ -206,6 +231,7 @@ const firstFloorCoordinates = [
     { latitude: 33.10968196939599, longitude: -96.66032463336444, reference: 'A124' },
     { latitude: 33.10969838561389, longitude: -96.66029974899303, reference: 'A122' },
     { latitude: 33.10974858771374, longitude: -96.66022365060626, reference: 'S1_17' },
+    { latitude: 33.10966730389557711, longitude: -96.66014764901987633, reference: 'BK4' },
     { latitude: 33.10958554123231, longitude: -96.66007208594999, reference: 'S1_27' },
     { latitude: 33.10956281808866, longitude: -96.66010656220340, reference: 'A115' },
     { latitude: 33.10953469317669, longitude: -96.66014923418610, reference: 'A116' },
@@ -218,8 +244,10 @@ const firstFloorCoordinates = [
     { latitude: 33.10938202253659, longitude: -96.66046247353700, reference: 'A104' },
     { latitude: 33.10944234865774, longitude: -96.6605181455, reference: 'A MID' },
     { latitude: 33.109349413, longitude: -96.660664880, reference: 'S1_14' },
+    { latitude: 33.10920354988491709, longitude: -96.66052975717859397, reference: 'BK5' },
 
     { latitude: 33.10909604500765000000, longitude: -96.66043027455417000000, reference: 'S1_13' },
+{ latitude: 33.10901045314075475, longitude:-96.66056509168994637, reference: 'BK6' },
     { latitude: 33.10899494581290, longitude: -96.66058915467005, reference: 'GMID' },
     { latitude: 33.10905716275518, longitude: -96.66064685173170, reference: 'G104' },
     { latitude: 33.10908779885913, longitude: -96.66067426235244, reference: 'CORNERL' },
@@ -234,6 +262,7 @@ const firstFloorCoordinates = [
     { latitude: 33.10881877723489, longitude: -96.66108197915065, reference: 'G117' },
     { latitude: 33.10881877723489, longitude: -96.66108197915065, reference: 'G118' },
     { latitude: 33.10880126526586, longitude: -96.66110845475237, reference: 'MIDCUTG1' },
+{ latitude: 33.1087488899009017, longitude: -96.6610601594954062, reference: 'BK8' },
     { latitude: 33.10863730352468, longitude: -96.66095707771076, reference: 'GMIDCUT2' },
     { latitude: 33.10880126526586, longitude: -96.66110845475237, reference: 'MIDCUTG1' },
     { latitude: 33.10875511428154, longitude: -96.66117822846417, reference: 'G121' },
@@ -243,8 +272,9 @@ const firstFloorCoordinates = [
     { latitude: 33.10862688506302, longitude: -96.66137209277000, reference: 'G126' },
     { latitude: 33.10861239099607, longitude: -96.66139400573383, reference: 'G127' },
     { latitude: 33.10853146243038, longitude: -96.66151635819290, reference: 'G128' },
-    { latitude: 33.10851678364739, longitude: -96.66153855042106, reference: 'S1_5' },
-    { latitude: 33.10835308826282, longitude: -96.66138774313453, reference: 'S1_19' },
+    { latitude: 33.10851644977691, longitude: -96.6615391375458, reference: "S1_5" },
+{ latitude: 33.10843478119996064, longitude: -96.66146286337266247, reference: 'BK7' },
+    { latitude: 33.10835238511223, longitude: -96.66138849989528, reference: "S1_19" },
     { latitude: 33.10836926588401, longitude: -96.66136322952454, reference: 'G138' },
     { latitude: 33.10841888660577, longitude: -96.66128804028583, reference: 'G139' },
     { latitude: 33.10844886016316, longitude: -96.66124262198313, reference: 'G140' },
@@ -266,7 +296,9 @@ const firstFloorCoordinates = [
     { latitude: 33.10899494581290, longitude: -96.66058915467005, reference: 'GMID' },
     { latitude: 33.10909604500765000000, longitude: -96.66043027455417000000, reference: 'S1_13' },
     { latitude: 33.10888318346311000000, longitude: -96.66023346097434000000, reference: 'S1_16' },
+    { latitude: 33.10885859267895626, longitude: -96.66021072473679965, reference: 'KNA' },
     { latitude: 33.10883392503870000000, longitude: -96.66018791621958000000, reference: 'K ENTRANCE' },
+    { latitude: 33.10888982707775341, longitude: -96.6601070953094279, reference: 'BK8' },
   { latitude: 33.10893343998354, longitude: -96.66004332519219, reference: 'K MID' },
   { latitude: 33.10899853172984, longitude: -96.66010402494138, reference: 'K130' },
   { latitude: 33.10903282294311, longitude: -96.66013597078240, reference: 'K126' },
@@ -277,6 +309,7 @@ const firstFloorCoordinates = [
   { latitude: 33.10922567925497, longitude: -96.65984611377192, reference: 'K117' },
   { latitude: 33.10928047281458, longitude: -96.65976423967675, reference: 'K118' },
   { latitude: 33.10930340456615, longitude: -96.65972997440133, reference: 'S1_29' },
+{ latitude: 33.10922535444780834, longitude: -96.65965655522006728, reference: 'BK9' },
   { latitude: 33.10913213359301, longitude: -96.65956880246307, reference: 'S1_25' },
   { latitude: 33.10911737272422, longitude: -96.65959119872659, reference: 'K112' },
   { latitude: 33.10906695174100, longitude: -96.65966770110893, reference: 'K110' },
@@ -291,7 +324,8 @@ const firstFloorCoordinates = [
   { latitude: 33.1086619585, longitude: -96.6600289543, reference: 'H ENTRANCE' },
   { latitude: 33.1085634645, longitude: -96.6601760848, reference: 'H101' },
 { latitude: 33.1085160383, longitude: -96.6602469942, reference: 'H100' },
-{ latitude: 33.1084710293, longitude: -96.6603049346, reference: 'S1_123' },
+{ latitude: 33.10846695, longitude: -96.66032052, reference: 'S1_123' },
+
 { latitude: 33.1085160383, longitude: -96.6602469942, reference: 'H100' },
 { latitude: 33.1083272249, longitude: -96.6605290615, reference: 'H104' },
 { latitude: 33.1083145142, longitude: -96.6605489087, reference: 'H112' },
@@ -306,123 +340,139 @@ const firstFloorCoordinates = [
 const secondFloorCoordinates = [
 
 
-  { latitude: 33.109971381724904, longitude: -96.66130147923262, reference: '2MAINHALL' },
-  { latitude: 33.10952242109021, longitude: -96.66088922805024, reference: '2FENTRANCE' },
-  { latitude: 33.109545215126175, longitude: -96.66085454284246, reference: 'S2_1' },
-  { latitude: 33.10956921622493, longitude: -96.66081717996883, reference: '2ENTRANCE' },
-  { latitude: 33.10945468699747, longitude: -96.66099546935033, reference: '2F MID FRONT' },
-  { latitude: 33.10954500167219, longitude: -96.66108226076537, reference: 'F207' },
-  { latitude: 33.10953483107906, longitude: -96.6610977603442, reference: 'F208' },
-  { latitude: 33.10946539704782, longitude: -96.66120357504222, reference: 'F210' },
-  { latitude: 33.10945784773486, longitude: -96.66121507989448, reference: 'F212' },
-  { latitude: 33.109452122162395, longitude: -96.66122380543887, reference: 'F213' },
-  { latitude: 33.109368113683416, longitude: -96.66135183101474, reference: 'F216' },
-  { latitude: 33.10935343444692, longitude: -96.66137420158647, reference: 'F217' },
-  { latitude: 33.1093251244839, longitude: -96.6614173448425, reference: 'F215' },
-  { latitude: 33.10930855790873, longitude: -96.66144259164321, reference: 'S2_7' },
-  { latitude: 33.10925549614271, longitude: -96.66152345566115, reference: 'MIDCUT1' },
-  { latitude: 33.10909147837973, longitude: -96.66136975085195, reference: 'MIDCUT2' },
-  { latitude: 33.10925549614271, longitude: -96.66152345566115, reference: 'MIDCUT1' },
-  { latitude: 33.109224250296336, longitude: -96.66157107308649, reference: 'F222' },
-  { latitude: 33.1092031527484, longitude: -96.66160322490923, reference: 'F224' },
-  { latitude: 33.10914850258018, longitude: -96.66168650958885, reference: 'F223' },
-  { latitude: 33.109128371004914, longitude: -96.66171718930771, reference: 'F226' },
-  { latitude: 33.10910782001707, longitude: -96.66174850819462, reference: 'F227' },
-  { latitude: 33.109039748725316, longitude: -96.66185224613196, reference: 'F228' },
-  { latitude: 33.10903177996745, longitude: -96.66186439020154, reference: 'F229' },
-  { latitude: 33.1090221335754, longitude: -96.6618790909188, reference: 'F230' },
-  { latitude: 33.10896764835255, longitude: -96.66196212422827, reference: 'S2_20' },
-  { latitude: 33.10880219053123, longitude: -96.661809713627, reference: 'S2_30' },
-  { latitude: 33.10885407349071, longitude: -96.66173080754453, reference: 'F234' },
-  { latitude: 33.1088667511467, longitude: -96.66171152675986, reference: 'S2_1' },
-  { latitude: 33.10887335684002, longitude: -96.661701480506, reference: 'F236' },
-  { latitude: 33.108949273233236, longitude: -96.66158602322979, reference: 'F238' },
-  { latitude: 33.10896128996865, longitude: -96.66156774760472, reference: 'F239' },
-  { latitude: 33.108982260399344, longitude: -96.66153585477227, reference: 'F241' },
-  { latitude: 33.10904438696183, longitude: -96.66144136972915, reference: 'F242' },
-  { latitude: 33.10905619398012, longitude: -96.66142341305189, reference: 'F243' },
-  { latitude: 33.10909147837973, longitude: -96.66136975085195, reference: 'MIDCUT2' },
-  { latitude: 33.10910835955181, longitude: -96.66134407715927, reference: 'FLY1' },
+  { latitude: 33.10998179849746, longitude: -96.66130964084124, reference: '2MAINHALL' },
+  { latitude: 33.10952169963112, longitude: -96.66088705671903, reference: '2FENTRANCE' },
+  { latitude: 33.10954785283901, longitude: -96.66084817927977, reference: 'S2_1' },
+  { latitude:33.10955605751488662, longitude: -96.66083596216621743, reference: 'NANA' },
+  { latitude: 33.10956957928691, longitude: -96.66081586050001, reference: '2ENTRANCE' },
+  { latitude: 33.10944654801100029, longitude: -96.66099883484157829, reference: '2F MID FRONT' },
+  { latitude: 33.10954360660423, longitude: -96.66108828646176, reference: 'F207' },
+{ latitude: 33.10953751508960, longitude: -96.66109746800724, reference: 'F208' },
+{ latitude: 33.10946438381708, longitude: -96.66120816235994, reference: 'F210' },
+{ latitude: 33.10946270674125, longitude: -96.66121078109140, reference: 'F212' },
+{ latitude: 33.10945437649234, longitude: -96.66122332448336, reference: 'F213' },
+{ latitude: 33.10939021534384, longitude: -96.66132047619131, reference: 'F216' },
+{ latitude: 33.10936836657369, longitude: -96.66135352153735, reference: 'F217' },
+{ latitude: 33.10935800616901, longitude: -96.66136923497268, reference: 'F215' },
+{ latitude: 33.10931009128630, longitude: -96.66144176811916, reference: 'S2_7' },
+{ latitude: 33.10928331647805, longitude: -96.66148221971221, reference: 'F220' },
+{ latitude: 33.10926967835358, longitude: -96.66150284908547, reference: 'F219' },
+  { latitude: 33.10925765435495549, longitude: -96.66152110457353785, reference: 'MIDCUT1' },
+  { latitude: 33.10911237993132517, longitude: -96.66138989589703101, reference: 'F245' },
+  { latitude: 33.10909143845764646, longitude: -96.66137102703240203, reference: 'MIDCUT2' },
+  { latitude: 33.10925765435495549, longitude: -96.66152110457353785, reference: 'MIDCUT1' },
+  { latitude: 33.10922337168959, longitude: -96.66157303739625, reference: 'F222' },
+{ latitude: 33.10921022488962, longitude: -96.66159292318079, reference: 'F224' },
+{ latitude: 33.10914848328237, longitude: -96.66168633224871, reference: 'F223' },
+{ latitude: 33.10912874015762, longitude: -96.66171630381297, reference: 'F226' },
+{ latitude: 33.10911658635285, longitude: -96.66173463903282, reference: 'F227' },
+{ latitude: 33.10909848720345, longitude: -96.66176204355116, reference: 'F228' },
+{ latitude: 33.10903219378231, longitude: -96.66186238152777, reference: 'F229' },
+{ latitude: 33.10901958335469, longitude: -96.6618815011458, reference: 'F230' },
+{ latitude: 33.10896972965433, longitude: -96.66195696881221, reference: 'S2_20' },
+{ latitude: 33.10889551968602973, longitude: -96.66188870894556828, reference: 'NANA' },
+{ latitude: 33.108804107403955, longitude: -96.66180463117112, reference: 'S2_30' },
+{ latitude: 33.10885404844903, longitude: -96.66172924484887, reference: 'F234' },
+{ latitude: 33.10893249331607, longitude: -96.66161089694324, reference: 'F236' },
+{ latitude: 33.10894943398673, longitude: -96.66158530141685, reference: 'F238' },
+{ latitude: 33.10896162431279, longitude: -96.66156694491208, reference: 'F239' },
+{ latitude: 33.10898309804684, longitude: -96.66153448533474, reference: 'F241' },
+{ latitude: 33.10904526415639, longitude: -96.66144069924573, reference: 'F242' },
+{ latitude: 33.10905579349739, longitude: -96.66142475778349, reference: 'F243' },
+{ latitude: 33.10909143845765, longitude: -96.6613710270324, reference: 'MIDCUT2' },
+{ latitude: 33.10910944616263, longitude: -96.66134381886421, reference: 'FLY1' },
+{ latitude: 33.10896241570292631, longitude: -96.66120851034847306, reference: 'BLIL' },
   { latitude: 33.10881966352259, longitude: -96.66108047573326, reference: "FLYCUT2" },
-  { latitude: 33.10910835955181, longitude: -96.66134407715927, reference: 'FLY1' },
-  { latitude: 33.10914197576989, longitude: -96.66129295200946, reference: 'S2_10' },
-  { latitude: 33.10915944477946, longitude: -96.66126638430546, reference: 'F248' },
-  { latitude: 33.10918823779095, longitude: -96.66122259451856, reference: 'F249' },
-  { latitude: 33.109200527784935, longitude: -96.6612039033088, reference: 'F250' },
-  { latitude: 33.10927004793607, longitude: -96.661098173743, reference: 'F252' },
-  { latitude: 33.109283322849, longitude: -96.66107798462147, reference: 'F253' },
-  { latitude: 33.10929575894579, longitude: -96.66105907121158, reference: 'F254' },
-  { latitude: 33.10934455626815, longitude: -96.6609848579134, reference: 'F255' },
-  { latitude: 33.109379913609914, longitude: -96.66093108477955, reference: 'TRC' },
-  { latitude: 33.10945468699747, longitude: -96.66099546935033, reference: '2F MID FRONT' },
-  { latitude: 33.10952242109021, longitude: -96.66088922805024, reference: '2FENTRANCE' },
-  { latitude: 33.10931541294438, longitude: -96.66069914601121, reference: 'S2_14' },
-  { latitude: 33.10906944131525, longitude: -96.66047328635425, reference: "GENTRANCE" },
-  { latitude: 33.10900017535599, longitude: -96.66058231936353, reference: "GMID" },
-  { latitude: 33.109058569591525, longitude: -96.66063592758371, reference: "G205" },
-  { latitude: 33.1090913645899, longitude: -96.66066596996748, reference: "G206" },
-  { latitude: 33.109073120338095, longitude: -96.6606940468132, reference: "G207" },
-  { latitude: 33.109044117584695, longitude: -96.6607382654019, reference: "G209" },
-  { latitude: 33.10901763127212, longitude: -96.66077864733893, reference: "G210" },
-  { latitude: 33.108997919075314, longitude: -96.66080870122764, reference: "G211" },
-  { latitude: 33.108939640217216, longitude: -96.66089755516573, reference: "S2_11" },
-  { latitude: 33.108913719398785, longitude: -96.66093707493107, reference: "G213" },
-  { latitude: 33.10888563793986, longitude: -96.66097988888274, reference: "G214" },
-  { latitude: 33.10886781305446, longitude: -96.66100706531199, reference: "G215" },
+  { latitude: 33.10910944616263, longitude: -96.66134381886421, reference: 'FLY1' },
+  { latitude: 33.10912676946563238, longitude: -96.6613176832595542, reference: 'NULLAHH' },
+  { latitude: 33.10914462005206, longitude: -96.66129074330831, reference: 'S2_10' },
+{ latitude: 33.10916081804419, longitude: -96.66126627169047, reference: 'F248' },
+{ latitude: 33.10918976139692, longitude: -96.66122261254381, reference: 'F249' },
+{ latitude: 33.10920051818454, longitude: -96.66120638731303, reference: 'F250' },
+{ latitude: 33.10927137511249, longitude: -96.6610994588909, reference: 'F252' },
+{ latitude: 33.10927874207388, longitude: -96.66108838397736, reference: 'F253' },
+{ latitude: 33.10929610194753, longitude: -96.66106213376814, reference: 'F254' },
+{ latitude: 33.10934659953242, longitude: -96.66098592484518, reference: 'F255' },
+{ latitude: 33.10937918067799, longitude: -96.66093675484768, reference: 'TRC' },
+
+{ latitude: 33.10944654801100029, longitude: -96.66099883484157829, reference: '2F MID FRONT' },
+{ latitude: 33.10952169963112, longitude: -96.66088705671903, reference: '2FENTRANCE' },
+  { latitude: 33.10931216654145004, longitude: -96.6606946340410218, reference: 'S2_14' },
+  { latitude: 33.10919741833349406, longitude: -96.66058919109320868, reference: 'LALAL' },
+  { latitude:33.1090693138961214, longitude: -96.66047159259980504, reference: "GENTRANCE" },
+  { latitude: 33.10899226279404672, longitude: -96.66058644549063672, reference: "GMID" },
+  { latitude: 33.10905467901029908, longitude: -96.6606440102834199, reference: "G205" },
+  { latitude: 33.10908794756337, longitude: -96.66067467680071, reference: "G206" },
+{ latitude: 33.10908634113585, longitude: -96.66067708701374, reference: "G207" },
+{ latitude: 33.10904554456506, longitude: -96.66073875478466, reference: "G209" },
+{ latitude: 33.10901154458896, longitude: -96.66079027396695, reference: "G210" },
+{ latitude: 33.10899978122588, longitude: -96.66080792808596, reference: "G211" },
+{ latitude: 33.10893856085592, longitude: -96.6609006658591, reference: "S2_11" },
+{ latitude: 33.10891434835608, longitude: -96.66093725911966, reference: "G213" },
+{ latitude: 33.10888556289904, longitude: -96.6609807072867, reference: "G214" },
+{ latitude: 33.10886957963719, longitude: -96.66100466500262, reference: "G215" },
+
   { latitude: 33.10881966352259, longitude: -96.66108047573326, reference: "FLYCUT2" },
-  { latitude: 33.10879927752077, longitude: -96.6611115569281, reference: "G218" },
-  { latitude: 33.10863610550598, longitude: -96.66095224283366, reference: "G247" },
-  { latitude: 33.10879927752077, longitude: -96.6611115569281, reference: "G218" },
-  { latitude: 33.10875741909612, longitude: -96.66117537571238, reference: "G220" },
-  { latitude: 33.10872401243574, longitude: -96.66122630864811, reference: "G221" },
-  { latitude: 33.10870675304451, longitude: -96.66125262290562, reference: "G222" },
-  { latitude: 33.108676619115855, longitude: -96.66129856612275, reference: "G223" },
-  { latitude: 33.10866040824057, longitude: -96.66132328177704, reference: "G224" },
-  { latitude: 33.10862874277224, longitude: -96.66137156003188, reference: "G225" },
-  { latitude: 33.108613014886394, longitude: -96.66139553930395, reference: "G226" },
-  { latitude: 33.108581705223514, longitude: -96.66144327508565, reference: "G227" },
-  { latitude: 33.10853124877592, longitude: -96.66152020270945, reference: "G228" },
-  { latitude: 33.10851678364739, longitude: -96.66153855042106, reference: 'S2_5' },
-  { latitude: 33.10834535768775, longitude: -96.6613946199867, reference: "S2_19" },
-  { latitude: 33.1083641486784, longitude: -96.66136620875649, reference: "G236" },
-  { latitude: 33.10841559016205, longitude: -96.66128790580876, reference: "G237" },
-  { latitude: 33.10844641688495, longitude: -96.66124098213743, reference: "G238" },
-  { latitude: 33.10845990162788, longitude: -96.66122045599695, reference: "G239" },
-  { latitude: 33.108540663924636, longitude: -96.66109752163636, reference: "G243" },
-  { latitude: 33.10855681123405, longitude: -96.66107294260334, reference: "G244" },
-  { latitude: 33.1085905548391, longitude: -96.66102157892652, reference: "G245" },
-  { latitude: 33.10863610550598, longitude: -96.66095224283366, reference: "G247" },
-  { latitude: 33.1086879026525, longitude: -96.66087339850478, reference: "G252" },
-  { latitude: 33.1087003388336, longitude: -96.66085446845904, reference: "G253" },
-  { latitude: 33.108717534638245, longitude: -96.66082829343264, reference: "G254" },
-  { latitude: 33.108768893385836, longitude: -96.6607501164237, reference: "S2_15" },
-  { latitude: 33.10881251197165, longitude: -96.6606837212966, reference: "G257" },
-  { latitude: 33.10882956163746, longitude: -96.66065776871913, reference: "G258" },
-  { latitude: 33.10884283661698, longitude: -96.66063756187529, reference: "G259" },
-  { latitude: 33.10892506649267, longitude: -96.6605136299307, reference: "G261" },
-  { latitude: 33.10896469384106, longitude: -96.6605499311982, reference: "G262" },
-  { latitude: 33.10900017535599, longitude: -96.66058231936353, reference: "GMID" },
-  { latitude: 33.10906944131525, longitude: -96.66047328635425, reference: "GENTRANCE" },
-  { latitude: 33.10909243570212, longitude: -96.66043978999765, reference: "S2_13" },
-  { latitude: 33.109116115103, longitude: -96.66039979772553, reference: "MIDGENTLATE" },
-  { latitude: 33.10909243570212, longitude: -96.66043978999765, reference: "S2_13" },
-  { latitude: 33.10906944131525, longitude: -96.66047328635425, reference: "GENTRANCE" },
+  { latitude: 33.10880310046841, longitude: -96.6611055427047, reference: "G218" },
+  { latitude: 33.10863850472994, longitude: -96.66095494891432, reference: "G247" },
+  { latitude: 33.10880310046841, longitude: -96.6611055427047, reference: "G218" },
+{ latitude: 33.10875902767602, longitude: -96.66117221888766, reference: "G220" },
+{ latitude: 33.10872432992495, longitude: -96.66122468463008, reference: "G221" },
+{ latitude: 33.1087076685154, longitude: -96.66124987973954, reference: "G222" },
+{ latitude: 33.10867540489772, longitude: -96.66129861602971, reference: "G223" },
+{ latitude: 33.1086602796856, longitude: -96.66132155521873, reference: "G224" },
+{ latitude: 33.10862571005891, longitude: -96.6613738922496, reference: "G225" },
+{ latitude: 33.10861503387773, longitude: -96.66139002721421, reference: "G226" },
+{ latitude: 33.10858198685049, longitude: -96.66143998672254, reference: "G227" },
+{ latitude: 33.10852755009005, longitude: -96.66152234587477, reference: "G228" },
+{ latitude: 33.10851644977691, longitude: -96.6615391375458, reference: "S2_5" },
+{ latitude: 33.10843495128003866, longitude: -96.66146431131359407, reference: 'NANA' },
+{ latitude: 33.10835238511223, longitude: -96.66138849989528, reference: "S2_19" },
+{ latitude: 33.10836477908231, longitude: -96.66136964255485, reference: "G236" },
+{ latitude: 33.10841862633921, longitude: -96.66128807915241, reference: "G237" },
+{ latitude: 33.1084484590674, longitude: -96.66124288886539, reference: "G238" },
+{ latitude: 33.10846216372035, longitude: -96.66122210542437, reference: "G239" },
+{ latitude: 33.10854212924796, longitude: -96.6611009909236, reference: "G243" },
+{ latitude: 33.10855970293342, longitude: -96.66107429998081, reference: "G244" },
+{ latitude: 33.10859351988372, longitude: -96.66102310261313, reference: "G245" },
+{ latitude: 33.10863850472994, longitude: -96.66095494891432, reference: "G247" },
+
+{ latitude: 33.10869147973177, longitude: -96.66087480081309, reference: "G252" },
+{ latitude: 33.10870240414086, longitude: -96.6608581443469, reference: "G253" },
+{ latitude: 33.10871871294477, longitude: -96.66083344182313, reference: "G254" },
+{ latitude: 33.10877392223281, longitude: -96.66074980486583, reference: "S2_15" },
+{ latitude: 33.10881685597057, longitude: -96.66068469309617, reference: "G257" },
+{ latitude: 33.10883437551009, longitude: -96.6606583008571, reference: "G258" },
+{ latitude: 33.10884565987725, longitude: -96.66064108229747, reference: "G259" },
+{ latitude: 33.1089235638625, longitude: -96.66052309257189, reference: "G261" },
+
+  { latitude:33.10895981098428109, longitude: -96.6605565153068369, reference: "G262" },
+  { latitude: 33.10899226279404672, longitude: -96.66058644549063672, reference: "GMID" },
+  { latitude:33.1090693138961214, longitude: -96.66047159259980504, reference: "GENTRANCE" },
+  { latitude: 33.10909663514075163, longitude: -96.66043088055286603, reference: "S2_13" },
+  { latitude: 33.10910530688347819, longitude: -96.6604179614658392, reference: "BK10" },
+  { latitude: 33.10911701440515031, longitude: -96.66040046469626645, reference: "MIDGENTLATE" },
+  { latitude: 33.10909663514075163, longitude: -96.66043088055286603, reference: "S2_13" },
+  { latitude:33.1090693138961214, longitude: -96.66047159259980504, reference: "GENTRANCE" },
   { latitude: 33.10886097025895, longitude: -96.66028186102025, reference: 'S2_16' },
+  { latitude: 33.1088687793279064, longitude: -96.6602704026850148, reference: 'LAKAK' },
   { latitude: 33.10890844171046, longitude: -96.66020960345315, reference: "HALLPT2" },
   { latitude: 33.10886097025895, longitude: -96.66028186102025, reference: 'S2_16' },
   { latitude: 33.1086301712, longitude: -96.6600676445, reference: 'H2ENTRANCE' },
 { latitude: 33.1085978749, longitude: -96.6601157274, reference: 'H203' },
 { latitude: 33.1085123138, longitude: -96.6602432465, reference: 'H204' },
+{ latitude: 33.10844426007398766, longitude: -96.66017871769547298, reference: 'S2_123' },
+{ latitude: 33.1085123138, longitude: -96.6602432465, reference: 'H204' },
 { latitude: 33.1084773589, longitude: -96.6602954475, reference: 'H205' },
 { latitude: 33.1084710292, longitude: -96.6603049345, reference: 'RND' },
-{ latitude: 33.1084710293, longitude: -96.6603049346, reference: 'S2_123' },
+
 { latitude: 33.1084710292, longitude: -96.6603049345, reference: 'RND' },
 { latitude: 33.1084635304, longitude: -96.6603159826, reference: 'H206' },
 { latitude: 33.1084626441, longitude: -96.6603174987, reference: 'H208' },
 { latitude: 33.1086301712, longitude: -96.6600676445, reference: 'H2ENTRANCE' },
 
 
-  { latitude: 33.10867497158879, longitude: -96.65999863931151, reference: "K204" },
+  { latitude: 33.10867793866387387, longitude:-96.65999741403315682, reference: "K204" },
   { latitude: 33.10885838458248, longitude: -96.66016301902835, reference: "K ENTRANCE" },
   { latitude: 33.10896982964244, longitude: -96.65998494750866, reference: "K MID" },
   { latitude: 33.10900371784144, longitude: -96.6600158792806, reference: "K228" },
@@ -434,6 +484,7 @@ const secondFloorCoordinates = [
   { latitude: 33.10921407932416, longitude: -96.65984212503454, reference: "K215" },
   { latitude: 33.109282569888094, longitude: -96.659738137832, reference: "K214" },
   { latitude: 33.10929611809012, longitude: -96.65971756799658, reference: "S2_29" },
+  { latitude: 33.10922715196259958, longitude: -96.65965416788897357, reference: "LAPU" },
   { latitude: 33.10912819010214, longitude: -96.6595629196543, reference: "S2_25" },
   { latitude: 33.10904976079582, longitude: -96.6596856200793, reference: "K211" },
   { latitude: 33.10904976079582, longitude: -96.65968562007973, reference: "K212" },
@@ -449,6 +500,7 @@ const secondFloorCoordinates = [
 { latitude: 33.10897834089072, longitude: -96.660272764514, reference: "K226" },
 { latitude: 33.109116115103, longitude: -96.66039979772553, reference: "midgentlate" },
 { latitude: 33.109362496538076, longitude: -96.66062614994448, reference: "A ENTRANCE" },
+{ latitude: 33.10934582737631615, longitude: -96.66065277765463293, reference: "LIES" },
 { latitude: 33.10931541294438, longitude: -96.66069914601121, reference: 'S2_14' },
 { latitude: 33.109362496538076, longitude: -96.66062614994448, reference: "A ENTRANCE" },
 { latitude: 33.10943150607069, longitude: -96.66052024554845, reference: "A MID" },
@@ -461,6 +513,7 @@ const secondFloorCoordinates = [
 { latitude: 33.109697871058806, longitude: -96.66029554780245, reference: "A222" },
 { latitude: 33.10972692243588, longitude: -96.6602509261226, reference: "A221" },
 { latitude: 33.1097488297521, longitude: -96.66021727741645, reference: "S2_17" },
+{ latitude: 33.10967731038478234, longitude: -96.660150464311399795, reference: "ABUDU" },
 { latitude: 33.10958652121709, longitude: -96.66006582712545, reference: "S2_27" },
 { latitude: 33.10956269539189, longitude: -96.66010141735043, reference: "A215" },
 { latitude: 33.10953360886999, longitude: -96.66014555950275, reference: "A216" },
@@ -475,7 +528,9 @@ const secondFloorCoordinates = [
 { latitude: 33.109362496538076, longitude: -96.66062614994448, reference: "A ENTRANCE" },
 { latitude: 33.10956921622493, longitude: -96.66081717996883, reference: "mid somewhere" },
 { latitude: 33.11001916668614, longitude: -96.66122943705936, reference: "starttop" },
+{ latitude: 33.1100082215519933, longitude: -96.6612447582097758, reference: "starttodfp" },
 { latitude: 33.10999358063734, longitude: -96.6612672276186, reference: "S2_9" },
+{ latitude: 33.10998598280522032, longitude: -96.66127808123567888, reference: "LUPULAKA" },
 { latitude: 33.109971381724904, longitude: -96.66130147923262, reference: "STARTOFITALL" }
 
 
