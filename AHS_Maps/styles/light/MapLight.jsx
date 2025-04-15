@@ -331,18 +331,18 @@ export  const styles = StyleSheet.create({
       alignItems: 'center',
       marginHorizontal: 4 * width
     },
-    rotationContainer: {
-      backgroundColor: 'white',
-      width: 23 * width,
-      height: 10 * height,
-      marginVertical: 10 * height,
-      marginHorizontal: 4 * width,
-      borderRadius: 5 * width,
-      display: 'flex',
-      justifyContent: 'center',
-      alignContent: 'center',
-      alignItems: 'center',
-      flexDirection: 'column'
-    }
+    // rotationContainer: {
+    //   backgroundColor: 'white',
+    //   width: 23 * width,
+    //   height: 10 * height,
+    //   marginVertical: 10 * height,
+    //   marginHorizontal: 4 * width,
+    //   borderRadius: 5 * width,
+    //   display: 'flex',
+    //   justifyContent: 'center',
+    //   alignContent: 'center',
+    //   alignItems: 'center',
+    //   flexDirection: 'column'
+    // }
 
   });

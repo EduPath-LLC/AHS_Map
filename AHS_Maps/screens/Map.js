@@ -1688,15 +1688,15 @@ const getDirectionGuidance = useCallback(() => {
   distance = distance ? `${distance[0]} feet` : 'unknown distance';
 
   if (directions.text.startsWith("From stairs")) {
-    let secondary = angle < 180 ? `Turn left` : `Turn right`;
-    return directions.text + " and " + secondary.toLowerCase();
+    // let secondary = angle < 180 ? `Turn left` : `Turn right`;
+    // return directions.text + " and " + secondary.toLowerCase();
   }
 
   // Provide turn instructions based on the angle
   if (angle < 180) {
-    return `Go straight for ${distance}`;
+    return `Turn left in ${distance}`;
   } else {
-    return `Go straight for ${distance}`;
+    return `Turn right in ${distance}`;
   }
 }, [routeSegments, currentSegmentIndex, directions.text]);
 
@@ -2275,7 +2275,7 @@ return (
 
     <View style={styles.rotationContainer}>
           <Text style={styles.directionsText}>
-            Coming Soon
+            
           </Text>
 
           {/* {getFirstHeadingDirection().startsWith("Rotate left") 
