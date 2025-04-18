@@ -30,16 +30,21 @@
       "bundleIdentifier": "com.rishinigam.mapavailability"
     },
     "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/images/logo.png",
-        "backgroundColor": "#FFFFFF"
-      },
-      "permissions": [
-        "ACCESS_COARSE_LOCATION",
-        "ACCESS_FINE_LOCATION"
-      ],
-      "package": "com.rishinigam.mapavailability"
-    },
+  "adaptiveIcon": {
+    "foregroundImage": "./assets/images/logo.png",
+    "backgroundColor": "#FFFFFF"
+  },
+  "permissions": [
+    "ACCESS_COARSE_LOCATION",
+    "ACCESS_FINE_LOCATION"
+  ],
+  "package": "com.rishinigam.mapavailability",
+  "config": {
+    "googleMaps": {
+      "apiKey": "AIzaSyBeftavaXmxeh44M3hsnJBKJa-nfxPdQxs"
+    }
+  }
+},
     "web": {
       "favicon": "./assets/images/logo.png"
     },
