@@ -243,6 +243,7 @@ const firstFloorCoordinates = [
     { latitude: 33.10934872496921, longitude: -96.66043174485885, reference: 'A106' },
     { latitude: 33.10938202253659, longitude: -96.66046247353700, reference: 'A104' },
     { latitude: 33.10944234865774, longitude: -96.6605181455, reference: 'A MID' },
+    { latitude: 33.10941080843694806, longitude: -96.66056559753064903, reference: 'BK3' },
     { latitude: 33.109349413, longitude: -96.660664880, reference: 'S1_14' },
     { latitude: 33.10920354988491709, longitude: -96.66052975717859397, reference: 'HOUSE 300' },
 
@@ -1680,19 +1681,14 @@ const getDirectionGuidance = useCallback(() => {
   // Extract distance from directions.text for turn guidance
   let distance = directions.text.match(/(\d+)/);
 
-  if (directions.text.startsWith('Proceed') || directions.text.startsWith('Climb')){
+  if (directions.text.startsWith('Proceed') || directions.text.startsWith('Climb')) {
     return directions.text;
   }
-
-
+  
   distance = distance ? `${distance[0]} feet` : 'unknown distance';
-
-  if (directions.text.startsWith("From stairs")) {
-    // let secondary = angle < 180 ? `Turn left` : `Turn right`;
-    // return directions.text + " and " + secondary.toLowerCase();
-  }
-
-  // Provide turn instructions based on the angle
+  
+  // Only provide turn instructions if not a "Proceed" or "Climb" direction
+  // (this is redundant now due to the early return above, but keeping for clarity)
   if (angle < 180) {
     return `Turn left in ${distance}`;
   } else {
