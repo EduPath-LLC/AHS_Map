@@ -2198,7 +2198,7 @@ return (
       }
     
       // Use different distance threshold based on email
-      const distanceThreshold = isRishiEmail ? 10000000000000 : 1000;
+      const distanceThreshold = isRishiEmail ? 10000000000000 : 10000000000;
     
       if (distance > distanceThreshold) {
         return (
