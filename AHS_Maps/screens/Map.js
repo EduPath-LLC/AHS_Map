@@ -2187,7 +2187,7 @@ return (
       // Check if email matches rishi.nigam@student.allenisd.org (case-insensitive)
       const isRishiEmail = typeof email === "string" && email.trim().toUpperCase() === "RISHI.NIGAM@STUDENT.ALLENISD.ORG";
       
-      if (distance === null || distance > 1000) {
+      if (distance === null || distance > 10000000) {
         return (
           <View style={styles.distanceOverlay}>
             <Text style={styles.distanceOverlayText}>
@@ -2198,7 +2198,7 @@ return (
       }
     
       // Use different distance threshold based on email
-      const distanceThreshold = isRishiEmail ? 10000000000000 : 10000000000;
+      const distanceThreshold = isRishiEmail ? 10000000000000 : 1000;
     
       if (distance > distanceThreshold) {
         return (
