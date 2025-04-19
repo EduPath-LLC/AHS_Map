@@ -18,17 +18,10 @@
       }
     },
     "production": {
-<<<<<<< HEAD
       "android": {
         "buildType": "apk"
       },
       "autoIncrement": true
-=======
-      "autoIncrement": true,
-      "android": {
-        "buildType": "apk"
-      }
->>>>>>> refs/remotes/origin/Mapv1
     }
   },
   "submit": {

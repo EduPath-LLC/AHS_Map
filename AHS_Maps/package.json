@@ -26,12 +26,8 @@
     "expo-sensors": "~14.0.2",
     "expo-splash-screen": "^0.29.24",
     "expo-status-bar": "~2.0.1",
-<<<<<<< HEAD
-    "firebase": "^11.6.0",
-=======
     "firebase": "^10.12.1",
     "gradle": "^1.0.8",
->>>>>>> refs/remotes/origin/Mapv1
     "graphlib": "^2.1.8",
     "graphql": "^16.10.0",
     "lottie-react-native": "^7.1.0",
