@@ -49,7 +49,7 @@ export default function HelpAndSupport({ navigation }) {
         </Pressable>
         <Text style={styles.bigText}> Help And Support </Text>
         <Text style={styles.normalText}>Issues with anything in the app? Contact:</Text>
-        <Text style={styles.normalTextBorder}>team@edupathllc-onmicrosoft.com</Text>
+        <Text style={styles.normalTextBorder}>team@edupathllc.com</Text>
       </View>
     </View>
   );
