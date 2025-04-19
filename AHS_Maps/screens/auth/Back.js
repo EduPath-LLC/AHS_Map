@@ -54,21 +54,19 @@ export default function Back({ navigation }) {
       setLoading(false);
 
       switch (error.code) {
-        case 'auth/invalid-email':
-          Alert.alert("Error", "The email address is not valid.");
-          break;
-        case 'auth/user-disabled':
-          Alert.alert("Error", "This user account has been disabled.");
-          break;
-        case 'auth/user-not-found':
+        case 'auth/invalid-credential':
+        case 'auth/user-not-found': // In case older SDK or specific case returns this
           Alert.alert("Error", "No user found with this email.");
           break;
         case 'auth/wrong-password':
           Alert.alert("Error", "Incorrect password. Please try again.");
           break;
+        case 'auth/invalid-email':
+          Alert.alert("Error", "The email address is badly formatted.");
+          break;
         default:
-          Alert.alert("Error", "An unexpected error occurred. Please try again later.");
-          console.error("Sign-in error:", error);
+          Alert.alert('Error', error.message);
+          break;
       }
     }
   };
