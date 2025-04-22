@@ -30,8 +30,7 @@ function isValidStaircasePair(point1, point2) {
   let lastSignificantBearing = calculateBearing(route[0], route[1]);
   let currentFloor = getFloor(route[0]);
   let specialStaircaseHandled = false;
-  let justExitedStaircase = false; // Flag to track if we just exited a staircase
-
+  
   // Enhanced staircase detection using both ID and reference
   const isTargetStaircase = (point) => {
     const identifiers = [point?.id, point?.nodeId, point?.reference];
@@ -63,6 +62,7 @@ function isValidStaircasePair(point1, point2) {
       const isSpecialCase = isTargetStaircase(currentPoint) || isTargetStaircase(nextPoint);
 
       let lookAhead = i + 1;
+      let staircaseExitIndex = i + 1;
       if (isSpecialCase) {
         // Special handling for S1_14/S2_14
         while (lookAhead < route.length && 
@@ -71,8 +71,10 @@ function isValidStaircasePair(point1, point2) {
           lookAhead++;
         }
 
+        staircaseExitIndex = lookAhead - 1;
+        
         // Create extended segment for special case
-        currentSegment = [route[lookAhead - 1]];
+        currentSegment = [route[staircaseExitIndex]];
         if (lookAhead < route.length) {
           currentSegment.push(route[lookAhead]);
           i = lookAhead; // Skip ahead
@@ -84,50 +86,47 @@ function isValidStaircasePair(point1, point2) {
               isFloorChange(route[lookAhead - 1], route[lookAhead])) {
           lookAhead++;
         }
-        i = lookAhead - 1;
+        staircaseExitIndex = lookAhead - 1;
+        i = staircaseExitIndex;
         currentSegment = [route[i]];
       }
       
-      justExitedStaircase = true; // Set flag to indicate we just exited a staircase
+      // CRITICAL FIX: Calculate the new bearing after exiting the staircase
+      // This ensures the next segment starts with the correct direction
+      if (i + 1 < route.length) {
+        lastSignificantBearing = calculateBearing(route[i], route[i + 1]);
+      }
+      
       continue;
     }
 
     // Reset bearing after special staircase
     if (specialStaircaseHandled) {
-      lastSignificantBearing = calculateBearing(
-        currentSegment[currentSegment.length - 2],
-        currentSegment[currentSegment.length - 1]
-      );
+      if (currentSegment.length >= 2) {
+        lastSignificantBearing = calculateBearing(
+          currentSegment[currentSegment.length - 2],
+          currentSegment[currentSegment.length - 1]
+        );
+      }
       specialStaircaseHandled = false;
-      justExitedStaircase = true; // We've just exited a staircase
     }
 
     currentSegment.push(nextPoint);
 
     // Bearing calculations for regular points
-    if (i < route.length - 1 && !specialStaircaseHandled) {
+    if (i < route.length - 1) {
       const newBearing = calculateBearing(nextPoint, route[i + 1]);
       let bearingDifference = Math.abs(newBearing - lastSignificantBearing);
       
       bearingDifference = bearingDifference > 180 ? 360 - bearingDifference : bearingDifference;
       console.log(bearingDifference);
       
-      // Only create a turn segment if we haven't just exited a staircase
-      if (bearingDifference >= 55 && bearingDifference <= 120 && !justExitedStaircase) {
+      // Detect significant turn (55-120 degrees)
+      if (bearingDifference >= 55 && bearingDifference <= 120) {
         segments.push(currentSegment);
         currentSegment = [nextPoint];
         lastSignificantBearing = newBearing;
-      } else {
-        // Update the bearing even if we don't create a new segment
-        // This ensures we capture the new direction after staircase exit
-        if (justExitedStaircase) {
-          lastSignificantBearing = newBearing;
-          justExitedStaircase = false; // Reset the flag
-        }
       }
-    } else {
-      // Reset the flag if we've processed the next point after a staircase
-      justExitedStaircase = false;
     }
   }
 
@@ -295,6 +294,7 @@ const firstFloorCoordinates = [
     { latitude: 33.10889413114312, longitude: -96.66056791220850, reference: 'G164' },
     { latitude: 33.10892365295320, longitude: -96.66052380872497, reference: 'G165' },
     { latitude: 33.10899494581290, longitude: -96.66058915467005, reference: 'GMID' },
+    { latitude: 33.10901045314075475, longitude:-96.66056509168994637, reference: 'BK6' },
     { latitude: 33.10909604500765000000, longitude: -96.66043027455417000000, reference: 'S1_13' },
     { latitude: 33.10888318346311000000, longitude: -96.66023346097434000000, reference: 'S1_16' },
     { latitude: 33.10885859267895626, longitude: -96.66021072473679965, reference: 'KNA' },
@@ -323,6 +323,7 @@ const firstFloorCoordinates = [
   { latitude: 33.10886276303221, longitude: -96.65997743957256, reference: 'K100' },
   { latitude: 33.10888939009556253, longitude: -96.66000209989829273, reference: 'HOUSE 200' },
   { latitude: 33.10893343998354, longitude: -96.66004332519219, reference: 'K MID' },
+  { latitude: 33.10888982707775341, longitude: -96.6601070953094279, reference: 'BK8' },
   { latitude: 33.10883392503870000000, longitude: -96.66018791621958000000, reference: 'K ENTRANCE' },
   // { latitude: 33.10856133683780, longitude: -96.65993588423450, reference: 'S1_21' },
   { latitude: 33.1086619585, longitude: -96.6600289543, reference: 'H ENTRANCE' },
@@ -456,11 +457,13 @@ const secondFloorCoordinates = [
   { latitude: 33.10909663514075163, longitude: -96.66043088055286603, reference: "S2_13" },
   { latitude: 33.10910530688347819, longitude: -96.6604179614658392, reference: "BK10" },
   { latitude: 33.10911701440515031, longitude: -96.66040046469626645, reference: "MIDGENTLATE" },
+  { latitude: 33.10910530688347819, longitude: -96.6604179614658392, reference: "BK10" },
   { latitude: 33.10909663514075163, longitude: -96.66043088055286603, reference: "S2_13" },
   { latitude:33.1090693138961214, longitude: -96.66047159259980504, reference: "GENTRANCE" },
   { latitude: 33.10886097025895, longitude: -96.66028186102025, reference: 'S2_16' },
   { latitude: 33.1088687793279064, longitude: -96.6602704026850148, reference: 'LAKAK' },
   { latitude: 33.10890844171046, longitude: -96.66020960345315, reference: "HALLPT2" },
+  { latitude: 33.1088687793279064, longitude: -96.6602704026850148, reference: 'LAKAK' },
   { latitude: 33.10886097025895, longitude: -96.66028186102025, reference: 'S2_16' },
   { latitude: 33.1086301712, longitude: -96.6600676445, reference: 'H2ENTRANCE' },
 { latitude: 33.1085978749, longitude: -96.6601157274, reference: 'H203' },
@@ -981,7 +984,7 @@ function constrainToAdjacentSegments(currentSegment, newSegment) {
  }
  return currentSegment;
 }
-function findNearestPointOnPolyline(point, errorMargin = 1) {
+function findNearestPointOnPolyline(point, errorMargin = 100) {
  if (!point || typeof point.latitude !== 'number' || typeof point.longitude !== 'number') {
    console.error('Invalid point:', point);
    return null;
@@ -1713,46 +1716,46 @@ const getDirectionGuidance = useCallback(() => {
 
 const [nearestPolylinePoint, setNearestPolylinePoint] = useState(null);
 
-const checkDistanceToPolyline = useCallback((userLocation) => {
-  if (!userLocation) return;
-   const { point: nearestPolylinePoint } = findNearestPointOnPolyline(userLocation);
-  const distanceToPolyline = calculateDistance(
-    userLocation.latitude,
-    userLocation.longitude,
-    nearestPolylinePoint.latitude,
-    nearestPolylinePoint.longitude
-  );
-   setIsMapDisabled(distanceToPolyline > 200);
-}, []);
-const updateNearestPolylinePoint = useCallback(() => {
- if (location) {
-   const { point: nearest, segmentIndex } = findNearestPointOnPolyline({
-     latitude: location.coords.latitude,
-     longitude: location.coords.longitude
-   });
+// const checkDistanceToPolyline = useCallback((userLocation) => {
+//   if (!userLocation) return;
+//    const { point: nearestPolylinePoint } = findNearestPointOnPolyline(userLocation);
+//   const distanceToPolyline = calculateDistance(
+//     userLocation.latitude,
+//     userLocation.longitude,
+//     nearestPolylinePoint.latitude,
+//     nearestPolylinePoint.longitude
+//   );
+//    setIsMapDisabled(distanceToPolyline > 200);
+// }, []);
+// const updateNearestPolylinePoint = useCallback(() => {
+//  if (location) {
+//    const { point: nearest, segmentIndex } = findNearestPointOnPolyline({
+//      latitude: location.coords.latitude,
+//      longitude: location.coords.longitude
+//    });
   
-   const constrainedSegment = constrainToAdjacentSegments(currentSegment, segmentIndex);
-   setCurrentSegment(constrainedSegment);
+//    const constrainedSegment = constrainToAdjacentSegments(currentSegment, segmentIndex);
+//    setCurrentSegment(constrainedSegment);
   
-   const constrainedPoint = firstFloorCoordinates[constrainedSegment];
-   setNearestPolylinePoint(constrainedPoint);
-   checkDistanceToPolyline(constrainedPoint);
- }
-}, [location, currentSegment, checkDistanceToPolyline]);
+//    const constrainedPoint = firstFloorCoordinates[constrainedSegment];
+//    setNearestPolylinePoint(constrainedPoint);
+//    checkDistanceToPolyline(constrainedPoint);
+//  }
+// }, [location, currentSegment, checkDistanceToPolyline]);
 
 
 
 
 
 
-useEffect(() => {
- const nearestPointInterval = setInterval(updateNearestPolylinePoint, 100); // Update every 100ms
+// useEffect(() => {
+//  const nearestPointInterval = setInterval(updateNearestPolylinePoint, 100); // Update every 100ms
 
 
- return () => {
-   clearInterval(nearestPointInterval);
- };
-}, [updateNearestPolylinePoint]);
+//  return () => {
+//    clearInterval(nearestPointInterval);
+//  };
+// }, [updateNearestPolylinePoint]);
 
 
 const calculateRoute = useCallback((start, end) => {
@@ -1791,8 +1794,8 @@ useEffect(() => {
         latitude: newLocation.coords.latitude,
         longitude: newLocation.coords.longitude
       });
-      setNearestPolylinePoint(nearest);
-      checkDistanceToPolyline(nearest);
+      // setNearestPolylinePoint(nearest);
+      // checkDistanceToPolyline(nearest);
       if (route.length > 1 && destinationCoords) {
         const { currentSegment, progress, currentBearing, nextBearing } = findCurrentSegment(
           nearest,
@@ -1843,7 +1846,7 @@ useEffect(() => {
    return () => {
     debouncedLocationUpdate.cancel();
   };
-}, [location, route, destinationCoords, animateCamera, bearing, checkDistanceToPolyline]);
+}, [location, route, destinationCoords, animateCamera, bearing]);
 
  // Modify the existing useInterval hook
  useInterval(() => {
@@ -1932,6 +1935,10 @@ const handleExitRoute = useCallback(() => {
 
 
 const handleSearch = useCallback(async () => {
+  if (startingPointQuery.toUpperCase() === searchQuery.toUpperCase()) {
+    alert("Starting point and destination must be different");
+    return;
+  }
   if (startingPointQuery && searchQuery) {
     Keyboard.dismiss();
     setShowSearch(false);
