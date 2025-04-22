@@ -2179,47 +2179,53 @@ return (
       </View>
     )}
     {(() => {
-      const { location } = useContext(LocationContext);
-      
-      const distance = useMemo(() => {
-        if (!location?.coords) return null;
-        return calculateDistance(
-          location.coords.latitude,
-          location.coords.longitude,
-          33.1096996205575,
-          -96.66076983204718
-        );
-      }, [location]);
-    
-      // Check if email matches rishi.nigam@student.allenisd.org (case-insensitive)
-      const isRishiEmail = typeof email === "string" && email.trim().toUpperCase() === "RISHI.NIGAM@STUDENT.ALLENISD.ORG";
-      
-      if (distance === null || distance > 10000000) {
-        return (
-          <View style={styles.distanceOverlay}>
-            <Text style={styles.distanceOverlayText}>
-              Please enable location services in settings and reopen the app.
-            </Text>
-          </View>
-        );
-      }
-    
-      // Use different distance threshold based on email
-      const distanceThreshold = isRishiEmail ? 10000000000000 : 1000;
-    
-      if (distance > distanceThreshold) {
-        return (
-          <View style={styles.distanceOverlay}>
-            <Text style={styles.distanceOverlayText}>
-              Please move closer to the building to use this feature.
-              {'\n'}You are {Math.round(distance / 1609)} miles away.
-            </Text>
-          </View>
-        );
-      }
-    
-      return null;
-    })()}
+  const { location } = useContext(LocationContext);
+
+  const distance = useMemo(() => {
+    if (!location?.coords) return null;
+    return calculateDistance(
+      location.coords.latitude,
+      location.coords.longitude,
+      33.1096996205575,
+      -96.66076983204718
+    );
+  }, [location]);
+
+  // Normalize and check email against privileged list
+  const normalizedEmail = typeof email === "string" ? email.trim().toUpperCase() : "";
+  const privilegedEmails = [
+    "RISHI.NIGAM@STUDENT.ALLENISD.ORG",
+    "ANISH.CHOUDHURY@STUDENT.ALLENISD.ORG",
+    "JAYADEEP.VELAGAPUDI@STUDENT.ALLENISD.ORG"
+  ];
+  const isPrivilegedEmail = privilegedEmails.includes(normalizedEmail);
+
+  if (distance === null || distance > 10000000) {
+    return (
+      <View style={styles.distanceOverlay}>
+        <Text style={styles.distanceOverlayText}>
+          Please enable location services in settings and reopen the app.
+        </Text>
+      </View>
+    );
+  }
+
+  const distanceThreshold = isPrivilegedEmail ? 10000000000000 : 1000;
+
+  if (distance > distanceThreshold) {
+    return (
+      <View style={styles.distanceOverlay}>
+        <Text style={styles.distanceOverlayText}>
+          Please move closer to the building to use this feature.
+          {'\n'}You are {Math.round(distance / 1609)} miles away.
+        </Text>
+      </View>
+    );
+  }
+
+  return null;
+})()}
+
 
       {/* {showHistory && (
         <View style={styles.historyContainer}>
