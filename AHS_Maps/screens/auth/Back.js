@@ -55,7 +55,9 @@ export default function Back({ navigation }) {
 
       switch (error.code) {
         case 'auth/invalid-credential':
-        case 'auth/user-not-found': // In case older SDK or specific case returns this
+          Alert.alert("Error", "Incorrect password. Please try again.");
+          break;
+        case 'auth/user-not-found':
           Alert.alert("Error", "No user found with this email.");
           break;
         case 'auth/wrong-password':

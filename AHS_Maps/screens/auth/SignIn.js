@@ -152,20 +152,22 @@ export default function SignIn({ navigation }) {
 
     } catch (error) {
       switch (error.code) {
-        case 'auth/invalid-credential':
-        case 'auth/user-not-found': // In case older SDK or specific case returns this
-          Alert.alert("Error", "No user found with this email.");
-          break;
-        case 'auth/wrong-password':
-          Alert.alert("Error", "Incorrect password. Please try again.");
-          break;
-        case 'auth/invalid-email':
-          Alert.alert("Error", "The email address is badly formatted.");
-          break;
-        default:
-          Alert.alert('Error', error.message);
-          break;
-      }
+              case 'auth/invalid-credential':
+                Alert.alert("Error", "Incorrect password. Please try again.");
+                break;
+              case 'auth/user-not-found':
+                Alert.alert("Error", "No user found with this email.");
+                break;
+              case 'auth/wrong-password':
+                Alert.alert("Error", "Incorrect password. Please try again.");
+                break;
+              case 'auth/invalid-email':
+                Alert.alert("Error", "The email address is badly formatted.");
+                break;
+              default:
+                Alert.alert('Error', error.message);
+                break;
+            }
       
       setLoading(false);
     }
