@@ -143,6 +143,19 @@ export const styles = StyleSheet.create({
     fontSize: 4 * width,
     fontWeight: 'bold',
   },
+  input: {
+    width: '100%',
+    marginVertical: 10,
+    backgroundColor: '#F8F8F8',
+    borderRadius: 8,
+    paddingHorizontal: 15,
+    paddingVertical: 12,
+  },
+  
+  textInput: {
+    fontSize: 16,
+    letterSpacing: 4, // Makes PIN digits more readable
+  },
   checkboxLabel: {
     fontSize: 4 * width,
     flex: 1,
