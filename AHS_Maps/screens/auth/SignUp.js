@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { 
   View, 
   Pressable, 
@@ -10,12 +10,12 @@ import {
   ScrollView, 
   TouchableOpacity,
   SafeAreaView,
-  TextInput
+  TextInput,
+  TouchableWithoutFeedback,
+  Keyboard
 } from 'react-native';
 import { styles } from '../../styles/light/SignUpLight';
 import WavyHeader from '../../components/headers/WavyHeader';
-import EmailInput from '../../components/inputs/Email';
-import PasswordInput from '../../components/inputs/Password';
 import Loader from '../../components/Loader';
 import { createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
 import { getFirestore, collection, addDoc, doc, setDoc } from 'firebase/firestore';
@@ -32,6 +32,7 @@ export default function SignUp({ navigation }) {
   const [loading, setLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [ppAccept, setPPAccept] = useState(false);
+  const scrollViewRef = useRef(null);
 
   const validateInputs = (email, password, confirm, pin) => {
     if (email === '' || password === '' || confirm === '' || pin === '') {
@@ -130,47 +131,100 @@ export default function SignUp({ navigation }) {
       }
     }
   };
-
+  
   return (
     <View style={styles.fullScreen}>
-      <WavyHeader customHeight={20} customTop={15} customImageDimensions={25} />
+      <WavyHeader customHeight={19} customTop={11} customImageDimensions={25} />
       <View style={styles.container}>
-        <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }} keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0}>
-          <Text style={styles.title}> Sign Up </Text>
-          {loading ? (
-            <View style={{ marginTop: 100 }}><Loader /></View>
-          ) : (
-            <View>
-              <EmailInput email={email} onEmailChange={setEmail} />
-              <PasswordInput password={password} onPasswordChange={setPassword} />
-              <PasswordInput password={confirm} onPasswordChange={setConfirm} placeholderText="Confirm Password" />
-              
-              {/* PIN Input Field */}
-              <View style={styles.input}>
-                <TextInput
-                  placeholder="Enter 4-digit PIN code"
-                  value={pin}
-                  onChangeText={setPin}
-                  keyboardType="numeric"
-                  secureTextEntry={true}
-                  maxLength={4}
-                  style={styles.textInput}
-                />
+        <KeyboardAvoidingView 
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
+          style={{ flex: 1, width: '100%' }} 
+          keyboardVerticalOffset={Platform.OS === 'ios' ? 120 : 20}
+        >
+          <ScrollView 
+            ref={scrollViewRef}
+            contentContainerStyle={styles.scrollViewContent}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+          >
+            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+              <View>
+                <Text style={styles.title}> Sign Up </Text>
               </View>
-              
-              <Pressable style={styles.button} onPress={showPrivacyPolicy}>
-                <Text style={styles.buttonText}>Sign Up</Text>
-              </Pressable>
-              <Pressable style={styles.signInButton} onPress={() => navigation.navigate('SignIn')}>
-                <Text style={styles.signInText}>Already Have An Account? </Text>
-                <Text style={styles.signIn}>Sign In</Text>
-              </Pressable>
-            </View>
-          )}
+            </TouchableWithoutFeedback>
+            
+            {loading ? (
+              <View style={{ marginTop: 100 }}><Loader /></View>
+            ) : (
+              <View style={styles.formContainer}>
+                {/* Input fields */}
+                <View style={styles.standardInput}>
+                  <TextInput
+                    placeholder="Email"
+                    value={email}
+                    onChangeText={setEmail}
+                    style={styles.standardTextInput}
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                  />
+                </View>
+                
+                <View style={styles.standardInput}>
+                  <TextInput
+                    placeholder="Password"
+                    value={password}
+                    onChangeText={setPassword}
+                    secureTextEntry={true}
+                    style={styles.standardTextInput}
+                  />
+                </View>
+                
+                <View style={styles.standardInput}>
+                  <TextInput
+                    placeholder="Confirm Password"
+                    value={confirm}
+                    onChangeText={setConfirm}
+                    secureTextEntry={true}
+                    style={styles.standardTextInput}
+                  />
+                </View>
+                
+                {/* PIN input - fix to match other inputs */}
+                <View style={styles.standardInput}>
+                  <TextInput
+                    placeholder="Enter 4-digit PIN code"
+                    value={pin}
+                    onChangeText={setPin}
+                    keyboardType="numeric"
+                    secureTextEntry={true}
+                    maxLength={4}
+                    style={styles.standardTextInput}
+                    onFocus={() => {
+                      setTimeout(() => {
+                        scrollViewRef.current?.scrollToEnd({ animated: true });
+                      }, 100);
+                    }}
+                  />
+                </View>
+                
+                <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                  <View>
+                    <Pressable style={styles.button} onPress={showPrivacyPolicy}>
+                      <Text style={styles.buttonText}>Sign Up</Text>
+                    </Pressable>
+                    <Pressable style={styles.signInButton} onPress={() => navigation.navigate('SignIn')}>
+                      <Text style={styles.signInText}>Already Have An Account? </Text>
+                      <Text style={styles.signIn}>Sign In</Text>
+                    </Pressable>
+                  </View>
+                </TouchableWithoutFeedback>
+              </View>
+            )}
+          </ScrollView>
         </KeyboardAvoidingView>
       </View>
       
-      {/* Privacy Policy Modal remains unchanged */}
+      {/* Privacy Policy Modal */}
       <Modal 
         animationType="slide" 
         transparent={true} 
@@ -186,7 +240,6 @@ export default function SignUp({ navigation }) {
               contentContainerStyle={styles.policyContent}
               showsVerticalScrollIndicator={true}
             >
-              {/* Privacy policy content unchanged */}
               <Text style={styles.scrollText}>Privacy Policy for Edupath</Text>
               <Text style={styles.scrollText2}>Effective Date: 7/31/2024</Text>
               <Text style={styles.scrollText}>1. Introduction</Text>
