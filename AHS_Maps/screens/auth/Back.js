@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Pressable, Alert, KeyboardAvoidingView, Platform } from 'react-native';
-import * as FileSystem from 'expo-file-system';
+import { View, Text, Pressable, Alert } from 'react-native';
+import * as SecureStore from 'expo-secure-store';
 import * as LocalAuthentication from 'expo-local-authentication';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 
@@ -11,102 +11,129 @@ import PasswordInput from '../../components/inputs/Password';
 
 import { styles } from '../../styles/light/BackLight'
 
+// Keys for secure storage
+const EMAIL_KEY = 'user_email';
+const NAME_KEY = 'user_name';
+const PASSWORD_KEY = 'user_password';
+
 export default function Back({ navigation }) {
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const [password, setPassword] = useState('');
-  const [pin, setPin] = useState('');
-  const [userPin, setUserPin] = useState('');
   const [loading, setLoading] = useState(true);
-  const [usePin, setUsePin] = useState(false);
+  const [usePassword, setUsePassword] = useState(false);
   const [biometricsAvailable, setBiometricsAvailable] = useState(false);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   useEffect(() => {
     const loadUserInfo = async () => {
       try {
-        // Load user email and name
-        const fileUri = FileSystem.documentDirectory + 'userInfo.txt';
-        const fileContents = await FileSystem.readAsStringAsync(fileUri, { encoding: FileSystem.EncodingType.UTF8 });
-        const [savedEmail, savedName] = fileContents.split('\n');
+        // Read from your existing FileSystem first to migrate data
+        try {
+          const FileSystem = require('expo-file-system');
+          const fileUri = FileSystem.documentDirectory + 'userInfo.txt';
+          const fileExists = await FileSystem.getInfoAsync(fileUri);
+          
+          if (fileExists.exists) {
+            const fileContents = await FileSystem.readAsStringAsync(fileUri, { encoding: FileSystem.EncodingType.UTF8 });
+            const [savedEmail, savedName] = fileContents.split('\n');
+            
+            if (savedEmail && savedName) {
+              // Store in SecureStore for future use
+              await SecureStore.setItemAsync(EMAIL_KEY, savedEmail);
+              await SecureStore.setItemAsync(NAME_KEY, savedName);
+              
+              setEmail(savedEmail);
+              setName(savedName);
+            }
+          }
+        } catch (fsError) {
+          console.log('No file system data to migrate:', fsError);
+        }
+
+        // Now try to load from SecureStore
+        const savedEmail = await SecureStore.getItemAsync(EMAIL_KEY);
+        const savedName = await SecureStore.getItemAsync(NAME_KEY);
         
-        setEmail(savedEmail);
-        setName(savedName);
-
-        // Load user PIN
-        const pinFileUri = FileSystem.documentDirectory + 'userPin.txt';
-        const savedPin = await FileSystem.readAsStringAsync(pinFileUri, { encoding: FileSystem.EncodingType.UTF8 });
-        setUserPin(savedPin);
-
-        // Check biometric availability
-        const compatible = await LocalAuthentication.hasHardwareAsync();
-        const enrolled = await LocalAuthentication.isEnrolledAsync();
-        setBiometricsAvailable(compatible && enrolled);
-
-        // If biometrics are available, attempt authentication immediately
-        if (compatible && enrolled) {
-          authenticateWithBiometrics();
+        if (savedEmail && savedName) {
+          setEmail(savedEmail);
+          setName(savedName);
+          
+          // Check biometric availability
+          const compatible = await LocalAuthentication.hasHardwareAsync();
+          const enrolled = await LocalAuthentication.isEnrolledAsync();
+          setBiometricsAvailable(compatible && enrolled);
+          
+          // Check if we have a stored password for biometric auth
+          const hasStoredPassword = await SecureStore.getItemAsync(PASSWORD_KEY) !== null;
+          
+          // If biometrics are available and password exists, attempt authentication immediately
+          if (compatible && enrolled && hasStoredPassword) {
+            authenticateWithBiometrics();
+          } else {
+            // Otherwise use password
+            setUsePassword(true);
+          }
         } else {
-          // If biometrics aren't available, use PIN instead
-          setUsePin(true);
+          // If no saved credentials, redirect to sign in
+          // But only on initial load to prevent loops
+          if (isInitialLoad) {
+            navigation.replace("SignIn");
+          }
         }
       } catch (error) {
         console.error('Error loading user info:', error);
-        setUsePin(true); // Fallback to PIN if there's an error
+        setUsePassword(true); // Fallback to password if there's an error
       } finally {
         setLoading(false);
+        setIsInitialLoad(false);
       }
     };
 
     loadUserInfo();
-  }, []);
+  }, [isInitialLoad, navigation]);
 
   const authenticateWithBiometrics = async () => {
     try {
       const result = await LocalAuthentication.authenticateAsync({
         promptMessage: 'Authenticate to access your account',
-        cancelLabel: 'Use PIN instead',
-        fallbackLabel: 'Use PIN',
+        cancelLabel: 'Use Password instead',
+        fallbackLabel: 'Use Password',
         disableDeviceFallback: false,
       });
 
       if (result.success) {
         // Biometric authentication successful
-        handleSignInAfterAuth();
+        handleSignInAfterBiometricAuth();
       } else {
         // Biometric authentication failed or was canceled
-        setUsePin(true);
+        setUsePassword(true);
       }
     } catch (error) {
       console.error('Biometric auth error:', error);
-      setUsePin(true); // Fall back to PIN
+      setUsePassword(true); // Fall back to password
     }
   };
 
-  const handlePinAuth = () => {
-    if (pin === userPin) {
-      handleSignInAfterAuth();
-    } else {
-      Alert.alert("Error", "Incorrect PIN. Please try again.");
-      setPin('');
-    }
-  };
-
-  const handleSignInAfterAuth = async () => {
+  const handleSignInAfterBiometricAuth = async () => {
     try {
       setLoading(true);
       
-      // Only perform Firebase authentication if we need the password
-      if (password !== '') {
-        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      // Retrieve the stored password from secure storage
+      const storedPassword = await SecureStore.getItemAsync(PASSWORD_KEY);
+      
+      if (storedPassword) {
+        // Use retrieved credentials with Firebase authentication
+        const userCredential = await signInWithEmailAndPassword(auth, email, storedPassword);
         const user = userCredential.user;
+        
         navigation.navigate("BottomTab", { userId: user.uid });
       } else {
-        // Use local auth instead
-        navigation.navigate("BottomTab", { userId: auth.currentUser?.uid });
+        // If somehow we don't have a stored password, fall back to manual password entry
+        setUsePassword(true);
+        Alert.alert("Info", "Please enter your password to continue");
       }
-
-      setPassword('');
-      setPin('');
+      
       setLoading(false);
     } catch (error) {
       setLoading(false);
@@ -124,6 +151,11 @@ export default function Back({ navigation }) {
       setLoading(true);
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
+
+      // After successful login, store the password securely for future biometric auth
+      await SecureStore.setItemAsync(EMAIL_KEY, email);
+      await SecureStore.setItemAsync(NAME_KEY, name);
+      await SecureStore.setItemAsync(PASSWORD_KEY, password);
 
       setPassword('');
       setLoading(false);
@@ -156,26 +188,33 @@ export default function Back({ navigation }) {
 
   async function wipeUserInfo() {
     try {
-      const fileUri = FileSystem.documentDirectory + 'userInfo.txt';
-      await FileSystem.writeAsStringAsync(fileUri, '', { encoding: FileSystem.EncodingType.UTF8 });
+      // Clear secure storage
+      await SecureStore.deleteItemAsync(EMAIL_KEY);
+      await SecureStore.deleteItemAsync(NAME_KEY);
+      await SecureStore.deleteItemAsync(PASSWORD_KEY);
       
-      // Also clear the PIN
-      const pinFileUri = FileSystem.documentDirectory + 'userPin.txt';
-      await FileSystem.writeAsStringAsync(pinFileUri, '', { encoding: FileSystem.EncodingType.UTF8 });
+      // Also clear any legacy filesystem storage
+      try {
+        const FileSystem = require('expo-file-system');
+        const fileUri = FileSystem.documentDirectory + 'userInfo.txt';
+        await FileSystem.writeAsStringAsync(fileUri, '', { encoding: FileSystem.EncodingType.UTF8 });
+      } catch (fsError) {
+        console.log('Error clearing file storage:', fsError);
+      }
       
-      navigation.navigate("SignIn");
+      navigation.replace("SignIn");
     } catch (error) {
       console.error('Error wiping user info:', error);
     }
   }
 
   async function switchAuth() {
-    if (usePin && biometricsAvailable) {
-      // Switch from PIN to biometrics
+    if (usePassword && biometricsAvailable) {
+      // Switch from password to biometrics
       authenticateWithBiometrics();
     } else {
-      // Switch to PIN or show message if already using PIN
-      setUsePin(true);
+      // Switch to password or show message if already using password
+      setUsePassword(true);
     }
   }
 
@@ -190,41 +229,23 @@ export default function Back({ navigation }) {
       <View style={styles.container}>
         <Text style={styles.bigText}>Hello, {name}</Text>
 
-        {usePin ? (
-          // PIN authentication UI
-          <View style={styles.input}>
-            <TextInput
-              placeholder="Enter your 4-digit PIN"
-              value={pin}
-              onChangeText={setPin}
-              keyboardType="numeric"
-              secureTextEntry={true}
-              maxLength={4}
-              style={styles.textInput}
-            />
-          </View>
-        ) : (
-          // Password input is rendered when not using PIN
+        {usePassword ? (
+          // Password input when necessary
           <PasswordInput password={password} onPasswordChange={setPassword} style={styles.input} />
-        )}
+        ) : null}
 
-        {usePin ? (
-          // PIN login button
-          <Pressable onPress={handlePinAuth} style={styles.button}>
-            <Text style={styles.buttonText}>Verify PIN</Text>
-          </Pressable>
-        ) : (
-          // Regular login button
+        {usePassword ? (
+          // Password login button
           <Pressable onPress={handleSignIn} style={styles.button}>
             <Text style={styles.buttonText}>Log In</Text>
           </Pressable>
-        )}
+        ) : null}
 
         {/* Button to switch between auth methods */}
         {biometricsAvailable && (
           <Pressable onPress={switchAuth} style={styles.switchAuthButton}>
             <Text style={styles.switchAuthText}>
-              {usePin ? "Use Biometrics Instead" : "Use PIN Instead"}
+              {usePassword ? "Use Biometrics Instead" : "Use Password Instead"}
             </Text>
           </Pressable>
         )}
