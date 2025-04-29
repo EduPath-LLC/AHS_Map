@@ -10,6 +10,7 @@ import { useRoute } from '@react-navigation/native';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { ScrollView } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function About({ navigation }) {
   const [darkMode, setDarkMode] = useState(false);
@@ -40,13 +41,11 @@ export default function About({ navigation }) {
         darkMode={darkMode}
       />
       <View style={styles.container}>
-        <Pressable style={styles.buttonNew} onPress={() => navigation.navigate("Settings", { userId })}>
-          <Image
-            source={ArrowBack}
-            style={styles.imageArrowStyle}
-          />
-          <Text style={styles.buttonNewText}>Back</Text>
+      <Pressable style={styles.backButton} onPress={() => navigation.goBack()}>
+          <Ionicons name="arrow-back" size={30} color="black" />
+          <Text style={styles.backButtonText}>Back</Text>
         </Pressable>
+
         <Text style={styles.bigText}> Privacy Policy </Text>
         <ScrollView style={styles.scrollStyle}>
             <Text style={styles.scrollText}>Privacy Policy for Edupath</Text>

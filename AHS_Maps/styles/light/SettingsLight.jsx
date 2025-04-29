@@ -1,109 +1,54 @@
-import React from 'react'
-import { StyleSheet, Dimensions } from 'react-native'
+import { StyleSheet, Dimensions, Platform } from 'react-native'
 
-// Get 1% of the width and height
 const width = Dimensions.get('window').width * 0.01;
 const height = Dimensions.get('window').height * 0.01;
-
 
 export const stylesLight = StyleSheet.create({
     fullScreen: {
         flex: 1,
+        backgroundColor: '#E0EDFC',
     },
     container: {
         flex: 1,
-        flexDirection: 'column',
-        alignItems: 'center',
-        paddingTop: 10 * height,
-        backgroundColor: "#E0EDFC",
-        marginTop: 15 * height
+        paddingTop: 25 * height,
+        paddingHorizontal: 5 * width,
     },
     bigText: {
-        fontSize: 10 * width,
-        alignItems: 'center',
-        textAlign: 'left',
+        fontSize: 8 * width,
         fontFamily: 'Kanit-Bold',
-    },
-    firstNameTextInput: {
-        width: 80 * width,
-        height: 7 * height,
-        padding: 3 * width,
-        borderRadius: 2 * width,
-        backgroundColor: "#FFFFFF",
-        margin: 2 * height,
-        placeholder: "First Name"
-    },
-    toggleSwitch: {
-        alignSelf: 'flex-end',
-        marginLeft: 40 * width,
-        marginBottom: 2 * width,
-        
-    },
-    normalText: {
-        fontSize: 5 * width,
-        alignSelf: 'flex-start',
-        textAlign: 'left',
-        fontFamily: 'Kanit-Bold',
-        // marginRight: 40 * width,
-        marginBottom: 2 * width,
-    },
-    button: {
-        borderRadius: 9999,
-        backgroundColor: '#007AFF',
-        width: 50 * width,
-        height: 5 * height,
-        justifyContent: 'center',
-        alignItems: 'center',
-        alignContent: 'center',
-        marginTop: 2 * width,
-        marginBottom: 2 * width
+        marginBottom: 4 * height,
+        color: '#000',
     },
     buttonNew: {
         flexDirection: 'row',
-        width: 80 * width,
-        height: 7 * height,
-        justifyContent: 'space-around',
         alignItems: 'center',
-        alignContent: 'center',
-        borderBottomColor: 'gray',
-        borderBottomWidth: 1,
-        padding: width,
-    },
-    buttonText: {
-        color: '#FFFFFF',
-        width: 50 * width,
-        alignSelf: 'center',
-        fontSize: 5 * width,
-        fontFamily: 'Kanit-Bold',
-        alignContent: 'center',
-        textAlign: 'center',
+        backgroundColor: '#FFFFFF',
+        borderRadius: 3 * width,
+        paddingVertical: 2 * height,
+        paddingHorizontal: 4 * width,
+        marginBottom: 3 * height,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: Platform.OS === 'android' ? 3 : 0,
     },
     buttonNewText: {
-        color: '#000000',
-        width: 60 * width,
-        alignSelf: 'flex-end',
+        flex: 1,
         fontSize: 5 * width,
         fontFamily: 'Kanit-Bold',
-        alignContent: 'flex-start',
-        textAlign: 'flex-start',
-        marginLeft: width,
+        marginLeft: 4 * width,
+        color: '#333333',
     },
     imageStyle: {
-        width: 7.5 * width,
-        height: 7.5 * width,
-        alignSelf: 'flex-end',
-        justifyContent: 'center',
-        alignItems: 'left',
-        alignContent: 'flex-start',
-        alignSelf: 'flex-end',
+        width: 8 * width,
+        height: 8 * width,
+        resizeMode: 'contain',
     },
     imageArrowStyle: {
-        width: 5 * width,
-        height: 7.5 * width,
-        alignSelf: 'flex-end',
-        justifyContent: 'center',
-        alignItems: 'left',
-        alignContent: 'flex-start',
-        alignSelf: 'flex-end',
-    }
-})
+        width: 4 * width,
+        height: 4 * width,
+        resizeMode: 'contain',
+        tintColor: '#999',
+    },
+});
