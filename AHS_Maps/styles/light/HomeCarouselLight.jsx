@@ -34,15 +34,15 @@ export const stylesLight = StyleSheet.create({
         color: '#FFFFFF',
     },
     modalBackground: {
-        flex: 1,
         alignItems: "center",
         backgroundColor: "rgba(255, 255, 255, 1)",
         position: "absolute",
-        top: 50,
-        left: 75,
-        right: 75,
-        bottom: 100,
+        top: 50, // Adjusted to reduce space
+        left: 75, // Adjusted to reduce space
+        right: 75, // Adjusted to reduce space
+        bottom: 'auto', // Removed fixed bottom space
         borderRadius: 25,
+        padding: 20,
     },
     classHeading: {
         fontSize: 23,

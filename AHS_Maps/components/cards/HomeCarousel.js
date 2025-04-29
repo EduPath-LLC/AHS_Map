@@ -36,6 +36,7 @@ export default class HomeCarousel extends Component {
             ab: "",
             school: false,
             previousRoom: "",
+            badBuilding: false,
         };
     }
 
@@ -285,6 +286,11 @@ export default class HomeCarousel extends Component {
             const prevRoom = scheduleMap[this.state.current-1].roomNumber;
             this.setState({previousRoom: prevRoom});
         }
+
+
+        if(scheduleMap[this.state.current].building !== "Allen High School" || scheduleMap[this.state.current].building !== "Allen High School") {
+            this.setState({badBuilding: true})
+        }
     }
 
     render() {
@@ -298,71 +304,82 @@ export default class HomeCarousel extends Component {
     
         return (
             <View>
-                <View style={this.state.styles.viewer}>
+            <View style={this.state.styles.viewer}>
+                <Pressable 
+                onPress={this.decrease}
+                style={this.state.styles.arrows}
+                >
+                <Image 
+                    style={this.state.styles.image}
+                    source={this.state.arrowBack}
+                />
+                </Pressable>
+        
+                <PanGestureHandler onHandlerStateChange={this.handleSwipe}>
+                <View>
+                    {this.renderCarousel(this.state.current)}
+                </View>
+                </PanGestureHandler>
+        
+                <Pressable 
+                onPress={this.increase}
+                style={this.state.styles.arrows}
+                >
+                <Image 
+                    style={this.state.styles.image}
+                    source={this.state.arrowForward}
+                />
+                </Pressable>
+            </View>
+        
+            <Pressable 
+                style={this.state.styles.button}
+                onPress={this.handleGoToClass}
+            >
+                <Text style={this.state.styles.buttonText}> Go To Class </Text>
+            </Pressable>
+        
+            {this.state.goToClass ? 
+                this.state.badBuilding ? 
+                <View style={this.state.styles.modalBackground}>
+                    <Text style={this.state.styles.classHeading}> Building not supported yet </Text>
+
                     <Pressable 
-                        onPress={this.decrease}
-                        style={this.state.styles.arrows}
+                    style={this.state.styles.buttonCancel}
+                    onPress={() => {this.setState({goToClass: false, badBuilding: false})}}
                     >
-                        <Image 
-                            style={this.state.styles.image}
-                            source={this.state.arrowBack}
-                        />
-                    </Pressable>
-    
-                    <PanGestureHandler onHandlerStateChange={this.handleSwipe}>
-                        <View>
-                            {this.renderCarousel(this.state.current)}
-                        </View>
-                    </PanGestureHandler>
-    
-                    <Pressable 
-                        onPress={this.increase}
-                        style={this.state.styles.arrows}
-                    >
-                        <Image 
-                            style={this.state.styles.image}
-                            source={this.state.arrowForward}
-                        />
+                    <Text style={this.state.styles.buttonText}> Cancel </Text>
                     </Pressable>
                 </View>
-    
-                <Pressable 
-                    style={this.state.styles.button}
-                    onPress={this.handleGoToClass}
-                >
-                    <Text style={this.state.styles.buttonText}> Go To Class </Text>
-                </Pressable>
-    
-                {this.state.goToClass ? 
-                    <View style={this.state.styles.modalBackground}>
-                        <Text style={this.state.styles.classHeading}> Go To Class </Text>
-                        <View style={this.state.styles.inputClass}>
-                            <Text style={this.state.styles.from}> From: </Text>
-                            <TextInput
-                                style={this.state.styles.classInput}
-                                placeholder="Class"
-                                value={this.state.previousRoom}
-                                onChangeText={(text) => this.setState({ previousRoom: text })}
-                                />
-
-                        </View>
-                        <Pressable 
-                            style={this.state.styles.button}
-                            onPress={this.handleSubmit}
-                        >
-                            <Text style={this.state.styles.buttonText}> Go </Text>
-                        </Pressable>
-                        <Pressable 
-                            style={this.state.styles.buttonCancel}
-                            onPress={() => {this.setState({goToClass: false})}}
-                        >
-                            <Text style={this.state.styles.buttonText}> Cancel </Text>
-                        </Pressable>
-                    </View> 
-                    : 
-                    <View>
+                :
+                <View style={this.state.styles.modalBackground}>
+                    <Text style={this.state.styles.classHeading}> Go To Class </Text>
+                    <View style={this.state.styles.inputClass}>
+                    <Text style={this.state.styles.from}> From: </Text>
+                    <TextInput
+                        style={this.state.styles.classInput}
+                        placeholder="Class"
+                        value={this.state.previousRoom}
+                        onChangeText={(text) => this.setState({ previousRoom: text })}
+                    />
                     </View>
-                }
+                    <Pressable 
+                    style={this.state.styles.button}
+                    onPress={this.handleSubmit}
+                    >
+                    <Text style={this.state.styles.buttonText}> Go </Text>
+                    </Pressable>
+                    <Pressable 
+                    style={this.state.styles.buttonCancel}
+                    onPress={() => {this.setState({goToClass: false})}}
+                    >
+                    <Text style={this.state.styles.buttonText}> Cancel </Text>
+                    </Pressable>
+                </View>
+                : 
+                <View>
+                </View>
+            }
             </View>
         );
     }
