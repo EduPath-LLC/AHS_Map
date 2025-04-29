@@ -460,6 +460,7 @@ const secondFloorCoordinates = [
   { latitude: 33.10910530688347819, longitude: -96.6604179614658392, reference: "BK10" },
   { latitude: 33.10909663514075163, longitude: -96.66043088055286603, reference: "S2_13" },
   { latitude:33.1090693138961214, longitude: -96.66047159259980504, reference: "GENTRANCE" },
+  { latitude: 33.10896515042408339, longitude: -96.66037592767513331, reference: 'KAKAKA' },
   { latitude: 33.10886097025895, longitude: -96.66028186102025, reference: 'S2_16' },
   { latitude: 33.1088687793279064, longitude: -96.6602704026850148, reference: 'LAKAK' },
   { latitude: 33.10890844171046, longitude: -96.66020960345315, reference: "HALLPT2" },
@@ -2075,10 +2076,21 @@ const animateCamera = useCallback((targetLocation, targetBearing) => {
     altitude: 1500,
   }, { duration: 1000 });
 }, []);
+
+
+const mapStyle = [
+  {
+    elementType: 'labels',
+    stylers: [{ visibility: 'off' }]
+  }
+];
+
+
 return (
   <View style={styles.container}>
     <MapView
       ref={mapRef}
+      customMapStyle={mapStyle}
       style={styles.map}
       initialCamera={{
         center: {
@@ -2092,7 +2104,7 @@ return (
       }}
       showsCompass={!isRouteActive}
       showsPointsOfInterest={false}
-      showsBuildings={true}
+      showsBuildings={false}
       showsIndoors={false}
     >
 {isRouteActive && (
@@ -2137,6 +2149,7 @@ return (
             latitude: routeSegments[currentSegmentIndex][0].latitude,
             longitude: routeSegments[currentSegmentIndex][0].longitude,
           }}
+          anchor={{ x: .3, y: .25 }}
         >
           <View style={styles.customMarker}>
             <View style={styles.markerInner} />

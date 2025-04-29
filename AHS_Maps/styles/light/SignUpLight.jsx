@@ -14,8 +14,18 @@ export const styles = StyleSheet.create({
     flexDirection: 'column',
     alignItems: 'center',
     backgroundColor: '#E0EDFC',
-    paddingTop: 10 * height,
+    paddingTop: 5 * height,
     marginTop: 20 * height
+  },
+  scrollViewContent: {
+    flexGrow: 1,
+    alignItems: 'center',
+    paddingBottom: 20 * height,
+    width: '100%'
+  },
+  formContainer: {
+    width: 85 * width,
+    alignItems: 'center',
   },
   button: {
     backgroundColor: '#574BE5',
@@ -25,6 +35,7 @@ export const styles = StyleSheet.create({
     margin: 2 * height,
     justifyContent: 'center',
     alignItems: 'center',
+    marginTop: 4 * height,
   },
   buttonText: {
     color: 'white',
@@ -56,6 +67,20 @@ export const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 4 * height,
     color: '#333',
+  },
+
+  // New standardized input styles
+  standardInput: {
+    width: 80 * width,
+    height: 7 * height,
+    backgroundColor: '#F8F8F8',
+    borderRadius: 2 * width,
+    paddingHorizontal: 4 * width,
+    marginVertical: 1.5 * height,
+    justifyContent: 'center',
+  },
+  standardTextInput: {
+    fontSize: 4.5 * width,
   },
 
   // Improved modal styles
@@ -142,6 +167,19 @@ export const styles = StyleSheet.create({
     color: 'white',
     fontSize: 4 * width,
     fontWeight: 'bold',
+  },
+  input: {
+    width: '100%',
+    marginVertical: 10,
+    backgroundColor: '#F8F8F8',
+    borderRadius: 8,
+    paddingHorizontal: 15,
+    paddingVertical: 12,
+  },
+  
+  textInput: {
+    fontSize: 16,
+    letterSpacing: 4, // Makes PIN digits more readable
   },
   checkboxLabel: {
     fontSize: 4 * width,
