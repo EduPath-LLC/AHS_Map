@@ -49,6 +49,7 @@ export const stylesLight = StyleSheet.create({
         paddingVertical: 2 * width,
         width: 35 * width,
         height: 10 * height,
+        zIndex: 10000
     },
     backButtonText: {
         fontSize: 5 * width,

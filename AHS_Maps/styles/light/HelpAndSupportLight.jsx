@@ -56,9 +56,10 @@ export const stylesLight = StyleSheet.create({
     alignItems: 'center',
     alignSelf: 'flex-start',
     paddingHorizontal: 5 * width,
-    paddingVertical: 2 * width,
+    paddingVertical: 2 * height,
     width: 35 * width,
     height: 10 * height,
+    zIndex: 10000
   },
   backButtonText: {
       fontSize: 5 * width,
