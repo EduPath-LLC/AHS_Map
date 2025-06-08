@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text, Pressable, Image, Alert } from 'react-native';
+import { View, Text, Pressable, Image, Alert, Switch } from 'react-native';
 import { getDocs, collection } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { PanGestureHandler, State, TextInput } from 'react-native-gesture-handler';
@@ -37,6 +37,7 @@ export default class HomeCarousel extends Component {
             school: false,
             previousRoom: "",
             badBuilding: false,
+            isADay: true, // New state to track A/B day toggle
         };
     }
 
@@ -293,17 +294,34 @@ export default class HomeCarousel extends Component {
         }
     }
 
+    toggleDay = () => {
+        this.setState((prevState) => ({
+            isADay: !prevState.isADay,
+            ab: prevState.isADay ? "B" : "A", // Update ab state accordingly
+        }));
+    };
+
     render() {
         if (!this.state.school) {
             return (
                 <View>
-                    <Text style={this.state.styles.noSchool}> Yay, Looks like there is not school today! </Text>
+                    <Text style={this.state.styles.noSchool}> Yay, Looks like there is no school today! </Text>
                 </View>
             );
         }
-    
+
         return (
             <View>
+            <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center'}}>
+                <Text style={{ marginHorizontal: 10, fontSize: 16, fontWeight: 'bold' }}>
+                {this.state.isADay ? "A Day" : "B Day"}
+                </Text>
+                <Switch
+                value={this.state.isADay}
+                onValueChange={this.toggleDay}
+                />
+            </View>
+
             <View style={this.state.styles.viewer}>
                 <Pressable 
                 onPress={this.decrease}
@@ -314,13 +332,13 @@ export default class HomeCarousel extends Component {
                     source={this.state.arrowBack}
                 />
                 </Pressable>
-        
+            
                 <PanGestureHandler onHandlerStateChange={this.handleSwipe}>
                 <View>
                     {this.renderCarousel(this.state.current)}
                 </View>
                 </PanGestureHandler>
-        
+            
                 <Pressable 
                 onPress={this.increase}
                 style={this.state.styles.arrows}
@@ -331,50 +349,50 @@ export default class HomeCarousel extends Component {
                 />
                 </Pressable>
             </View>
-        
+            
             <Pressable 
                 style={this.state.styles.button}
                 onPress={this.handleGoToClass}
             >
                 <Text style={this.state.styles.buttonText}> Go To Class </Text>
             </Pressable>
-        
+            
             {this.state.goToClass ? 
                 this.state.badBuilding ? 
                 <View style={this.state.styles.modalBackground}>
-                    <Text style={this.state.styles.classHeading}> Building not supported yet </Text>
+                <Text style={this.state.styles.classHeading}> Building not supported yet </Text>
 
-                    <Pressable 
+                <Pressable 
                     style={this.state.styles.buttonCancel}
                     onPress={() => {this.setState({goToClass: false, badBuilding: false})}}
-                    >
+                >
                     <Text style={this.state.styles.buttonText}> Cancel </Text>
-                    </Pressable>
+                </Pressable>
                 </View>
                 :
                 <View style={this.state.styles.modalBackground}>
-                    <Text style={this.state.styles.classHeading}> Go To Class </Text>
-                    <View style={this.state.styles.inputClass}>
+                <Text style={this.state.styles.classHeading}> Go To Class </Text>
+                <View style={this.state.styles.inputClass}>
                     <Text style={this.state.styles.from}> From: </Text>
                     <TextInput
-                        style={this.state.styles.classInput}
-                        placeholder="Class"
-                        value={this.state.previousRoom}
-                        onChangeText={(text) => this.setState({ previousRoom: text })}
+                    style={this.state.styles.classInput}
+                    placeholder="Class"
+                    value={this.state.previousRoom}
+                    onChangeText={(text) => this.setState({ previousRoom: text })}
                     />
-                    </View>
-                    <Pressable 
+                </View>
+                <Pressable 
                     style={this.state.styles.button}
                     onPress={this.handleSubmit}
-                    >
+                >
                     <Text style={this.state.styles.buttonText}> Go </Text>
-                    </Pressable>
-                    <Pressable 
+                </Pressable>
+                <Pressable 
                     style={this.state.styles.buttonCancel}
                     onPress={() => {this.setState({goToClass: false})}}
-                    >
+                >
                     <Text style={this.state.styles.buttonText}> Cancel </Text>
-                    </Pressable>
+                </Pressable>
                 </View>
                 : 
                 <View>
@@ -383,5 +401,4 @@ export default class HomeCarousel extends Component {
             </View>
         );
     }
-    
 }
