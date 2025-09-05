@@ -1,3 +1,3 @@
-# Map
+# Eagle Maps
 
-## Improving Navigation and Efficiency Inside School
+## Improving Navigation and Efficiency Inside Allen High School
