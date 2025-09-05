@@ -1,4 +1,4 @@
-# Eagle Maps
+# AHS Maps
 
 ## Improving Navigation and Efficiency Inside Allen High School
 
