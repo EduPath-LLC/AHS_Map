@@ -2,6 +2,8 @@
 
 **Improving Navigation and Efficiency Inside Allen High School**
 
+[Watch the demo video](https://drive.google.com/file/d/18OhC0-kpRXjwGhQV396cImN3pblTH5kd/view?usp=sharing)
+
 AHS Maps is a mobile campus navigation app designed to help students, staff, and visitors move efficiently inside Allen High School. The app provides accurate indoor directions using pathfinding algorithms instead of GPS.
 
 This project was developed by EduPath LLC in partnership with Allen High School.
